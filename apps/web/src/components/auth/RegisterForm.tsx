@@ -3,6 +3,9 @@ import { motion } from "framer-motion";
 import { User, Mail, UserCircle } from "lucide-react";
 import PasswordInput from "./PasswordInput";
 import { RegisterFormData, registerSchema } from "../../lib/validations/auth";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { register } from "../../services/auth.service";
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState<RegisterFormData>({
@@ -16,6 +19,8 @@ export default function RegisterForm() {
 
   const [errors, setErrors] = useState<Partial<Record<keyof RegisterFormData, string>>>({});
   const [isLoading, setIsLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,8 +40,34 @@ export default function RegisterForm() {
     }
 
     setIsLoading(true);
-    console.log("Form data:", result.data);
-    setTimeout(() => setIsLoading(false), 2000);
+    try {
+      await register({
+        username: result.data.username,
+        email: result.data.email,
+        firstName: result.data.firstName,
+        lastName: result.data.lastName,
+        password: result.data.password,        
+      });
+
+      toast.success("Cuenta creada exitosamente");
+      navigate("/");
+    } catch (error: any) {
+      const errorMsg = error?.error || "";
+      
+      if (errorMsg.includes("Username")) {
+        setErrors({ username: "Este usuario ya está en uso" });
+      } else if (errorMsg.includes("Email already")) {
+        setErrors({ email: "Este email ya está registrado" });
+      } else if (errorMsg.includes("Email address")) {
+        setErrors({ email: "Email inválido" });
+      } else if (errorMsg.includes("Password")) {
+        setErrors({ password: "Debe tener al menos 8 caracteres, una mayúscula y una minúscula" });
+      } else {
+        toast.error("Error al crear la cuenta. Intentá de nuevo.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
