@@ -1,8 +1,8 @@
 import { Controller, Get, Post, Body } from '@nestjs/common';
 import { UserService } from '../services/user.service';
-import { RegisterDTO, UserToDB } from '../dto/user.dto';
-import { registerValidator } from '../validators/user.validator'
-import { createUser } from 'src/database/crud/user.crud'
+import { RegisterDTO, UserToDB, LoginDTO, LoginResponse } from '../dto/user.dto';
+import { loginValidator, registerValidator } from '../validators/user.validator'
+import { createUser, getUserFromEmailOrUsername } from 'src/database/crud/user.crud'
 import { ERROR_CREATING_USER } from 'src/utils/user.utils';
 import bcrypt from "bcrypt";
 
@@ -11,7 +11,7 @@ export class UserController {
     constructor(private readonly userService: UserService) {}
     
     @Post('/register')
-    async register(@Body() registerData: RegisterDTO){
+    async register(@Body() registerData: RegisterDTO) {
         await registerValidator(registerData);
 
         const hashedPassword  = await bcrypt.hash(registerData.password, 10);
@@ -31,6 +31,23 @@ export class UserController {
         }
 
         return true;
+    }
+
+    @Post('/login')
+    async login(@Body() loginData: LoginDTO) {
+        await loginValidator(loginData);
+
+        const user = await getUserFromEmailOrUsername(loginData.email, loginData.username);
+
+        const accessToken: string = await this.userService.generateToken(
+            { // add parameters to include more info in the token.
+                username: user.username,
+            }
+        );
+
+        return new LoginResponse(
+            accessToken
+        );
     }
 }
         
