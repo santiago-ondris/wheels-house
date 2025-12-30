@@ -14,7 +14,7 @@ export class BaseUser {
     }
 }
 
-export class RegisterDto extends BaseUser {
+export class RegisterDTO extends BaseUser {
     password: string;
     constructor(username: string, email: string, firstName: string, lastName: string, password: string, 
                 picture: string = ""){

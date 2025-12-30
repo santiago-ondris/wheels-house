@@ -1,8 +1,8 @@
-import { RegisterDto } from "../dto/user.dto";
+import { RegisterDTO } from "../dto/user.dto";
 import { getUserFromEmail, getUserFromUsername } from "src/database/crud/user.crud";
 import * as userUtils from "../utils/user.utils";
 
-export async function registerValidator(userRegister: RegisterDto) {
+export async function registerValidator(userRegister: RegisterDTO) {
     if (!userUtils.validatePassword(userRegister.password)){
         throw userUtils.INVALID_PASSWORD_EXCEPTION;
     }

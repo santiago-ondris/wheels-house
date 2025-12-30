@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body } from '@nestjs/common';
 import { UserService } from '../services/user.service';
-import { RegisterDto, UserToDB } from '../dto/user.dto';
+import { RegisterDTO, UserToDB } from '../dto/user.dto';
 import { registerValidator } from '../validators/user.validator'
 import { createUser } from 'src/database/crud/user.crud'
 import { ERROR_CREATING_USER } from 'src/utils/user.utils';
@@ -11,7 +11,7 @@ export class UserController {
     constructor(private readonly userService: UserService) {}
     
     @Post('/register')
-    async register(@Body() registerData: RegisterDto){
+    async register(@Body() registerData: RegisterDTO){
         await registerValidator(registerData);
 
         const hashedPassword  = await bcrypt.hash(registerData.password, 10);
@@ -23,6 +23,7 @@ export class UserController {
 
         // TO DO: User verification.
 
+        // Inserts user into the db.
         const created = await createUser(newUser); 
 
         if (!created) {
