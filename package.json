@@ -8,6 +8,10 @@
     "lint": "turbo run lint"
   },
   "devDependencies": {
+    "drizzle-kit": "1.0.0-beta.6-4414a19",
     "turbo": "^2.5.0"
+  },
+  "dependencies": {
+    "drizzle-orm": "1.0.0-beta.6-4414a19"
   }
 }
