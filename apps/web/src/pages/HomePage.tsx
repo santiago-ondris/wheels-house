@@ -1,6 +1,9 @@
 import { motion } from "framer-motion";
 import { Car, Layers, Star, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import LoginModal from "../components/auth/LoginModal";
+import { useAuth } from "../contexts/AuthContext";
 
 const features = [
   {
@@ -36,6 +39,9 @@ const fadeInUp = {
 };
 
 export default function HomePage() {
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const { isAuthenticated } = useAuth();
+  
   return (
     <div className="flex flex-col">
       <section className="relative min-h-[80vh] flex items-center overflow-hidden">
@@ -62,16 +68,28 @@ export default function HomePage() {
             <p className="text-white/60 text-lg mt-6 max-w-md">
               Tu colección de Hot Wheels organizada, accesible desde cualquier lugar, con imágenes y grupos personalizados.
             </p>
+          {isAuthenticated ? (
             <Link
-              to="/login"
+              to="/collection"
+              className="inline-flex items-center gap-2 mt-8 px-6 py-3 bg-accent hover:bg-accent/80 text-white font-bold rounded-lg transition-colors"
+            >
+              Ir a mi colección
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          ) : (
+            <button
+              onClick={() => setIsLoginOpen(true)}
               className="inline-flex items-center gap-2 mt-8 px-6 py-3 bg-accent hover:bg-accent/80 text-white font-bold rounded-lg transition-colors"
             >
               Login
               <ArrowRight className="w-4 h-4" />
-            </Link>
+            </button>
+          )}
           </motion.div>
         </div>
       </section>
+
+      <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
 
       <section className="container mx-auto px-6 py-20">
         <motion.div
