@@ -3,9 +3,8 @@ import MainLayout from "./layouts/MainLayout";
 import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import CollectionPage from "./pages/CollectionPage";
-import { DetailMuseum } from "./pages/DetailMuseum";
 import RegisterPage from "./pages/RegisterPage";
-import ProtectedRoute from "./components/auth/ProtectedRoute";
+// import ProtectedRoute from "./components/auth/ProtectedRoute"; todo -> terminar las protected routes
 import AuthRequiredPage from "./pages/AuthRequiredPage";
 import CarDetailPage from "./pages/CarDetailPage";
 
@@ -20,11 +19,6 @@ export default function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/auth-required" element={<AuthRequiredPage />} />
           <Route path="/car" element={<CarDetailPage />} />
-          <Route path="/concept/trading-card" element={
-            <ProtectedRoute>
-              <DetailMuseum />
-            </ProtectedRoute>
-          } />
         </Route>
       </Routes>
     </BrowserRouter>
