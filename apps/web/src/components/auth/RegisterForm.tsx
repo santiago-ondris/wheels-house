@@ -1,0 +1,159 @@
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { User, Mail, UserCircle } from "lucide-react";
+import PasswordInput from "./PasswordInput";
+import { RegisterFormData, registerSchema } from "../../lib/validations/auth";
+
+export default function RegisterForm() {
+  const [formData, setFormData] = useState<RegisterFormData>({
+    username: "",
+    email: "",
+    firstName: "",
+    lastName: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const [errors, setErrors] = useState<Partial<Record<keyof RegisterFormData, string>>>({});
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrors({});
+
+    const result = registerSchema.safeParse(formData);
+
+    if (!result.success) {
+      const fieldErrors: Partial<Record<keyof RegisterFormData, string>> = {};
+      result.error.issues.forEach((err) => {
+        if (err.path[0]) {
+          fieldErrors[err.path[0] as keyof RegisterFormData] = err.message;
+        }
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+
+    setIsLoading(true);
+    console.log("Form data:", result.data);
+    setTimeout(() => setIsLoading(false), 2000);
+  };
+
+  return (
+    <motion.form
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      onSubmit={handleSubmit}
+      className="space-y-4"
+    >
+      <div>
+        <label htmlFor="username" className="block text-accent uppercase tracking-widest text-xs mb-2">
+          Usuario
+        </label>
+        <div className="relative">
+          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+          <input
+            id="username"
+            type="text"
+            placeholder="tu_usuario"
+            value={formData.username}
+            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+            className="w-full bg-input-bg pl-11 pr-4 py-3 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-accent"
+          />
+        </div>
+        {errors.username && <p className="text-danger text-xs mt-1 ml-1">{errors.username}</p>}
+      </div>
+
+      <div>
+        <label htmlFor="email" className="block text-accent uppercase tracking-widest text-xs mb-2">
+          Email
+        </label>
+        <div className="relative">
+          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+          <input
+            id="email"
+            type="email"
+            placeholder="tu@email.com"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            className="w-full bg-input-bg pl-11 pr-4 py-3 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-accent"
+          />
+        </div>
+        {errors.email && <p className="text-danger text-xs mt-1 ml-1">{errors.email}</p>}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="firstName" className="block text-accent uppercase tracking-widest text-xs mb-2">
+            Nombre
+          </label>
+          <div className="relative">
+            <UserCircle className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+            <input
+              id="firstName"
+              type="text"
+              placeholder="Juan"
+              value={formData.firstName}
+              onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+              className="w-full bg-input-bg pl-11 pr-4 py-3 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-accent"
+            />
+          </div>
+          {errors.firstName && <p className="text-danger text-xs mt-1 ml-1">{errors.firstName}</p>}
+        </div>
+
+        <div>
+          <label htmlFor="lastName" className="block text-accent uppercase tracking-widest text-xs mb-2">
+            Apellido
+          </label>
+          <div className="relative">
+            <UserCircle className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+            <input
+              id="lastName"
+              type="text"
+              placeholder="Pérez"
+              value={formData.lastName}
+              onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+              className="w-full bg-input-bg pl-11 pr-4 py-3 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-accent"
+            />
+          </div>
+          {errors.lastName && <p className="text-danger text-xs mt-1 ml-1">{errors.lastName}</p>}
+        </div>
+      </div>
+
+      <div>
+        <label htmlFor="password" className="block text-accent uppercase tracking-widest text-xs mb-2">
+          Contraseña
+        </label>
+        <PasswordInput
+          id="password"
+          placeholder="••••••••"
+          value={formData.password}
+          onChange={(value) => setFormData({ ...formData, password: value })}
+          error={errors.password}
+        />
+      </div>
+
+      <div>
+        <label htmlFor="confirmPassword" className="block text-accent uppercase tracking-widest text-xs mb-2">
+          Confirmar Contraseña
+        </label>
+        <PasswordInput
+          id="confirmPassword"
+          placeholder="••••••••"
+          value={formData.confirmPassword}
+          onChange={(value) => setFormData({ ...formData, confirmPassword: value })}
+          error={errors.confirmPassword}
+        />
+      </div>
+
+      <button
+        type="submit"
+        disabled={isLoading}
+        className="w-full mt-6 px-6 py-3 bg-primary hover:bg-primary/80 disabled:bg-primary/50 text-white font-bold rounded-xl transition-colors"
+      >
+        {isLoading ? "Creando cuenta..." : "Crear cuenta"}
+      </button>
+    </motion.form>
+  );
+}
