@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus  } from "@nestjs/common";
+import bcrypt from "bcrypt";
 
 export const isLower = (c: string) => c === c.toLowerCase() && c !== c.toUpperCase();
 export const isUpper = (c: string) => c === c.toUpperCase() && c !== c.toLowerCase();
@@ -43,6 +44,21 @@ export const ERROR_CREATING_USER = new HttpException(
     HttpStatus.INTERNAL_SERVER_ERROR
 );
 
+export const INEXISTENT_USER = new HttpException(
+    {
+        status: HttpStatus.UNAUTHORIZED,
+        error: 'Inexistent user.' 
+    },
+    HttpStatus.UNAUTHORIZED
+);
+
+export const INVALID_CREDENTIALS = new HttpException(
+    {
+        status: HttpStatus.UNAUTHORIZED,
+        error: 'Invalid credentials.' 
+    },
+    HttpStatus.UNAUTHORIZED
+);
 
 export function isValidEmail(email: string): boolean {
     const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -59,4 +75,8 @@ export function validatePassword(password: string): boolean {
     }
 
     return hasLower && hasUpper;
+}
+
+export async function verifyPassword(password: string, hashedPassword: string) {
+    return await bcrypt.compare(password, hashedPassword);
 }

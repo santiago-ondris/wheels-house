@@ -5,7 +5,7 @@ export class BaseUser {
     firstName: string;
     lastName: string;
 
-    constructor(username: string, email: string, firstName: string, lastName: string, picture: string = ""){
+    constructor(username: string, email: string, firstName: string, lastName: string, picture: string = "") {
         this.username = username;
         this.email = email;
         this.picture = picture;
@@ -16,8 +16,9 @@ export class BaseUser {
 
 export class RegisterDTO extends BaseUser {
     password: string;
-    constructor(username: string, email: string, firstName: string, lastName: string, password: string, 
-                picture: string = ""){
+
+    constructor(username: string, email: string, firstName: string, lastName: string, 
+                password: string, picture: string = "") {
         super(username, email, firstName, lastName, picture);
         this.password = password;
     }
@@ -25,9 +26,30 @@ export class RegisterDTO extends BaseUser {
 
 export class UserToDB extends BaseUser {
     hashedPassword: string;
+
     constructor(username: string, email: string, firstName: string, lastName: string, 
-                hashedPassword: string, picture: string = ""){
+                hashedPassword: string, picture: string = "") {
         super(username, email, firstName, lastName, picture);
         this.hashedPassword = hashedPassword;
+    }
+}
+
+export class LoginDTO {
+    username: string = "";
+    email: string = "";
+    password: string;
+
+    constructor(username: string, email: string, password: string) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+    }
+}
+
+export class LoginResponse {
+    authorization: string;
+
+    constructor(authorization: string) {
+        this.authorization = authorization;
     }
 }
