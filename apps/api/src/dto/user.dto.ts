@@ -35,10 +35,10 @@ export class UserToDB extends BaseUser {
 }
 
 export class LoginDTO {
-    usernameOrEmail: string = "";
+    usernameOrEmail: string;
     password: string;
 
-    constructor(usernameOrEmail: string, password: string) {
+    constructor(usernameOrEmail: string = "", password: string) {
         this.usernameOrEmail = usernameOrEmail;
         this.password = password;
     }
@@ -49,5 +49,13 @@ export class LoginResponse {
 
     constructor(authorization: string) {
         this.authorization = authorization;
+    }
+}
+
+export class TokenData {
+    username: string;
+
+    constructor(username: string) {
+        this.username = username;
     }
 }

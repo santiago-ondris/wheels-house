@@ -1,4 +1,3 @@
-// Schema de la base de datos - definir tablas aca
 import { serial, text, integer, date, boolean, unique, pgTable, timestamp } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user",{
@@ -23,7 +22,9 @@ export const collection = pgTable("collection",{
     description: text("description"),
     userId: integer("userId").references(() => user.userId).notNull(),
     picture: text("picture"),
-});
+}, (t) => [
+    unique().on(t.name, t.userId),
+]);
 
 
 export const group = pgTable("group",{
