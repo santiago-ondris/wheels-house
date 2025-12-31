@@ -1,5 +1,5 @@
 import { LoginDTO, RegisterDTO } from "../dto/user.dto";
-import { getUserFromEmail, getUserFromEmailOrUsername, getUserFromUsername } from "src/database/crud/user.crud";
+import { getUserFromEmail, getUserFromUsername, getUserFromUsernameOrEmail } from "src/database/crud/user.crud";
 import * as userUtils from "../utils/user.utils";
 
 export async function registerValidator(registerData: RegisterDTO) {
@@ -27,7 +27,7 @@ export async function registerValidator(registerData: RegisterDTO) {
 }
 
 export async function loginValidator(loginData: LoginDTO){
-    const user = await getUserFromEmailOrUsername(loginData.email, loginData.username);
+    const user = await getUserFromUsernameOrEmail(loginData.usernameOrEmail);
 
     if(!user) {
         throw userUtils.INEXISTENT_USER;

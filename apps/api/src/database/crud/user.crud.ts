@@ -24,7 +24,7 @@ export async function createUser(newUser: UserToDB) {
 // Read
 
 export async function getUserFromUsername(username: string) {
-    // Notice that select returns an array of objects (that's why we access the 0 idx.)
+    // Notice that the object is an array of length 1 (or 0).
     const userObject = await db.select().from(user).where(eq(user.username, username));
     // return await db.query.user.findFirst({
     //     where: (user, { eq }) => eq(user.username, username),
@@ -33,6 +33,7 @@ export async function getUserFromUsername(username: string) {
 }
 
 export async function getUserFromEmail(email: string) {
+    // Notice that the object is an array of length 1 (or 0).
     const userObject = await db.select().from(user).where(eq(user.email, email));
     // return await db.query.user.findFirst({
         //     where: (user, { eq }) => eq(user.email, email),
@@ -40,12 +41,12 @@ export async function getUserFromEmail(email: string) {
     return userObject[0];
 }
 
-export async function getUserFromEmailOrUsername(email: string, username: string) {
-    // Try by email. Notice that the object is an array of length 1 (or null).
-    const userFromEmailObject = await db.select().from(user).where(eq(user.email, email));
-    if(userFromEmailObject != null) return userFromEmailObject[0];
+export async function getUserFromUsernameOrEmail(usernameOrEmail: string) {
+    // Try by email. Notice that the object is an array of length 1 (or 0).
+    const userFromEmailObject = await db.select().from(user).where(eq(user.email, usernameOrEmail));
+    if(userFromEmailObject[0]) return userFromEmailObject[0];
 
     // Try by username.
-    const userFromUsernameObject = await db.select().from(user).where(eq(user.username,username));
+    const userFromUsernameObject = await db.select().from(user).where(eq(user.username, usernameOrEmail));
     return userFromUsernameObject[0];
 }
