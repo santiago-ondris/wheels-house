@@ -35,13 +35,11 @@ export class UserToDB extends BaseUser {
 }
 
 export class LoginDTO {
-    username: string = "";
-    email: string = "";
+    usernameOrEmail: string = "";
     password: string;
 
-    constructor(username: string, email: string, password: string) {
-        this.username = username;
-        this.email = email;
+    constructor(usernameOrEmail: string, password: string) {
+        this.usernameOrEmail = usernameOrEmail;
         this.password = password;
     }
 }
