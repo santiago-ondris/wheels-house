@@ -46,10 +46,10 @@ export const ERROR_CREATING_USER = new HttpException(
 
 export const INEXISTENT_USER = new HttpException(
     {
-        status: HttpStatus.UNAUTHORIZED,
+        status: HttpStatus.NOT_FOUND,
         error: 'Inexistent user.' 
     },
-    HttpStatus.UNAUTHORIZED
+    HttpStatus.NOT_FOUND
 );
 
 export const INVALID_CREDENTIALS = new HttpException(

@@ -1,4 +1,3 @@
-// Schema de la base de datos - definir tablas aca
 import { serial, text, integer, date, boolean, unique, pgTable, timestamp } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user",{
@@ -17,19 +16,19 @@ export const user = pgTable("user",{
 });
 
 
-export const collection = pgTable("collection",{
-    collectionId: serial("collectionId").primaryKey(),
-    name: text("name").notNull(),
-    description: text("description"),
-    userId: integer("userId").references(() => user.userId).notNull(),
-    picture: text("picture"),
-});
+// export const collection = pgTable("collection",{
+//     collectionId: serial("collectionId").primaryKey(),
+//     name: text("name").notNull(),
+//     description: text("description"),
+//     userId: integer("userId").references(() => user.userId).notNull(),
+//     picture: text("picture"),
+// });
 
 
 export const group = pgTable("group",{
     groupId: serial("groupId").primaryKey(),
     name: text("name").notNull(),
-    collectionId: integer("collectionId").references(() => collection.collectionId).notNull(),
+    userId: integer("userId").references(() => user.userId).notNull(),
     description: text("description"),
     picture: text("picture")
 });
@@ -37,9 +36,12 @@ export const group = pgTable("group",{
 
 export const car = pgTable("car",{
     carId: serial("carId").primaryKey(),
+    name: text("name").notNull(),
     color: text("color").notNull(),
     brand: text("brand").notNull(),
+    scale: text("scale").notNull(),
     manufacturer: text("manufacturer").notNull(),
+    userId: integer("userId").references(() => user.userId).notNull(),
     description: text("description"),
     designer: text("designer"),
     series: text("series"),
@@ -47,21 +49,22 @@ export const car = pgTable("car",{
 });
 
 
-export const carInCollection = pgTable("carInCollection",{
-    carInCollectionId: serial("carInCollectionId").primaryKey(),
-    carId: integer("carId").references(() => car.carId).notNull(),
-    collectionId: integer("collectionId").references(() => collection.collectionId).notNull(),
-}, (t) => [
-    unique().on(t.carId, t.collectionId)
-]);
+// export const carInCollection = pgTable("carInCollection",{
+//     carInCollectionId: serial("carInCollectionId").primaryKey(),
+//     carId: integer("carId").references(() => car.carId).notNull(),
+//     collectionId: integer("collectionId").references(() => collection.collectionId).notNull(),
+// }, (t) => [
+//     unique().on(t.carId, t.collectionId)
+// ]);
 
 
-export const groupedCar = pgTable("listedCar",{
+export const groupedCar = pgTable("groupedCar",{
     groupedCarId: serial("groupedCarId").primaryKey(),
 
-    // when inserting a grouped car it should be verified that the car is in the same collection as the group. 
-    carInCollectionId: integer("carInCollectionId").references(() => carInCollection.carInCollectionId).notNull(),
+    // when inserting a grouped car it should be verified that the owner of the car is the same as the 
+    // owner of the group. 
+    carId: integer("carId").references(() => car.carId).notNull(),
     groupId: integer("groupId").references(() => group.groupId).notNull(),
 }, (t) => [
-    unique().on(t.carInCollectionId,t.groupId)
+    unique().on(t.carId,t.groupId)
 ]);
