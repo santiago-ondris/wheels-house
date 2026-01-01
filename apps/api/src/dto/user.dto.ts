@@ -10,7 +10,7 @@ export class BaseUser {
     @IsString()
     email: string;
     
-    @Transform(({ value }) => value === null || value === undefined ? '' : value)
+    @Transform(({ value }) => value ?? '')
     @IsString()
     @IsOptional()
     picture: string;
@@ -57,7 +57,7 @@ export class UserToDB extends BaseUser {
 export class LoginDTO {
     @IsNotEmpty()
     @IsString()
-    usernameOrEmail: string = "";
+    usernameOrEmail: string;
 
     @IsNotEmpty()
     @IsString()
