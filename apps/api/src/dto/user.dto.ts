@@ -51,3 +51,11 @@ export class LoginResponse {
         this.authorization = authorization;
     }
 }
+
+export class TokenData {
+    username: string;
+
+    constructor(username: string) {
+        this.username = username;
+    }
+}
