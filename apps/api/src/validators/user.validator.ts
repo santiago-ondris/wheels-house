@@ -30,7 +30,7 @@ export async function loginValidator(loginData: LoginDTO){
     const user = await getUserFromUsernameOrEmail(loginData.usernameOrEmail);
 
     if(!user) {
-        throw userUtils.INEXISTENT_USER;
+        throw userUtils.INVALID_CREDENTIALS;
     }
 
     const validPassword = await userUtils.verifyPassword(loginData.password, user.hashedPassword);

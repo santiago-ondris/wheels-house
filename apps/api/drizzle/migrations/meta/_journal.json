@@ -8,6 +8,20 @@
       "when": 1767052382696,
       "tag": "0000_strange_gorgon",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1767302198193,
+      "tag": "0001_lazy_molly_hayes",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1767302391184,
+      "tag": "0002_nasty_shinko_yamashiro",
+      "breakpoints": true
     }
   ]
 }

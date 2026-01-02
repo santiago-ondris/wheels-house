@@ -7,14 +7,7 @@ import { eq } from 'drizzle-orm';
 
 export async function createUser(newUser: UserToDB) {
     try {
-        await db.insert(user).values({
-            username: newUser.username,
-            firstName: newUser.firstName,
-            lastName: newUser.lastName,
-            email: newUser.email,
-            hashedPassword: newUser.hashedPassword,
-            picture: newUser.picture
-        });
+        await db.insert(user).values(newUser);
         return true;
     } catch {
         return false;
