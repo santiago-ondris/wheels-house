@@ -16,6 +16,26 @@ export async function createCar(newCar: CarToDB) {
 
 // Read
 
+export async function getCarById(carId: number) {
+    // carObject is an array of length 1 (or 0).
+    const carObject = await db.select().from(car).where(eq(car.carId, carId));
+
+    return carObject[0];
+}
+
 export async function getCarsFromUserId(userId: number) {
     return await db.select().from(car).where(eq(car.userId, userId));
+}
+
+// Update
+
+// Delete
+
+export async function deleteCarById(carId: number) {
+    try {
+        await db.delete(car).where(eq(car.carId, carId));
+        return true;
+    } catch {
+        return false;
+    }
 }

@@ -15,3 +15,19 @@ export const CAR_NAME_ALREADY_IN_USE = new HttpException(
     },
     HttpStatus.CONFLICT
 );
+
+export const INEXISTENT_CAR = new HttpException(
+    {
+        status: HttpStatus.NOT_FOUND,
+        error: 'Inexistent car.' 
+    },
+    HttpStatus.NOT_FOUND
+);
+
+export const CAR_DO_NOT_BELONG_TO_USER = new HttpException(
+    {
+        status: HttpStatus.UNAUTHORIZED,
+        error: 'Car do not belong to user.'
+    },
+    HttpStatus.UNAUTHORIZED
+);

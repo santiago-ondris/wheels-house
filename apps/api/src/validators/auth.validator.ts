@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { PassportStrategy } from '@nestjs/passport';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { PassportStrategy, AuthGuard } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { TokenData } from 'src/dto/user.dto';
 
-
+// Validates token
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(configService: ConfigService) {
@@ -20,5 +20,19 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: TokenData) {
     // Whatever you return here becomes available in req.user
     return payload;
+  }
+}
+
+// Decorator for controllers, overrides handleRequest method to ensure that an
+// unauthorized exception is thrown when receiving an invalid token.
+@Injectable()
+export class JwtAuthGuard extends AuthGuard('jwt') {
+  handleRequest(err, user, info) {
+    if (err || !user) {
+      // Forcefully throw a standard UnauthorizedException 
+      // from the current project's scope.
+      throw err || new UnauthorizedException();
+    }
+    return user;
   }
 }

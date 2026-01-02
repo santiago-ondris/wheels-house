@@ -3,7 +3,7 @@ import { TokenData } from '../dto/user.dto';
 import { getUserFromUsername } from 'src/database/crud/user.crud';
 import { CarInfo, CarToDB, CreateCarDTO } from 'src/dto/car.dto';
 import { ERROR_CREATING_CAR } from 'src/utils/car.utils';
-import { createCar, getCarsFromUserId } from 'src/database/crud/car.crud';
+import { createCar, deleteCarById, getCarById, getCarsFromUserId } from 'src/database/crud/car.crud';
 
 @Injectable()
 export class CarService {
@@ -25,21 +25,23 @@ export class CarService {
         return true;
     }
 
-    async listCars(username: string) {
+    async listCarsService(username: string) {
         const user = await getUserFromUsername(username);
 
-        const carsFromDB : CarToDB[] = await getCarsFromUserId(user.userId);
+        const listedCars : CarInfo[] = await getCarsFromUserId(user.userId);
 
-        let listedCars : CarInfo[] = [];
+        return listedCars;
+    }
 
-        carsFromDB.forEach(car => {
-            listedCars.push(new CarInfo(
-                car.name, car.color, car.brand, car.scale, 
-                car.manufacturer, car.description, car.designer,
-                car.series, car.picture
-            ));
-        });
+    async getCarService(carId: number) {
+        const car : CarInfo = await getCarById(carId);
 
-        return listedCars; 
+        return car;
+    }
+
+    async deleteCarService(carId: number) {
+        const deleted = deleteCarById(carId);
+
+        return deleted;
     }
 }
