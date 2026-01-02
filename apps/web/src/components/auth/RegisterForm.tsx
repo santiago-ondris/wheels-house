@@ -6,6 +6,7 @@ import { RegisterFormData, registerSchema } from "../../lib/validations/auth";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { register } from "../../services/auth.service";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState<RegisterFormData>({
@@ -21,6 +22,7 @@ export default function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,9 +50,10 @@ export default function RegisterForm() {
         lastName: result.data.lastName,
         password: result.data.password,        
       });
-
-      toast.success("Cuenta creada exitosamente");
-      navigate("/");
+    
+      await login(result.data.username, result.data.password);
+      toast.success("¡Cuenta creada exitosamente!");
+      navigate(`/collection/${result.data.username}`);
     } catch (error: any) {
       const errorMsg = error?.error || "";
       

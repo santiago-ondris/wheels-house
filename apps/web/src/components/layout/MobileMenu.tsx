@@ -32,8 +32,7 @@ export default function MobileMenu({ onLoginClick }: MobileMenuProps) {
               {isAuthenticated ? (
                 <div className="p-4 space-y-2">
                   <div className="pb-3 mb-3 border-b border-white/10">
-                    <p className="text-white font-bold">{user?.firstName} {user?.lastName}</p>
-                    <p className="text-white/50 text-sm">{user?.email}</p>
+                    <p className="text-white font-bold">{user?.username}</p>
                   </div>
 
                   <Link

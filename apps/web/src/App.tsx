@@ -4,7 +4,7 @@ import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import CollectionPage from "./pages/CollectionPage";
 import RegisterPage from "./pages/RegisterPage";
-// import ProtectedRoute from "./components/auth/ProtectedRoute"; todo -> terminar las protected routes
+import ProtectedRoute from "./components/auth/ProtectedRoute"; 
 import AuthRequiredPage from "./pages/AuthRequiredPage";
 import CarDetailPage from "./pages/CarDetailPage";
 
@@ -15,10 +15,15 @@ export default function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="*" element={<NotFoundPage />} />
-          <Route path="/collection" element={<CollectionPage />} />
+          {/* <Route path="/collection" element={<CollectionPage />} /> */}
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/auth-required" element={<AuthRequiredPage />} />
           <Route path="/car" element={<CarDetailPage />} />
+          <Route path="/collection" element={
+          <ProtectedRoute>
+            <CollectionPage />
+          </ProtectedRoute>
+        } />
         </Route>
       </Routes>
     </BrowserRouter>

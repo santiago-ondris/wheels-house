@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Mail, User } from "lucide-react";
 import PasswordInput from "./PasswordInput";
 import { useAuth } from "../../contexts/AuthContext";
+import toast from "react-hot-toast";
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -12,18 +13,28 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
   const [credential, setCredential] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
+    setError(null);
+  
     try {
       await login(credential, password);
+      toast.success("¡Bienvenido de vuelta!");
       onSuccess?.();
-    } catch (error) {
-      console.error("Login error:", error);
+    } catch (err: any) {
+      console.log("Error completo:", err);
+      const errorMsg = err?.error || "Error al iniciar sesión";
+      
+      if (errorMsg.includes("Invalid credentials")) {
+        setError("Usuario o contraseña incorrectos");
+      } else {
+        setError("Error al iniciar sesión. Intentá de nuevo.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -81,6 +92,10 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
           ¿Olvidaste tu contraseña?
         </button>
       </div>
+
+      {error && (
+        <p className="text-danger text-sm text-center">{error}</p>
+      )}    
 
       <button
         type="submit"

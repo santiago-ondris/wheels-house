@@ -1,40 +1,51 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { login as loginService } from "../services/auth.service";
 
 interface User {
-  id: string;
   username: string;
-  email: string;
-  firstName: string;
-  lastName: string;
 }
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  isLoading: boolean;
+  login: (usernameOrEmail: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+function decodeToken(token: string): { username: string } {
+  const payload = token.split('.')[1];
+  const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+  return JSON.parse(atob(base64));
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const login = async (email: string, password: string) => {
-    console.log("Login mock:", email, password);
-    
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+  useEffect(() => {
+    const token = localStorage.getItem("auth_token");
+    if (token) {
+      try {
+        const decoded = decodeToken(token);
+        setUser({ username: decoded.username });
+      } catch {
+        localStorage.removeItem("auth_token");
+      }
+    }
+    setIsLoading(false);
+  }, []);
 
-    const mockUser: User = {
-      id: "1",
-      username: "juan_perez",
-      email: email,
-      firstName: "Juan",
-      lastName: "Pérez",
-    };
+  const login = async (usernameOrEmail: string, password: string) => {
+    const response = await loginService({usernameOrEmail, password});
+    const token = response.authorization;
 
-    setUser(mockUser);
-    localStorage.setItem("auth_token", "mock_token_123");
+    localStorage.setItem("auth_token", token);
+
+    const decoded = decodeToken(token);
+    setUser({ username: decoded.username });
   };
 
   const logout = () => {
@@ -47,12 +58,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         isAuthenticated: !!user,
+        isLoading,
         login,
         logout,
       }}
     >
       {children}
-    </AuthContext.Provider>
+    </AuthContext.Provider>  
   );
 }
 

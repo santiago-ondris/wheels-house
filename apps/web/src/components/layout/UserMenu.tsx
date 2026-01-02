@@ -13,10 +13,10 @@ export default function UserMenu() {
       <Menu.Button className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors">
         <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
           <span className="text-white font-bold text-sm">
-            {user.firstName[0]}{user.lastName[0]}
+            {user.username[0].toUpperCase()}
           </span>
         </div>
-        <span className="text-white text-sm hidden md:block">{user.firstName}</span>
+        <span className="text-white text-sm hidden md:block">{user.username}</span>
         <ChevronDown className="w-4 h-4 text-white/60" />
       </Menu.Button>
 
@@ -31,8 +31,7 @@ export default function UserMenu() {
       >
         <Menu.Items className="absolute right-0 mt-2 w-48 origin-top-right bg-dark/95 backdrop-blur-md border border-white/10 rounded-xl shadow-lg overflow-hidden z-50">
           <div className="p-3 border-b border-white/10">
-            <p className="text-white font-bold text-sm">{user.firstName} {user.lastName}</p>
-            <p className="text-white/50 text-xs">{user.email}</p>
+            <p className="text-white font-bold text-sm">{user.username}</p>
           </div>
           
           <div className="p-1">
