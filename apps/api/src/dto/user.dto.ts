@@ -1,8 +1,26 @@
+import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { Transform } from 'class-transformer';
+
 export class BaseUser {
+    @IsNotEmpty()
+    @IsString()
     username: string;
+    
+    @IsNotEmpty()
+    @IsString()
     email: string;
+    
+    @Transform(({ value }) => value ?? '')
+    @IsString()
+    @IsOptional()
     picture: string;
+    
+    @IsNotEmpty()
+    @IsString()
     firstName: string;
+    
+    @IsNotEmpty()
+    @IsString()
     lastName: string;
 
     constructor(username: string, email: string, firstName: string, lastName: string, picture: string = "") {
@@ -15,6 +33,8 @@ export class BaseUser {
 }
 
 export class RegisterDTO extends BaseUser {
+    @IsNotEmpty()
+    @IsString()
     password: string;
 
     constructor(username: string, email: string, firstName: string, lastName: string, 
@@ -35,7 +55,12 @@ export class UserToDB extends BaseUser {
 }
 
 export class LoginDTO {
-    usernameOrEmail: string = "";
+    @IsNotEmpty()
+    @IsString()
+    usernameOrEmail: string;
+
+    @IsNotEmpty()
+    @IsString()
     password: string;
 
     constructor(usernameOrEmail: string, password: string) {
