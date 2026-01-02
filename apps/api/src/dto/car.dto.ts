@@ -41,16 +41,6 @@ export class CreateCarDTO {
     @IsString()
     @IsOptional()
     picture: string | null;
-
-    constructor(
-        name: string, color: string, brand: string, scale: string,
-        manufacturer: string, description: string | null = "", designer: string | null = "",
-        series: string | null = "", picture: string | null = ""
-    ) {
-        this.name = name, this.color = color, this.brand = brand, this.scale = scale, 
-        this.manufacturer = manufacturer, this.description = description, 
-        this.designer = designer, this.series = series, this.picture = picture;
-    }
 }
 
 export class CarToDB extends CreateCarDTO {
@@ -60,12 +50,17 @@ export class CarToDB extends CreateCarDTO {
         manufacturer: string, description: string | null = "", designer: string | null = "",
         series: string | null = "", picture: string | null = ""
     ) {
-        super(
-            name, color, brand, scale,
-            manufacturer, description, designer,
-            series, picture
-        );
+        super();
         this.userId = userId;
+        this.name = name;
+        this.color = color;
+        this.brand = brand;
+        this.scale = scale;
+        this.manufacturer = manufacturer;
+        this.description = description;
+        this.designer = designer;
+        this.series = series;
+        this.picture = picture;
     }
 }
 
@@ -75,10 +70,15 @@ export class CarInfo extends CreateCarDTO {
         manufacturer: string, description: string | null = "", designer: string | null = "",
         series: string | null = "", picture: string | null = ""
     ) {
-        super(
-            name, color, brand, scale,
-            manufacturer, description, designer,
-            series, picture
-        );
+        super();
+        this.name = name;
+        this.color = color;
+        this.brand = brand;
+        this.scale = scale;
+        this.manufacturer = manufacturer;
+        this.description = description;
+        this.designer = designer;
+        this.series = series;
+        this.picture = picture;
     }
 }
