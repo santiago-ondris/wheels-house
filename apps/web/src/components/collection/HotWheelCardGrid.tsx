@@ -3,13 +3,15 @@ import type { HotWheelMock } from "../../data/mockHotWheels";
 
 interface Props {
   car: HotWheelMock;
+  onClick?: () => void;
 }
 
-export default function HotWheelCardGrid({ car }: Props) {
+export default function HotWheelCardGrid({ car, onClick }: Props) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
+      onClick={onClick}
       className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl overflow-hidden cursor-pointer hover:bg-white/10 transition-colors"
     >
       <div className="aspect-4/3">

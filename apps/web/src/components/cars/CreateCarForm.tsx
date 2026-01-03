@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Car, FileText, User, Layers, Image as ImageIcon, Tag, Palette, Ruler, Factory } from "lucide-react";
 import { carSchema, CarFormData } from "../../lib/validations/car";
-import { createCar } from "../../services/car.service";
+import { createCar, updateCar, CarData } from "../../services/car.service";
 import { scales, manufacturers, brands, colors } from "../../data/carOptions";
 import SearchableSelect from "../ui/SearchableSelect";
 import toast from "react-hot-toast";
@@ -9,9 +9,10 @@ import toast from "react-hot-toast";
 interface CreateCarFormProps {
     onSuccess: () => void;
     onCancel: () => void;
+    initialData?: CarData;
 }
 
-export default function CreateCarForm({ onSuccess, onCancel }: CreateCarFormProps) {
+export default function CreateCarForm({ onSuccess, onCancel, initialData }: CreateCarFormProps) {
     const [formData, setFormData] = useState<CarFormData>({
         name: "",
         color: "",
@@ -23,6 +24,22 @@ export default function CreateCarForm({ onSuccess, onCancel }: CreateCarFormProp
         series: "",
         picture: "",
     });
+
+    useEffect(() => {
+        if (initialData) {
+            setFormData({
+                name: initialData.name,
+                color: initialData.color,
+                brand: initialData.brand,
+                scale: initialData.scale,
+                manufacturer: initialData.manufacturer,
+                description: initialData.description || "",
+                designer: initialData.designer || "",
+                series: initialData.series || "",
+                picture: initialData.picture || "",
+            });
+        }
+    }, [initialData]);
 
     const [errors, setErrors] = useState<Partial<Record<keyof CarFormData, string>>>({});
     const [isLoading, setIsLoading] = useState(false);
@@ -46,11 +63,16 @@ export default function CreateCarForm({ onSuccess, onCancel }: CreateCarFormProp
 
         setIsLoading(true);
         try {
-            await createCar(result.data);
-            toast.success("¡Auto agregado a tu colección!");
+            if (initialData && initialData.carId) {
+                await updateCar(initialData.carId, result.data);
+                toast.success("¡Auto actualizado con éxito!");
+            } else {
+                await createCar(result.data);
+                toast.success("¡Auto agregado a tu colección!");
+            }
             onSuccess();
         } catch (error: any) {
-            toast.error("Error al agregar el auto. Intentá de nuevo.");
+            toast.error("Error al guardar el auto. Intentá de nuevo.");
             console.error(error);
         } finally {
             setIsLoading(false);
