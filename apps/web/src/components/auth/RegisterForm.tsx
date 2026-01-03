@@ -53,7 +53,7 @@ export default function RegisterForm() {
     
       await login(result.data.username, result.data.password);
       toast.success("¡Cuenta creada exitosamente!");
-      navigate(`/collection/${result.data.username}`);
+      navigate(`/collection/`);
     } catch (error: any) {
       const errorMsg = error?.error || "";
       

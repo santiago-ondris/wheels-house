@@ -18,3 +18,14 @@ export const registerSchema = z
   });
 
 export type RegisterFormData = z.infer<typeof registerSchema>;
+
+export const loginSchema = z.object({
+  credential: z.string().min(1, "Este campo es requerido"),
+  password: z.string().min(1, "La contraseña es requerida"),
+});
+
+export const loginEmailSchema = loginSchema.extend({
+  credential: z.string().min(1, "Este campo es requerido").email("Formato de email inválido"),
+});
+
+export type LoginFormData = z.infer<typeof loginSchema>;

@@ -42,7 +42,7 @@ export default function PasswordInput({
           )}
         </button>
       </div>
-      {error && <p className="text-danger text-xs mt-1 ml-1">{error}</p>}
+      {error && <p className="text-danger text-[10px] mt-1 ml-1">{error}</p>}
     </div>
   );
 }
