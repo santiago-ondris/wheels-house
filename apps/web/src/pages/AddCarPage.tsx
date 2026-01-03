@@ -7,7 +7,6 @@ import {
     FileText,
     User,
     Layers,
-    Image as ImageIcon,
     Tag,
     Palette,
     Ruler,
@@ -19,6 +18,7 @@ import { carSchema, CarFormData } from "../lib/validations/car";
 import { createCar } from "../services/car.service";
 import { scales, manufacturers, brands, colors } from "../data/carOptions";
 import FieldSelector from "../components/cars/addcar/FieldSelector";
+import ImageUploadWidget from "../components/ui/ImageUploadWidget";
 import toast from "react-hot-toast";
 
 export default function AddCarPage() {
@@ -75,7 +75,6 @@ export default function AddCarPage() {
 
     const updateField = (field: keyof CarFormData, value: string) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
-        // Clear error when user starts typing
         if (errors[field]) {
             setErrors((prev) => ({ ...prev, [field]: undefined }));
         }
@@ -83,7 +82,6 @@ export default function AddCarPage() {
 
     return (
         <div className="min-h-screen pb-32 md:pb-8">
-            {/* Header */}
             <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -105,7 +103,6 @@ export default function AddCarPage() {
                                 Sumá un nuevo modelo a tu colección
                             </p>
                         </div>
-                        {/* Desktop save button in header */}
                         <button
                             onClick={handleSubmit}
                             disabled={isLoading}
@@ -118,7 +115,6 @@ export default function AddCarPage() {
                 </div>
             </motion.div>
 
-            {/* Form Content */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -126,7 +122,6 @@ export default function AddCarPage() {
                 className="container mx-auto px-4 py-6"
             >
                 <form onSubmit={handleSubmit} className="max-w-5xl mx-auto">
-                    {/* Required Fields Section */}
                     <div className="mb-8">
                         <div className="flex items-center gap-2 mb-4">
                             <Sparkles className="w-4 h-4 text-accent" />
@@ -136,7 +131,6 @@ export default function AddCarPage() {
                         </div>
 
                         <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 md:p-6 space-y-5">
-                            {/* Model Name - Full width */}
                             <div>
                                 <label className="block text-accent uppercase tracking-widest text-[10px] font-bold mb-1.5 ml-1">
                                     Nombre del Modelo <span className="text-danger">*</span>
@@ -154,7 +148,6 @@ export default function AddCarPage() {
                                 {errors.name && <p className="text-danger text-[10px] mt-1 ml-1">{errors.name}</p>}
                             </div>
 
-                            {/* Grid for selectors */}
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                                 <FieldSelector
                                     label="Marca (Real)"
@@ -203,7 +196,6 @@ export default function AddCarPage() {
                         </div>
                     </div>
 
-                    {/* Optional Fields Section */}
                     <div className="mb-8">
                         <div className="flex items-center gap-2 mb-4">
                             <FileText className="w-4 h-4 text-white/40" />
@@ -232,7 +224,6 @@ export default function AddCarPage() {
                                     </div>
                                 </div>
 
-                                {/* Designer */}
                                 <div>
                                     <label className="block text-white/50 uppercase tracking-widest text-[10px] font-bold mb-1.5 ml-1">
                                         Diseñador
@@ -250,7 +241,6 @@ export default function AddCarPage() {
                                 </div>
                             </div>
 
-                            {/* Description */}
                             <div>
                                 <label className="block text-white/50 uppercase tracking-widest text-[10px] font-bold mb-1.5 ml-1">
                                     Descripción
@@ -266,26 +256,19 @@ export default function AddCarPage() {
                                 </div>
                             </div>
 
-                            {/* Picture URL */}
                             <div>
                                 <label className="block text-white/50 uppercase tracking-widest text-[10px] font-bold mb-1.5 ml-1">
-                                    URL de Imagen
+                                    Imagen del Auto
                                 </label>
-                                <div className="relative">
-                                    <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
-                                    <input
-                                        type="text"
-                                        placeholder="https://..."
-                                        value={formData.picture}
-                                        onChange={(e) => updateField("picture", e.target.value)}
-                                        className="w-full bg-input-bg border border-white/5 pl-12 pr-4 py-3.5 rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-base"
-                                    />
-                                </div>
+                                <ImageUploadWidget
+                                    value={formData.picture}
+                                    onChange={(url) => updateField("picture", url)}
+                                    onRemove={() => updateField("picture", "")}
+                                />
                             </div>
                         </div>
                     </div>
 
-                    {/* Desktop Cancel Button */}
                     <div className="hidden md:flex justify-end gap-4">
                         <button
                             type="button"
@@ -297,8 +280,7 @@ export default function AddCarPage() {
                     </div>
                 </form>
             </motion.div>
-
-            {/* Mobile Fixed Bottom Bar */}
+            
             <motion.div
                 initial={{ y: 100 }}
                 animate={{ y: 0 }}
