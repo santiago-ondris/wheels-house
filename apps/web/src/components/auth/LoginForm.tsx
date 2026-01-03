@@ -3,6 +3,7 @@ import { Mail, User } from "lucide-react";
 import PasswordInput from "./PasswordInput";
 import { useAuth } from "../../contexts/AuthContext";
 import toast from "react-hot-toast";
+import { loginSchema, loginEmailSchema, LoginFormData } from "../../lib/validations/auth";
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -13,14 +14,34 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
   const [credential, setCredential] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof LoginFormData, string>>>({});
+  const [generalError, setGeneralError] = useState<string | null>(null);
 
   const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFieldErrors({});
+    setGeneralError(null);
+    
+    const schema = loginType === "email" ? loginEmailSchema : loginSchema;
+    const result = schema.safeParse({ credential, password });
+
+    if (!result.success) {
+      const errors: Partial<Record<keyof LoginFormData, string>> = {};
+      result.error.issues.forEach((err) => {
+        if (err.path[0]) {
+          const field = err.path[0] as keyof LoginFormData;
+          if (!errors[field]) {
+            errors[field] = err.message;
+          }
+        }
+      });
+      setFieldErrors(errors);
+      return;
+    }
+
     setIsLoading(true);
-    setError(null);
   
     try {
       await login(credential, password);
@@ -31,9 +52,9 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
       const errorMsg = err?.error || "Error al iniciar sesión";
       
       if (errorMsg.includes("Invalid credentials")) {
-        setError("Usuario o contraseña incorrectos");
+        setGeneralError("Usuario o contraseña incorrectos");
       } else {
-        setError("Error al iniciar sesión. Intentá de nuevo.");
+        setGeneralError("Error al iniciar sesión. Intentá de nuevo.");
       }
     } finally {
       setIsLoading(false);
@@ -41,7 +62,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4" noValidate>
       <div>
         <div className="flex items-center justify-between mb-2">
           <label className="block text-accent uppercase tracking-widest text-xs">
@@ -66,10 +87,10 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
             placeholder={loginType === "email" ? "tu@email.com" : "tu_usuario"}
             value={credential}
             onChange={(e) => setCredential(e.target.value)}
-            required
             className="w-full bg-input-bg pl-11 pr-4 py-3 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-accent"
           />
         </div>
+        {fieldErrors.credential && <p className="text-danger text-[10px] mt-1 ml-1">{fieldErrors.credential}</p>}
       </div>
 
       <div>
@@ -81,6 +102,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
           placeholder="••••••••"
           value={password}
           onChange={setPassword}
+          error={fieldErrors.password}
         />
       </div>
 
@@ -93,8 +115,8 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
         </button>
       </div>
 
-      {error && (
-        <p className="text-danger text-sm text-center">{error}</p>
+      {generalError && (
+        <p className="text-danger text-sm text-center">{generalError}</p>
       )}    
 
       <button

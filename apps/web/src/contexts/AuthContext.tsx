@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
 import { login as loginService } from "../services/auth.service";
 
 interface User {
@@ -24,6 +25,7 @@ function decodeToken(token: string): { username: string } {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
@@ -49,8 +51,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
-    setUser(null);
-    localStorage.removeItem("auth_token");
+    navigate("/", { replace: true });
+    setTimeout(() => {
+      setUser(null);
+      localStorage.removeItem("auth_token");
+    }, 50);
   };
 
   return (
