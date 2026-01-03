@@ -72,3 +72,41 @@ export class CarInfo extends CreateCarDTO {
         this.picture = picture;
     }
 }
+
+export class CarUpdateDTO {
+    @IsString()
+    @IsOptional()
+    name: string;
+
+    @IsString()
+    @IsOptional()
+    color: string;
+
+    @IsString()
+    @IsOptional()
+    brand: string;
+
+    @IsString()
+    @IsOptional()
+    scale: string;
+
+    @IsString()
+    @IsOptional()
+    manufacturer: string;
+
+    @IsString()
+    @IsOptional()
+    description: string;
+
+    @IsString()
+    @IsOptional()
+    designer: string;
+
+    @IsString()
+    @IsOptional()
+    series: string;
+
+    @IsString()
+    @IsOptional()
+    picture: string;
+}

@@ -1,4 +1,4 @@
-import { CarToDB } from "src/dto/car.dto";
+import { CarToDB, CarUpdateDTO } from "src/dto/car.dto";
 import { db } from "../index";
 import { car } from "../schema";
 import { eq } from 'drizzle-orm';
@@ -28,6 +28,15 @@ export async function getCarsFromUserId(userId: number) {
 }
 
 // Update
+
+export async function updateCar(carChanges: CarUpdateDTO, carId: number) {
+    try {
+        await db.update(car).set(carChanges).where(eq(car.carId, carId));
+        return true;
+    } catch {
+        return false;
+    }
+}
 
 // Delete
 

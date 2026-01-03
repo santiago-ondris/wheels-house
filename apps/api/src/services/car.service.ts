@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { TokenData } from '../dto/user.dto';
 import { getUserFromUsername } from 'src/database/crud/user.crud';
-import { CarInfo, CarToDB, CreateCarDTO } from 'src/dto/car.dto';
-import { ERROR_CREATING_CAR } from 'src/utils/car.utils';
-import { createCar, deleteCarById, getCarById, getCarsFromUserId } from 'src/database/crud/car.crud';
+import { CarInfo, CarToDB, CarUpdateDTO, CreateCarDTO } from 'src/dto/car.dto';
+import { ERROR_CREATING_CAR, ERROR_DELETING_CAR, ERROR_UPDATING_CAR } from 'src/utils/car.utils';
+import { createCar, deleteCarById, getCarById, getCarsFromUserId, updateCar } from 'src/database/crud/car.crud';
 
 @Injectable()
 export class CarService {
@@ -39,9 +39,23 @@ export class CarService {
         return car;
     }
 
+    async updateCarService(carChanges: CarUpdateDTO, carId: number) {
+        const updated = await updateCar(carChanges, carId);
+
+        if (!updated) {
+            throw ERROR_UPDATING_CAR;
+        }
+
+        return true;
+    }
+
     async deleteCarService(carId: number) {
         const deleted = deleteCarById(carId);
 
-        return deleted;
+        if(!deleted) {
+            throw ERROR_DELETING_CAR;
+        }
+
+        return true;
     }
 }
