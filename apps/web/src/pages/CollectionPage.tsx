@@ -38,8 +38,8 @@ export default function CollectionPage() {
     navigate("/collection/add");
   };
 
-  const mappedCars = cars.map((car, index) => ({
-    id: index.toString(),
+  const mappedCars = cars.map((car) => ({
+    id: String(car.carId),
     name: car.name,
     brand: car.brand,
     year: 0,
@@ -99,7 +99,13 @@ export default function CollectionPage() {
                   className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
                 >
                   {mappedCars.map((car) => (
-                    <HotWheelCardGrid key={car.id} car={car} />
+                    <HotWheelCardGrid 
+                        key={car.id} 
+                        car={car} 
+                        onClick={() => {
+                            navigate(`/car/${car.id}`);
+                        }}
+                    />
                   ))}
                 </motion.div>
               ) : (
@@ -111,7 +117,14 @@ export default function CollectionPage() {
                   className="flex flex-col gap-3"
                 >
                   {mappedCars.map((car) => (
-                    <HotWheelCardList key={car.id} car={car} />
+                    <HotWheelCardList 
+                        key={car.id} 
+                        car={car} 
+                        onClick={() => {
+                            console.log("Navigating to car:", car.id);
+                            navigate(`/car/${car.id}`);
+                        }}
+                    />
                   ))}
                 </motion.div>
               )}
