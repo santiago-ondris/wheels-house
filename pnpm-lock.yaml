@@ -54,15 +54,24 @@ importers:
       '@nestjs/platform-express':
         specifier: ^11.0.1
         version: 11.1.11(@nestjs/common@11.1.11(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.11)
+      '@types/multer':
+        specifier: ^2.0.0
+        version: 2.0.0
       bcrypt:
         specifier: ^6.0.0
         version: 6.0.0
+      cloudinary:
+        specifier: ^2.8.0
+        version: 2.8.0
       dotenv:
         specifier: ^17.2.3
         version: 17.2.3
       drizzle-orm:
         specifier: 0.45.1
         version: 0.45.1(@types/pg@8.16.0)(pg@8.16.3)(postgres@3.4.7)
+      multer:
+        specifier: ^2.0.2
+        version: 2.0.2
       pg:
         specifier: 8.16.3
         version: 8.16.3
@@ -1788,6 +1797,9 @@ packages:
   '@types/mssql@9.1.8':
     resolution: {integrity: sha512-mt9h5jWj+DYE5jxnKaWSV/GqDf9FV52XYVk6T3XZF69noEe+JJV6MKirii48l81+cjmAkSq+qeKX+k61fHkYrQ==}
 
+  '@types/multer@2.0.0':
+    resolution: {integrity: sha512-C3Z9v9Evij2yST3RSBktxP9STm6OdMc5uR1xF1SGr98uv8dUlAL2hqwrZ3GVB3uyMyiegnscEK6PGtYvNrjTjw==}
+
   '@types/node@22.19.3':
     resolution: {integrity: sha512-1N9SBnWYOJTrNZCdh/yJE+t910Y128BoyY+zBLWhL3r0TYzlTmFdXrPwHL9DyFZmlEXNQQolTZh3KHV31QDhyA==}
 
@@ -2356,6 +2368,10 @@ packages:
   clone@1.0.4:
     resolution: {integrity: sha512-JQHZ2QMW6l3aH/j6xCqQThY/9OH4D/9ls34cgkUBiEeocRTU04tHfKPBsUK1PqZCUQM7GiA0IIXJSuXHI64Kbg==}
     engines: {node: '>=0.8'}
+
+  cloudinary@2.8.0:
+    resolution: {integrity: sha512-s7frvR0HnQXeJsQSIsbLa/I09IMb1lOnVLEDH5b5E53WTiCYgrNNOBGV/i/nLHwrcEOUkqjfSwP1+enXWNYmdw==}
+    engines: {node: '>=9'}
 
   clsx@2.1.1:
     resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
@@ -4015,6 +4031,14 @@ packages:
 
   pure-rand@7.0.1:
     resolution: {integrity: sha512-oTUZM/NAZS8p7ANR3SHh30kXB+zK2r2BPcEn/awJIbOvq82WoMN4p62AWWp3Hhw50G0xMsw1mhIBLqHw64EcNQ==}
+
+  q@1.5.1:
+    resolution: {integrity: sha512-kV/CThkXo6xyFEZUugw/+pIOywXcDbFYgSct5cT3gqlbkBE1SJdwy6UQoZvodiWF/ckQLZyDE/Bu1M6gVu5lVw==}
+    engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
+    deprecated: |-
+      You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
+
+      (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
 
   qs@6.14.1:
     resolution: {integrity: sha512-4EK3+xJl8Ts67nLYNwqw/dsFVnCf+qR7RgXSK9jEEm9unao3njwMDdmsdvoKBKHzxd7tCYz5e5M+SnMjdtXGQQ==}
@@ -6321,6 +6345,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@types/multer@2.0.0':
+    dependencies:
+      '@types/express': 5.0.6
+
   '@types/node@22.19.3':
     dependencies:
       undici-types: 6.21.0
@@ -6950,6 +6978,11 @@ snapshots:
       wrap-ansi: 7.0.0
 
   clone@1.0.4: {}
+
+  cloudinary@2.8.0:
+    dependencies:
+      lodash: 4.17.21
+      q: 1.5.1
 
   clsx@2.1.1: {}
 
@@ -8606,6 +8639,8 @@ snapshots:
   punycode@2.3.1: {}
 
   pure-rand@7.0.1: {}
+
+  q@1.5.1: {}
 
   qs@6.14.1:
     dependencies:
