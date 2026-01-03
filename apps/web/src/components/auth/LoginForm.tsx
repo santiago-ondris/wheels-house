@@ -31,7 +31,10 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
       const errors: Partial<Record<keyof LoginFormData, string>> = {};
       result.error.issues.forEach((err) => {
         if (err.path[0]) {
-          errors[err.path[0] as keyof LoginFormData] = err.message;
+          const field = err.path[0] as keyof LoginFormData;
+          if (!errors[field]) {
+            errors[field] = err.message;
+          }
         }
       });
       setFieldErrors(errors);
