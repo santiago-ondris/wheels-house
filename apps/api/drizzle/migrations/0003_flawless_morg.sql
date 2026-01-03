@@ -1,0 +1,1 @@
+ALTER TABLE "car" ADD COLUMN "country" text;

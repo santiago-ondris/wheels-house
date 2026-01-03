@@ -13,7 +13,7 @@ export class CarService {
         const newCar : CarToDB = new CarToDB(
             user.userId, carData.name, carData.color, carData.brand,
             carData.scale, carData.manufacturer, carData.description,
-            carData.designer, carData.series, carData.picture
+            carData.designer, carData.series, carData.picture, carData.country
         );
 
         const created = await createCar(newCar);

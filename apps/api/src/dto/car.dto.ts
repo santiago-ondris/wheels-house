@@ -41,6 +41,11 @@ export class CreateCarDTO {
     @IsString()
     @IsOptional()
     picture: string | null;
+
+    @Transform(({ value }) => value ?? '')
+    @IsString()
+    @IsOptional()
+    country: string | null;
 }
 
 export class CarToDB extends CreateCarDTO {
@@ -48,13 +53,13 @@ export class CarToDB extends CreateCarDTO {
     constructor(
         userId: number, name: string, color: string, brand: string, scale: string,
         manufacturer: string, description: string | null = "", designer: string | null = "",
-        series: string | null = "", picture: string | null = ""
+        series: string | null = "", picture: string | null = "", country: string | null = ""
     ) {
         super();
         this.userId = userId, this.name = name, this.color = color;
         this.brand = brand, this.scale = scale, this.manufacturer = manufacturer;
         this.description = description, this.designer = designer, this.series = series;
-        this.picture = picture;
+        this.picture = picture, this.country = country;
     }
 }
 
@@ -63,13 +68,13 @@ export class CarInfo extends CreateCarDTO {
     constructor(
         carId: number, name: string, color: string, brand: string, scale: string,
         manufacturer: string, description: string | null = "", designer: string | null = "",
-        series: string | null = "", picture: string | null = ""
+        series: string | null = "", picture: string | null = "", country: string | null = ""
     ) {
         super();
         this.carId = carId, this.name = name, this.color = color;
         this.brand = brand, this.scale = scale, this.manufacturer = manufacturer;
         this.description = description, this.designer = designer, this.series = series;
-        this.picture = picture;
+        this.picture = picture, this.country = country;
     }
 }
 
@@ -109,4 +114,8 @@ export class CarUpdateDTO {
     @IsString()
     @IsOptional()
     picture: string;
+
+    @IsString()
+    @IsOptional()
+    country: string;
 }
