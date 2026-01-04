@@ -72,7 +72,7 @@ export const CAR_PICTURE_FORMAT_NOT_VALID = new HttpException(
     HttpStatus.BAD_REQUEST
 );
 
-export function validateCarPicture(url: string): boolean {
+export function validCarPicture(url: string): boolean {
     const cloudinaryRegex = /^https:\/\/res\.cloudinary\.com\/dyx7kjnjq\/image\/upload\/v\d+\/wheels-house\/cars\/[a-zA-Z0-9_-]+\.(jpg|jpeg|png|webp)$/;
     
     return cloudinaryRegex.test(url);
