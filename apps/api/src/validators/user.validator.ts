@@ -3,23 +3,27 @@ import { getUserFromEmail, getUserFromUsername, getUserFromUsernameOrEmail } fro
 import * as userUtils from "../utils/user.utils";
 
 export async function registerValidator(registerData: RegisterDTO) {
-    if (!userUtils.validatePassword(registerData.password)){
+    if (!userUtils.validatePassword(registerData.password)) {
         throw userUtils.INVALID_PASSWORD_EXCEPTION;
     }
 
-    if(!userUtils.isValidEmail(registerData.email)){
+    if(!userUtils.isValidEmail(registerData.email)) {
         throw userUtils.INVALID_EMAIL_ADDRESS;
+    }
+
+    if(!userUtils.validUserPicture(registerData.picture)) {
+        throw userUtils.USER_PICTURE_FORMAT_NOT_VALID;
     }
 
     // Query username in use.
     const userFromUsername = await getUserFromUsername(registerData.username);
-    if(userFromUsername != null){
+    if(userFromUsername != null) {
         throw userUtils.USERNAME_ALREADY_IN_USE;
     }
     
     // Query email in use.
     const userFromEmail = await getUserFromEmail(registerData.email);
-    if(userFromEmail != null){
+    if(userFromEmail != null) {
         throw userUtils.EMAIL_ALREADY_IN_USE;
     }
     

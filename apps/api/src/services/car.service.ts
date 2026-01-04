@@ -3,7 +3,8 @@ import { TokenData } from '../dto/user.dto';
 import { getUserFromUsername } from 'src/database/crud/user.crud';
 import { CarInfo, CarPictureToDB, CarToDB, CarUpdateDTO, CreateCarDTO } from 'src/dto/car.dto';
 import { ERROR_CREATING_CAR, ERROR_DELETING_CAR, ERROR_UPDATING_CAR } from 'src/utils/car.utils';
-import { createCar, deleteCarById, getCarById, getCarsFromUserId, updateCar, createCarPicture, getPicturesFromCar } from 'src/database/crud/car.crud';
+import { createCar, deleteCar, getCarById, getCarsFromUserId, updateCar, createCarPicture, getPicturesFromCar, 
+    deleteAllCarPictures, deleteCarPicture, updateCarPicture } from 'src/database/crud/car.crud';
 
 @Injectable()
 export class CarService {
@@ -84,19 +85,65 @@ export class CarService {
     }
 
     async updateCarService(carChanges: CarUpdateDTO, carId: number) {
-        const updated = await updateCar(carChanges, carId);
-
-        if (!updated) {
+        const carUpdated = await updateCar(carChanges, carId);
+        
+        if (!carUpdated) {
             throw ERROR_UPDATING_CAR;
+        }
+
+        const carPicturesFromDB = await getPicturesFromCar(carId);
+
+        for(let idx = 0; idx < Math.min(carChanges.pictures!.length, carPicturesFromDB.length); ++idx) {
+            if(carChanges.pictures![idx] == carPicturesFromDB[idx].url) continue;
+
+            const pictureUpdated = await updateCarPicture(new CarPictureToDB(
+                carChanges.pictures![idx], 
+                carId,
+                idx
+            ), carPicturesFromDB[idx].carPictureId);
+
+            if(!pictureUpdated) {
+                throw ERROR_UPDATING_CAR;
+            }
+        }
+
+        if(carChanges.pictures!.length > carPicturesFromDB.length) {
+            // In this case the updated car has more picture after the update.
+            // We create the missing ones.
+            for(let idx = carPicturesFromDB.length; idx < carChanges.pictures!.length; ++idx) {
+                const newCarPicture = new CarPictureToDB(
+                    carChanges.pictures![idx],
+                    carId,
+                    idx
+                );
+
+                const createdPicture = await createCarPicture(newCarPicture);
+
+                if(!createdPicture) {
+                    throw ERROR_UPDATING_CAR;
+                }
+            }
+        } else if(carChanges.pictures!.length < carPicturesFromDB.length) {
+            // In this case the updated car has less pictures after the update.
+            // We delete the extra ones.
+            for(let idx = carChanges.pictures!.length; idx < carPicturesFromDB.length; ++idx) {
+                const pictureDeleted = await deleteCarPicture(carPicturesFromDB[idx].carPictureId);
+
+                if(!pictureDeleted) {
+                    throw ERROR_UPDATING_CAR;
+                }
+            }
         }
 
         return true;
     }
 
     async deleteCarService(carId: number) {
-        const deleted = deleteCarById(carId);
+        const picturesDeleted = deleteAllCarPictures(carId);
 
-        if(!deleted) {
+        const carDeleted = deleteCar(carId);
+
+        if(!carDeleted || !picturesDeleted) {
             throw ERROR_DELETING_CAR;
         }
 

@@ -49,6 +49,16 @@ export async function updateCarValidator(requestUserData: TokenData, carChanges:
     if(car.userId != user.userId) {
         throw CAR_DO_NOT_BELONG_TO_USER;
     }
+
+    if(carChanges.pictures!.length > 10) {
+        throw MAX_CARS_PICTURES_LIMIT;
+    }
+
+    carChanges.pictures!.forEach(url => {
+        if(!validCarPicture(url)) {
+            throw CAR_PICTURE_FORMAT_NOT_VALID;
+        }
+    });
 }
 
 export async function deleteCarValidator(requestUserData: TokenData, carId: number) {

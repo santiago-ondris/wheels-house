@@ -51,11 +51,38 @@ export async function updateCar(carChanges: CarUpdateDTO, carId: number) {
     }
 }
 
+export async function updateCarPicture(carPictureData: CarPictureToDB, carPictureId: number) {
+    try {
+        await db.update(carPicture).set(carPictureData).where(eq(carPicture.carPictureId, carPictureId));
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 // Delete
 
-export async function deleteCarById(carId: number) {
+export async function deleteCar(carId: number) {
     try {
         await db.delete(car).where(eq(car.carId, carId));
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+export async function deleteCarPicture(carPictureId: number) {
+    try {
+        await db.delete(carPicture).where(eq(carPicture.carPictureId, carPictureId));
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+export async function deleteAllCarPictures(carId: number) {
+    try {
+        await db.delete(carPicture).where(eq(car.carId, carId));
         return true;
     } catch {
         return false;

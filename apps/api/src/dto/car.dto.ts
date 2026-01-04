@@ -25,27 +25,27 @@ export class CreateCarDTO {
     @Transform(({ value }) => value ?? '')
     @IsString()
     @IsOptional()
-    description: string | null;
+    description: string | null = '';
 
     @Transform(({ value }) => value ?? '')
     @IsString()
     @IsOptional()
-    designer: string | null;
+    designer: string | null = '';
 
     @Transform(({ value }) => value ?? '')
     @IsString()
     @IsOptional()
-    series: string | null;
+    series: string | null = '';
 
     @Transform(({ value }) => value ?? [])
     @IsArray()
     @IsOptional()
-    pictures: string[] | null;
+    pictures: string[] | null = [];
 
     @Transform(({ value }) => value ?? '')
     @IsString()
     @IsOptional()
-    country: string | null;
+    country: string | null = '';
 }
 
 export class CarToDB {
@@ -62,8 +62,8 @@ export class CarToDB {
 
     constructor(
         userId: number, name: string, color: string, brand: string, scale: string,
-        manufacturer: string, description: string | null = "", designer: string | null = "",
-        series: string | null = "", country: string | null = ""
+        manufacturer: string, description: string | null = '', designer: string | null = '',
+        series: string | null = '', country: string | null = ''
     ) {
         this.userId = userId, this.name = name, this.color = color;
         this.brand = brand, this.scale = scale, this.manufacturer = manufacturer;
@@ -86,8 +86,8 @@ export class CarInfo extends CreateCarDTO {
     carId: number;
     constructor(
         carId: number, name: string, color: string, brand: string, scale: string,
-        manufacturer: string, description: string | null = "", designer: string | null = "",
-        series: string | null = "", pictures: string[] | null = [], country: string | null = ""
+        manufacturer: string, description: string | null = '', designer: string | null = '',
+        series: string | null = '', pictures: string[] | null = [], country: string | null = ''
     ) {
         super();
         this.carId = carId, this.name = name, this.color = color;
@@ -99,42 +99,42 @@ export class CarInfo extends CreateCarDTO {
 
 export class CarUpdateDTO {
     @IsString()
-    @IsOptional()
+    @IsNotEmpty()
     name: string;
 
     @IsString()
-    @IsOptional()
+    @IsNotEmpty()
     color: string;
 
     @IsString()
-    @IsOptional()
+    @IsNotEmpty()
     brand: string;
 
     @IsString()
-    @IsOptional()
+    @IsNotEmpty()
     scale: string;
 
     @IsString()
-    @IsOptional()
+    @IsNotEmpty()
     manufacturer: string;
 
     @IsString()
     @IsOptional()
-    description: string;
+    description: string | null = '';
 
     @IsString()
     @IsOptional()
-    designer: string;
+    designer: string | null = '';
 
     @IsString()
     @IsOptional()
-    series: string;
+    series: string | null = '';
 
     @IsArray()
     @IsOptional()
-    pictures: string[];
+    pictures: string[] | null = [];
 
     @IsString()
     @IsOptional()
-    country: string;
+    country: string | null = '';
 }

@@ -76,4 +76,4 @@ export function validCarPicture(url: string): boolean {
     const cloudinaryRegex = /^https:\/\/res\.cloudinary\.com\/dyx7kjnjq\/image\/upload\/v\d+\/wheels-house\/cars\/[a-zA-Z0-9_-]+\.(jpg|jpeg|png|webp)$/;
     
     return cloudinaryRegex.test(url);
-  }
+}

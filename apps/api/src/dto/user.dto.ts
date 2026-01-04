@@ -13,12 +13,12 @@ export class BaseUser {
     @Transform(({ value }) => value ?? '')
     @IsString()
     @IsOptional()
-    picture: string;
-    
+    picture: string = '';
+
     @IsNotEmpty()
     @IsString()
     firstName: string;
-    
+
     @IsNotEmpty()
     @IsString()
     lastName: string;
