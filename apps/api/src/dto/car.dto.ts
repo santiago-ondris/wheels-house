@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsArray } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class CreateCarDTO {
@@ -37,10 +37,10 @@ export class CreateCarDTO {
     @IsOptional()
     series: string | null;
 
-    @Transform(({ value }) => value ?? '')
-    @IsString()
+    @Transform(({ value }) => value ?? [])
+    @IsArray()
     @IsOptional()
-    picture: string | null;
+    pictures: string[] | null;
 
     @Transform(({ value }) => value ?? '')
     @IsString()
@@ -48,18 +48,37 @@ export class CreateCarDTO {
     country: string | null;
 }
 
-export class CarToDB extends CreateCarDTO {
+export class CarToDB {
     userId: number;
+    name: string;
+    color: string;
+    brand: string;
+    scale: string;
+    manufacturer: string;
+    description: string | null;
+    designer: string | null;
+    series: string | null;
+    country: string | null;
+
     constructor(
         userId: number, name: string, color: string, brand: string, scale: string,
         manufacturer: string, description: string | null = "", designer: string | null = "",
-        series: string | null = "", picture: string | null = "", country: string | null = ""
+        series: string | null = "", country: string | null = ""
     ) {
-        super();
         this.userId = userId, this.name = name, this.color = color;
         this.brand = brand, this.scale = scale, this.manufacturer = manufacturer;
         this.description = description, this.designer = designer, this.series = series;
-        this.picture = picture, this.country = country;
+        this.country = country;
+    }
+}
+
+export class CarPictureToDB {
+    url: string;
+    carId: number;
+    index: number;
+
+    constructor(url: string, carId: number, index: number) {
+        this.url = url, this.carId = carId, this.index = index;
     }
 }
 
@@ -68,13 +87,13 @@ export class CarInfo extends CreateCarDTO {
     constructor(
         carId: number, name: string, color: string, brand: string, scale: string,
         manufacturer: string, description: string | null = "", designer: string | null = "",
-        series: string | null = "", picture: string | null = "", country: string | null = ""
+        series: string | null = "", pictures: string[] | null = [], country: string | null = ""
     ) {
         super();
         this.carId = carId, this.name = name, this.color = color;
         this.brand = brand, this.scale = scale, this.manufacturer = manufacturer;
         this.description = description, this.designer = designer, this.series = series;
-        this.picture = picture, this.country = country;
+        this.pictures = pictures, this.country = country;
     }
 }
 
@@ -111,9 +130,9 @@ export class CarUpdateDTO {
     @IsOptional()
     series: string;
 
-    @IsString()
+    @IsArray()
     @IsOptional()
-    picture: string;
+    pictures: string[];
 
     @IsString()
     @IsOptional()

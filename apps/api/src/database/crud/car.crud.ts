@@ -1,16 +1,25 @@
-import { CarToDB, CarUpdateDTO } from "src/dto/car.dto";
+import { CarPictureToDB, CarToDB, CarUpdateDTO } from "src/dto/car.dto";
 import { db } from "../index";
-import { car } from "../schema";
+import { car, carPicture } from "../schema";
 import { eq } from 'drizzle-orm';
 
 // Create
 
 export async function createCar(newCar: CarToDB) {
     try {
-        await db.insert(car).values(newCar);
-        return true;
+        const createdCar = await db.insert(car).values(newCar).returning();
+        return createdCar[0];
     } catch {
-        return false;
+        return null;
+    }
+}
+
+export async function createCarPicture(newCarPicture: CarPictureToDB) {
+    try {
+        const createdPicture = await db.insert(carPicture).values(newCarPicture).returning();
+        return createdPicture[0];
+    } catch {
+        return null;
     }
 }
 
@@ -25,6 +34,10 @@ export async function getCarById(carId: number) {
 
 export async function getCarsFromUserId(userId: number) {
     return await db.select().from(car).where(eq(car.userId, userId));
+}
+
+export async function getPicturesFromCar(carId: number) {
+    return await db.select().from(carPicture).where(eq(carPicture.carId, carId)).orderBy(carPicture.index);
 }
 
 // Update

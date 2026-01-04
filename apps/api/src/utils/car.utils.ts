@@ -55,3 +55,25 @@ export const NO_FIELDS_UPDATED = new HttpException(
     },
     HttpStatus.BAD_REQUEST
 );
+
+export const MAX_CARS_PICTURES_LIMIT = new HttpException(
+    {
+        status: HttpStatus.BAD_REQUEST,
+        error: 'You can not upload more than 10 pictures.' 
+    },
+    HttpStatus.BAD_REQUEST
+);
+
+export const CAR_PICTURE_FORMAT_NOT_VALID = new HttpException(
+    {
+        status: HttpStatus.BAD_REQUEST,
+        error: 'Picture format not valid.' 
+    },
+    HttpStatus.BAD_REQUEST
+);
+
+export function validateCarPicture(url: string): boolean {
+    const cloudinaryRegex = /^https:\/\/res\.cloudinary\.com\/dyx7kjnjq\/image\/upload\/v\d+\/wheels-house\/cars\/[a-zA-Z0-9_-]+\.(jpg|jpeg|png|webp)$/;
+    
+    return cloudinaryRegex.test(url);
+  }
