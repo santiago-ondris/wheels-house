@@ -137,9 +137,9 @@ export class CarService {
     }
 
     async deleteCarService(carId: number) {
-        const picturesDeleted = deleteAllCarPictures(carId);
+        const picturesDeleted = await deleteAllCarPictures(carId);
 
-        const carDeleted = deleteCar(carId);
+        const carDeleted = await deleteCar(carId);
 
         if (!carDeleted || !picturesDeleted) {
             throw ERROR_DELETING_CAR;
