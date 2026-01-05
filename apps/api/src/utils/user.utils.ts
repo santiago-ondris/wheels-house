@@ -60,6 +60,14 @@ export const INVALID_CREDENTIALS = new HttpException(
     HttpStatus.UNAUTHORIZED
 );
 
+export const USER_PICTURE_FORMAT_NOT_VALID = new HttpException(
+    {
+        status: HttpStatus.BAD_REQUEST,
+        error: 'Picture format not valid.' 
+    },
+    HttpStatus.BAD_REQUEST
+);
+
 export function isValidEmail(email: string): boolean {
     const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return pattern.test(email);
@@ -79,4 +87,12 @@ export function validatePassword(password: string): boolean {
 
 export async function verifyPassword(password: string, hashedPassword: string) {
     return await bcrypt.compare(password, hashedPassword);
+}
+
+export function validUserPicture(url: string): boolean {
+    if(url.length == 0) return true;
+    
+    const cloudinaryRegex = /^https:\/\/res\.cloudinary\.com\/dyx7kjnjq\/image\/upload\/v\d+\/wheels-house\/cars\/[a-zA-Z0-9_-]+\.(jpg|jpeg|png|webp)$/;
+    
+    return cloudinaryRegex.test(url);
 }

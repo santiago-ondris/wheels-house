@@ -15,7 +15,6 @@ export const user = pgTable("user",{
     // restorePasswordCode: integer("restorePasswordCode"),
 });
 
-
 // export const collection = pgTable("collection",{
 //     collectionId: serial("collectionId").primaryKey(),
 //     name: text("name").notNull(),
@@ -23,16 +22,6 @@ export const user = pgTable("user",{
 //     userId: integer("userId").references(() => user.userId).notNull(),
 //     picture: text("picture"),
 // });
-
-
-export const group = pgTable("group",{
-    groupId: serial("groupId").primaryKey(),
-    name: text("name").notNull(),
-    userId: integer("userId").references(() => user.userId).notNull(),
-    description: text("description"),
-    picture: text("picture")
-});
-
 
 export const car = pgTable("car",{
     carId: serial("carId").primaryKey(),
@@ -45,8 +34,25 @@ export const car = pgTable("car",{
     description: text("description"),
     designer: text("designer"),
     series: text("series"),
-    picture: text("picture"),
     country: text("country")
+});
+
+export const carPicture = pgTable("carPicture",{
+    carPictureId: serial("carPictureId").primaryKey(),
+    url: text("url").notNull(),
+    carId: integer("carId").references(() => car.carId).notNull(),
+    index: integer("index").notNull()
+}, (t) => [
+    unique().on(t.carId, t.index)
+]);
+
+
+export const group = pgTable("group",{
+    groupId: serial("groupId").primaryKey(),
+    name: text("name").notNull(),
+    userId: integer("userId").references(() => user.userId).notNull(),
+    description: text("description"),
+    picture: text("picture")
 });
 
 

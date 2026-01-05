@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsArray } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class CreateCarDTO {
@@ -25,41 +25,60 @@ export class CreateCarDTO {
     @Transform(({ value }) => value ?? '')
     @IsString()
     @IsOptional()
-    description: string | null;
+    description: string | null = '';
 
     @Transform(({ value }) => value ?? '')
     @IsString()
     @IsOptional()
-    designer: string | null;
+    designer: string | null = '';
 
     @Transform(({ value }) => value ?? '')
     @IsString()
     @IsOptional()
-    series: string | null;
+    series: string | null = '';
+
+    @Transform(({ value }) => value ?? [])
+    @IsArray()
+    @IsOptional()
+    pictures: string[] | null = [];
 
     @Transform(({ value }) => value ?? '')
     @IsString()
     @IsOptional()
-    picture: string | null;
-
-    @Transform(({ value }) => value ?? '')
-    @IsString()
-    @IsOptional()
-    country: string | null;
+    country: string | null = '';
 }
 
-export class CarToDB extends CreateCarDTO {
+export class CarToDB {
     userId: number;
+    name: string;
+    color: string;
+    brand: string;
+    scale: string;
+    manufacturer: string;
+    description: string | null;
+    designer: string | null;
+    series: string | null;
+    country: string | null;
+
     constructor(
         userId: number, name: string, color: string, brand: string, scale: string,
-        manufacturer: string, description: string | null = "", designer: string | null = "",
-        series: string | null = "", picture: string | null = "", country: string | null = ""
+        manufacturer: string, description: string | null = '', designer: string | null = '',
+        series: string | null = '', country: string | null = ''
     ) {
-        super();
         this.userId = userId, this.name = name, this.color = color;
         this.brand = brand, this.scale = scale, this.manufacturer = manufacturer;
         this.description = description, this.designer = designer, this.series = series;
-        this.picture = picture, this.country = country;
+        this.country = country;
+    }
+}
+
+export class CarPictureToDB {
+    url: string;
+    carId: number;
+    index: number;
+
+    constructor(url: string, carId: number, index: number) {
+        this.url = url, this.carId = carId, this.index = index;
     }
 }
 
@@ -67,55 +86,55 @@ export class CarInfo extends CreateCarDTO {
     carId: number;
     constructor(
         carId: number, name: string, color: string, brand: string, scale: string,
-        manufacturer: string, description: string | null = "", designer: string | null = "",
-        series: string | null = "", picture: string | null = "", country: string | null = ""
+        manufacturer: string, description: string | null = '', designer: string | null = '',
+        series: string | null = '', pictures: string[] | null = [], country: string | null = ''
     ) {
         super();
         this.carId = carId, this.name = name, this.color = color;
         this.brand = brand, this.scale = scale, this.manufacturer = manufacturer;
         this.description = description, this.designer = designer, this.series = series;
-        this.picture = picture, this.country = country;
+        this.pictures = pictures, this.country = country;
     }
 }
 
 export class CarUpdateDTO {
     @IsString()
-    @IsOptional()
+    @IsNotEmpty()
     name: string;
 
     @IsString()
-    @IsOptional()
+    @IsNotEmpty()
     color: string;
 
     @IsString()
-    @IsOptional()
+    @IsNotEmpty()
     brand: string;
 
     @IsString()
-    @IsOptional()
+    @IsNotEmpty()
     scale: string;
 
     @IsString()
-    @IsOptional()
+    @IsNotEmpty()
     manufacturer: string;
 
     @IsString()
     @IsOptional()
-    description: string;
+    description: string | null = '';
 
     @IsString()
     @IsOptional()
-    designer: string;
+    designer: string | null = '';
 
     @IsString()
     @IsOptional()
-    series: string;
+    series: string | null = '';
+
+    @IsArray()
+    @IsOptional()
+    pictures: string[] | null = [];
 
     @IsString()
     @IsOptional()
-    picture: string;
-
-    @IsString()
-    @IsOptional()
-    country: string;
+    country: string | null = '';
 }
