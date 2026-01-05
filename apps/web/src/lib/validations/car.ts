@@ -9,7 +9,8 @@ export const carSchema = z.object({
     description: z.string().optional().default(""),
     designer: z.string().optional().default(""),
     series: z.string().optional().default(""),
-    picture: z.string().optional().default(""),
+    pictures: z.array(z.string()).optional().default([]),
 });
 
 export type CarFormData = z.infer<typeof carSchema>;
+

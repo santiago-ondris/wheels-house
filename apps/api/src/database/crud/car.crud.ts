@@ -82,7 +82,7 @@ export async function deleteCarPicture(carPictureId: number) {
 
 export async function deleteAllCarPictures(carId: number) {
     try {
-        await db.delete(carPicture).where(eq(car.carId, carId));
+        await db.delete(carPicture).where(eq(carPicture.carId, carId));
         return true;
     } catch {
         return false;

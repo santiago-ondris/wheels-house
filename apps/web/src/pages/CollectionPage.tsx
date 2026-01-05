@@ -44,7 +44,7 @@ export default function CollectionPage() {
     brand: car.brand,
     year: 0,
     series: car.series || undefined,
-    image: car.picture || "https://placehold.co/400x300/1A1B4B/D9731A?text=No+Image"
+    image: (car.pictures && car.pictures.length > 0 ? car.pictures[0] : "https://placehold.co/400x300/1A1B4B/D9731A?text=No+Image")
   }));
 
   return (
@@ -99,12 +99,12 @@ export default function CollectionPage() {
                   className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
                 >
                   {mappedCars.map((car) => (
-                    <HotWheelCardGrid 
-                        key={car.id} 
-                        car={car} 
-                        onClick={() => {
-                            navigate(`/car/${car.id}`);
-                        }}
+                    <HotWheelCardGrid
+                      key={car.id}
+                      car={car}
+                      onClick={() => {
+                        navigate(`/car/${car.id}`);
+                      }}
                     />
                   ))}
                 </motion.div>
@@ -117,13 +117,13 @@ export default function CollectionPage() {
                   className="flex flex-col gap-3"
                 >
                   {mappedCars.map((car) => (
-                    <HotWheelCardList 
-                        key={car.id} 
-                        car={car} 
-                        onClick={() => {
-                            console.log("Navigating to car:", car.id);
-                            navigate(`/car/${car.id}`);
-                        }}
+                    <HotWheelCardList
+                      key={car.id}
+                      car={car}
+                      onClick={() => {
+                        console.log("Navigating to car:", car.id);
+                        navigate(`/car/${car.id}`);
+                      }}
                     />
                   ))}
                 </motion.div>

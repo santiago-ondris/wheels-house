@@ -9,7 +9,7 @@
   },
   "devDependencies": {
     "@types/passport-jwt": "^4.0.1",
-    "drizzle-kit": "1.0.0-beta.6-4414a19",
+    "drizzle-kit": "0.31.8",
     "turbo": "^2.5.0"
   },
   "dependencies": {
@@ -18,7 +18,7 @@
     "@nestjs/passport": "^11.0.5",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
-    "drizzle-orm": "1.0.0-beta.6-4414a19",
+    "drizzle-orm": "0.45.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1"
   }

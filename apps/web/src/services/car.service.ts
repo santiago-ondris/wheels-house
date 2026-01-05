@@ -10,7 +10,7 @@ export interface CarData {
     description?: string;
     designer?: string;
     series?: string;
-    picture?: string;
+    pictures?: string[];
     country?: string;
 }
 
