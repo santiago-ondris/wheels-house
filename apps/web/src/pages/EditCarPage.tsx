@@ -18,7 +18,7 @@ import { carSchema, CarFormData } from "../lib/validations/car";
 import { updateCar, getCar } from "../services/car.service";
 import { scales, manufacturers, brands, colors } from "../data/carOptions";
 import FieldSelector from "../components/cars/addcar/FieldSelector";
-import ImageUploadWidget from "../components/ui/ImageUploadWidget";
+import MultiImageUploadWidget from "../components/ui/MultiImageUploadWidget";
 import toast from "react-hot-toast";
 
 export default function EditCarPage() {
@@ -33,7 +33,7 @@ export default function EditCarPage() {
         description: "",
         designer: "",
         series: "",
-        picture: "",
+        pictures: [],
     });
 
     const [errors, setErrors] = useState<Partial<Record<keyof CarFormData, string>>>({});
@@ -58,7 +58,7 @@ export default function EditCarPage() {
                 description: data.description || "",
                 designer: data.designer || "",
                 series: data.series || "",
-                picture: data.picture || "",
+                pictures: data.pictures || [],
             });
         } catch (error) {
             console.error("Error fetching car:", error);
@@ -297,12 +297,12 @@ export default function EditCarPage() {
 
                             <div>
                                 <label className="block text-white/50 uppercase tracking-widest text-[10px] font-bold mb-1.5 ml-1">
-                                    Imagen del Auto
+                                    Imágenes del Auto
                                 </label>
-                                <ImageUploadWidget
-                                    value={formData.picture}
-                                    onChange={(url) => updateField("picture", url)}
-                                    onRemove={() => updateField("picture", "")}
+                                <MultiImageUploadWidget
+                                    values={formData.pictures || []}
+                                    onChange={(urls) => setFormData(prev => ({ ...prev, pictures: urls }))}
+                                    maxImages={10}
                                 />
                             </div>
                         </div>
@@ -319,7 +319,7 @@ export default function EditCarPage() {
                     </div>
                 </form>
             </motion.div>
-            
+
             <motion.div
                 initial={{ y: 100 }}
                 animate={{ y: 0 }}

@@ -62,18 +62,7 @@ export const CarDetailPage = () => {
         return <div className="min-h-screen bg-background flex items-center justify-center text-white">Auto no encontrado</div>;
     }
 
-    // fotos mock
-    const mockGalleryImages = [
-        car.picture || "",
-        "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&q=80&w=800",
-        "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&q=80&w=800",
-        car.picture || "",
-        "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=800",
-        "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&q=80&w=800",
-        "https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&q=80&w=800",
-        car.picture || "",
-        "https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&q=80&w=800",
-    ].filter(img => img !== "");
+    const galleryImages = car.pictures && car.pictures.length > 0 ? car.pictures : [];
 
     return (
         <div className="w-full min-h-screen bg-background text-white flex flex-col font-arvo">
@@ -100,13 +89,13 @@ export const CarDetailPage = () => {
                     </div>
 
                     <div className="flex gap-3">
-                         <button 
+                        <button
                             onClick={() => navigate(`/collection/edit/${car.carId}`)}
                             className="p-2 border border-white/10 rounded-lg hover:bg-white/10 transition-colors text-white/70 hover:text-white"
                         >
                             <Edit size={18} />
                         </button>
-                        <button 
+                        <button
                             onClick={() => setIsDeleteModalOpen(true)}
                             className="p-2 border border-red-500/30 rounded-lg hover:bg-red-500/10 transition-colors text-red-400 hover:text-red-300"
                         >
@@ -115,26 +104,27 @@ export const CarDetailPage = () => {
                     </div>
                 </div>
 
-                {car.picture ? (
-                     <div className="w-full aspect-video rounded-2xl overflow-hidden border border-white/10 relative group">
-                        <img 
-                            src={car.picture} 
-                            alt={car.name} 
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                {galleryImages.length > 0 ? (
+                    <div className="w-full aspect-video rounded-2xl overflow-hidden border border-white/10 relative group">
+                        <img
+                            src={galleryImages[0]}
+                            alt={car.name}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
-                     </div>
+                    </div>
                 ) : (
                     <div className="w-full h-64 flex items-center justify-center bg-white/5 rounded-2xl border border-white/10 text-white/30">
                         Sin imagen disponible
                     </div>
                 )}
-                
-                {/* Muestras de Masonry Grid */}
-                 <div className="mt-10">
-                    <h3 className="text-xl font-bold text-white mb-6 px-4 md:px-0">Galería</h3>
-                    <CarMasonryGrid images={mockGalleryImages} />
-                 </div>
+
+                {galleryImages.length > 1 && (
+                    <div className="mt-10">
+                        <h3 className="text-xl font-bold text-white mb-6 px-4 md:px-0">Galería</h3>
+                        <CarMasonryGrid images={galleryImages} />
+                    </div>
+                )}
             </section>
 
             <main ref={detailsRef} className="flex-1 bg-[#050505] border-t border-white/5">
@@ -154,9 +144,8 @@ export const CarDetailPage = () => {
                         </h1>
 
                         <div className="flex flex-wrap gap-3 mb-10">
-                            {/* Year is not in backend DTO anymore? Using '0' or removing if not there. Logic in CollectionPage used 0. */}
-                             <span className="px-4 py-2 bg-white text-black text-sm font-bold uppercase rounded-full tracking-wide">
-                                0
+                            <span className="px-4 py-2 bg-white text-black text-sm font-bold uppercase rounded-full tracking-wide">
+                                {car.brand || "N/A"}
                             </span>
                             <span className="px-4 py-2 border border-white/20 text-white text-sm font-bold uppercase rounded-full tracking-wide">
                                 {car.series || "N/A"}
@@ -183,20 +172,19 @@ export const CarDetailPage = () => {
                 </div>
             </main>
 
-            
-             {/* Delete Modal */}
-             <Modal
+
+            <Modal
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}
                 title="Eliminar Auto"
             >
                 <div className="p-6">
                     <p className="text-white/80 mb-8 max-w-sm">
-                        ¿Estás seguro que querés eliminar el <span className="font-bold text-white">{car.name}</span>? 
+                        ¿Estás seguro que querés eliminar el <span className="font-bold text-white">{car.name}</span>?
                         Esta acción no se puede deshacer.
                     </p>
                     <div className="flex gap-3">
-                         <button
+                        <button
                             onClick={() => setIsDeleteModalOpen(false)}
                             className="flex-1 px-6 py-3 border border-white/10 text-white font-bold rounded-xl hover:bg-white/5 transition-all"
                         >
