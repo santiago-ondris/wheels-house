@@ -12,6 +12,7 @@ export interface CarData {
     series?: string;
     pictures?: string[];
     country?: string;
+    ownerUsername?: string;
 }
 
 export type CarUpdateDTO = Partial<CarData>;

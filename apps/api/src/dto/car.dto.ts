@@ -97,6 +97,19 @@ export class CarInfo extends CreateCarDTO {
     }
 }
 
+export class CarInfoWithOwner extends CarInfo {
+    ownerUsername: string;
+    constructor(
+        carId: number, name: string, color: string, brand: string, scale: string,
+        manufacturer: string, ownerUsername: string, description: string | null = '',
+        designer: string | null = '', series: string | null = '',
+        pictures: string[] | null = [], country: string | null = ''
+    ) {
+        super(carId, name, color, brand, scale, manufacturer, description, designer, series, pictures, country);
+        this.ownerUsername = ownerUsername;
+    }
+}
+
 export class CarUpdateDTO {
     @IsString()
     @IsNotEmpty()

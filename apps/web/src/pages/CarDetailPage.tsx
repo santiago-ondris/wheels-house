@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowDown, ArrowUp, Edit, Trash2, ArrowLeft } from "lucide-react";
 import { getCar, deleteCar, CarData } from "../services/car.service";
-import { useAuth } from "../contexts/AuthContext";
 
 import { CarMasonryGrid } from "../components/cars/CarMasonryGrid";
 import Modal from "../components/ui/Modal";
@@ -12,7 +11,6 @@ import toast from "react-hot-toast";
 export const CarDetailPage = () => {
     const { carId } = useParams<{ carId: string }>();
     const navigate = useNavigate();
-    const { user } = useAuth();
     const [car, setCar] = useState<CarData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -42,7 +40,7 @@ export const CarDetailPage = () => {
         try {
             await deleteCar(car.carId);
             toast.success("Auto eliminado correctamente");
-            navigate(`/collection/${user?.username}`);
+            navigate(`/collection/${car.ownerUsername}`);
         } catch (error) {
             console.error("Error deleting car:", error);
             toast.error("Error al eliminar el auto");
@@ -50,7 +48,7 @@ export const CarDetailPage = () => {
     };
 
     const handleBack = () => {
-        navigate(`/collection/${user?.username}`);
+        navigate(`/collection/${car?.ownerUsername}`);
     };
 
     const galleryRef = useRef<HTMLDivElement>(null);

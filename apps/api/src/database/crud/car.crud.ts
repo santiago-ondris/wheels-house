@@ -1,6 +1,6 @@
 import { CarPictureToDB, CarToDB, CarUpdateDTO } from "src/dto/car.dto";
 import { db } from "../index";
-import { car, carPicture } from "../schema";
+import { car, carPicture, user } from "../schema";
 import { eq } from 'drizzle-orm';
 
 // Create
@@ -26,10 +26,30 @@ export async function createCarPicture(newCarPicture: CarPictureToDB) {
 // Read
 
 export async function getCarById(carId: number) {
-    // carObject is an array of length 1 (or 0).
     const carObject = await db.select().from(car).where(eq(car.carId, carId));
-
     return carObject[0];
+}
+
+export async function getCarByIdWithOwner(carId: number) {
+    const result = await db
+        .select({
+            carId: car.carId,
+            name: car.name,
+            color: car.color,
+            brand: car.brand,
+            scale: car.scale,
+            manufacturer: car.manufacturer,
+            description: car.description,
+            designer: car.designer,
+            series: car.series,
+            country: car.country,
+            ownerUsername: user.username,
+        })
+        .from(car)
+        .innerJoin(user, eq(car.userId, user.userId))
+        .where(eq(car.carId, carId));
+
+    return result[0];
 }
 
 export async function getCarsFromUserId(userId: number) {
