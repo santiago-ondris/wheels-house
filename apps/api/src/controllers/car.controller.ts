@@ -16,7 +16,7 @@ export class CarController {
         return await this.carService.createCarService(carData, req.user);
     }
 
-    @UseGuards(JwtAuthGuard)
+    // @UseGuards(JwtAuthGuard)
     @Get('list/:username')
     async listCars(@Request() req, @Param('username') username) {
         await listCarsValidator(req.user, username);
@@ -24,7 +24,7 @@ export class CarController {
         return await this.carService.listCarsService(username);
     }
 
-    @UseGuards(JwtAuthGuard)
+    // @UseGuards(JwtAuthGuard)
     @Get('info/:carId')
     async getCar(@Request() req, @Param('carId') carId) {
         await getCarValidator(req.user, carId);
