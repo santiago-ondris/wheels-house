@@ -45,7 +45,7 @@ export default function MobileMenu({ onLoginClick }: MobileMenuProps) {
                   </Link>
 
                   <Link
-                    to="/collection"
+                    to={`/collection/${user?.username}`}
                     onClick={() => close()}
                     className="flex items-center gap-3 px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors"
                   >

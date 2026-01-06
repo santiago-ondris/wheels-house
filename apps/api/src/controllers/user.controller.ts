@@ -1,16 +1,16 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import { RegisterDTO, LoginDTO } from '../dto/user.dto';
 import { loginValidator, registerValidator } from '../validators/user.validator'
 
 @Controller()
 export class UserController {
-    constructor(private readonly userService: UserService) {}
-    
+    constructor(private readonly userService: UserService) { }
+
     @Post('/register')
     async register(@Body() registerData: RegisterDTO) {
         await registerValidator(registerData);
-        
+
         return await this.userService.registerService(registerData);
     }
 
@@ -20,5 +20,9 @@ export class UserController {
 
         return await this.userService.loginService(loginData);
     }
+
+    @Get('/profile/:username')
+    async getPublicProfile(@Param('username') username: string) {
+        return await this.userService.getPublicProfileService(username);
+    }
 }
-        

@@ -20,9 +20,11 @@ import { scales, manufacturers, brands, colors } from "../data/carOptions";
 import FieldSelector from "../components/cars/addcar/FieldSelector";
 import MultiImageUploadWidget from "../components/ui/MultiImageUploadWidget";
 import toast from "react-hot-toast";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function AddCarPage() {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [formData, setFormData] = useState<CarFormData>({
         name: "",
         color: "",
@@ -60,7 +62,7 @@ export default function AddCarPage() {
         try {
             await createCar(result.data);
             toast.success("¡Auto agregado a tu colección!");
-            navigate("/collection");
+            navigate(`/collection/${user?.username}`);
         } catch (error: any) {
             toast.error("Error al agregar el auto. Intentá de nuevo.");
             console.error(error);
@@ -70,7 +72,7 @@ export default function AddCarPage() {
     };
 
     const handleCancel = () => {
-        navigate("/collection");
+        navigate(`/collection/${user?.username}`);
     };
 
     const updateField = (field: keyof CarFormData, value: string) => {

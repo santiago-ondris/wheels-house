@@ -7,7 +7,7 @@ import MobileMenu from "./layout/MobileMenu";
 import LoginModal from "./auth/LoginModal";
 
 export default function Navbar() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   return (
@@ -24,7 +24,7 @@ export default function Navbar() {
           {isAuthenticated ? (
             <>
               <div className="hidden md:flex items-center gap-6">
-                <Link to="/collection" className="text-white/70 hover:text-white transition-colors">
+                <Link to={`/collection/${user?.username}`} className="text-white/70 hover:text-white transition-colors">
                   Mi Colección
                 </Link>
                 <Link to="/explore" className="text-white/70 hover:text-white transition-colors flex items-center gap-2">

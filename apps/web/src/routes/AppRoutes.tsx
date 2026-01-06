@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 import HomePage from "../pages/HomePage";
 import NotFoundPage from "../pages/NotFoundPage";
-import CollectionPage from "../pages/CollectionPage";
+import ProfilePage from "../pages/ProfilePage";
 import AddCarPage from "../pages/AddCarPage";
 import RegisterPage from "../pages/RegisterPage";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
@@ -18,11 +18,7 @@ export default function AppRoutes() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/auth-required" element={<AuthRequiredPage />} />
         <Route path="/car/:carId" element={<CarDetailPage />} />
-        <Route path="/collection" element={
-          <ProtectedRoute>
-            <CollectionPage />
-          </ProtectedRoute>
-        } />
+        <Route path="/collection/:username" element={<ProfilePage />} />
         <Route path="/collection/add" element={
           <ProtectedRoute>
             <AddCarPage />

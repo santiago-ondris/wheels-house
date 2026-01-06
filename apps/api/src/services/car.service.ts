@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { TokenData } from '../dto/user.dto';
 import { getUserFromUsername } from 'src/database/crud/user.crud';
-import { CarInfo, CarPictureToDB, CarToDB, CarUpdateDTO, CreateCarDTO } from 'src/dto/car.dto';
+import { CarInfo, CarInfoWithOwner, CarPictureToDB, CarToDB, CarUpdateDTO, CreateCarDTO } from 'src/dto/car.dto';
 import { ERROR_CREATING_CAR, ERROR_DELETING_CAR, ERROR_UPDATING_CAR } from 'src/utils/car.utils';
 import {
-    createCar, deleteCar, getCarById, getCarsFromUserId, updateCar, createCarPicture, getPicturesFromCar,
+    createCar, deleteCar, getCarById, getCarByIdWithOwner, getCarsFromUserId, updateCar, createCarPicture, getPicturesFromCar,
     deleteAllCarPictures, deleteCarPicture, updateCarPicture
 } from 'src/database/crud/car.crud';
 
@@ -68,19 +68,17 @@ export class CarService {
     }
 
     async getCarService(carId: number) {
-        const carFromDB = await getCarById(carId);
+        const carFromDB = await getCarByIdWithOwner(carId);
 
         const carPicturesFromDB = await getPicturesFromCar(carFromDB.carId);
 
-        let carPicturesURLs: string[] = [];
-        carPicturesFromDB.forEach(picture => {
-            carPicturesURLs.push(picture.url);
-        });
+        const carPicturesURLs = carPicturesFromDB.map(picture => picture.url);
 
-        const car: CarInfo = new CarInfo(
+        const car: CarInfoWithOwner = new CarInfoWithOwner(
             carFromDB.carId, carFromDB.name, carFromDB.color, carFromDB.brand,
-            carFromDB.scale, carFromDB.manufacturer, carFromDB.description,
-            carFromDB.designer, carFromDB.series, carPicturesURLs, carFromDB.country
+            carFromDB.scale, carFromDB.manufacturer, carFromDB.ownerUsername,
+            carFromDB.description, carFromDB.designer, carFromDB.series,
+            carPicturesURLs, carFromDB.country
         );
 
         return car;

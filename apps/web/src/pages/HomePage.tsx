@@ -40,8 +40,20 @@ const fadeInUp = {
 
 export default function HomePage() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const { isAuthenticated } = useAuth();
-  
+  const { isAuthenticated, user } = useAuth();
+
+  const handleFeatureClick = (e: React.MouseEvent, href: string) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      setIsLoginOpen(true);
+      return;
+    }
+    if (href === "/collection" && user?.username) {
+      e.preventDefault();
+      window.location.href = `/collection/${user.username}`;
+    }
+  };
+
   return (
     <div className="flex flex-col">
       <section className="relative min-h-[80vh] flex items-center overflow-hidden">
@@ -68,23 +80,22 @@ export default function HomePage() {
             <p className="text-white/60 text-lg mt-6 max-w-md">
               Tu colección de Hot Wheels organizada, accesible desde cualquier lugar, con imágenes y grupos personalizados.
             </p>
-          {isAuthenticated ? (
-            <Link
-              to="/collection"
-              className="inline-flex items-center gap-2 mt-8 px-6 py-3 bg-accent hover:bg-accent/80 text-white font-bold rounded-lg transition-colors"
-            >
-              Ir a mi colección
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          ) : (
-            <button
-              onClick={() => setIsLoginOpen(true)}
-              className="inline-flex items-center gap-2 mt-8 px-6 py-3 bg-accent hover:bg-accent/80 text-white font-bold rounded-lg transition-colors"
-            >
-              Login
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          )}
+            {isAuthenticated ? (
+              <Link
+                to={`/collection/${user?.username}`}
+                className="inline-flex items-center gap-2 mt-8 px-6 py-3 bg-accent hover:bg-accent/80 text-white font-bold rounded-lg transition-colors"
+              >
+                Ir a mi colección
+                <ArrowRight className="w-4 h-4" />n            </Link>
+            ) : (
+              <button
+                onClick={() => setIsLoginOpen(true)}
+                className="inline-flex items-center gap-2 mt-8 px-6 py-3 bg-accent hover:bg-accent/80 text-white font-bold rounded-lg transition-colors"
+              >
+                Login
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            )}
           </motion.div>
         </div>
       </section>
@@ -122,6 +133,7 @@ export default function HomePage() {
             >
               <Link
                 to={feature.href}
+                onClick={(e) => handleFeatureClick(e, feature.href)}
                 className="group block h-full bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-colors"
               >
                 <span className="text-accent/60 text-sm">0{index + 1}</span>
