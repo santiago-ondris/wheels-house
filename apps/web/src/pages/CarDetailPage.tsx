@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowDown, ArrowUp, Edit, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Edit, Trash2, ArrowLeft } from "lucide-react";
 import { getCar, deleteCar, CarData } from "../services/car.service";
+import { useAuth } from "../contexts/AuthContext";
 
 import { CarMasonryGrid } from "../components/cars/CarMasonryGrid";
 import Modal from "../components/ui/Modal";
@@ -11,6 +12,7 @@ import toast from "react-hot-toast";
 export const CarDetailPage = () => {
     const { carId } = useParams<{ carId: string }>();
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [car, setCar] = useState<CarData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -40,11 +42,15 @@ export const CarDetailPage = () => {
         try {
             await deleteCar(car.carId);
             toast.success("Auto eliminado correctamente");
-            navigate("/collection");
+            navigate(`/collection/${user?.username}`);
         } catch (error) {
             console.error("Error deleting car:", error);
             toast.error("Error al eliminar el auto");
         }
+    };
+
+    const handleBack = () => {
+        navigate(`/collection/${user?.username}`);
     };
 
     const galleryRef = useRef<HTMLDivElement>(null);
@@ -74,6 +80,12 @@ export const CarDetailPage = () => {
                             animate={{ opacity: 1, x: 0 }}
                             className="flex items-center gap-3 text-sm text-gray-400 mb-4"
                         >
+                            <button
+                                onClick={handleBack}
+                                className="p-2 text-white/60 hover:text-white transition-colors rounded-xl hover:bg-white/5 active:scale-95 mr-2"
+                            >
+                                <ArrowLeft className="w-5 h-5" />
+                            </button>
                             <span className="uppercase tracking-widest">{car.brand}</span>
                             <span className="w-1 h-1 bg-gray-600 rounded-full" />
                             <span className="text-white font-bold">{car.name}</span>

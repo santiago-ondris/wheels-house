@@ -20,10 +20,12 @@ import { scales, manufacturers, brands, colors } from "../data/carOptions";
 import FieldSelector from "../components/cars/addcar/FieldSelector";
 import MultiImageUploadWidget from "../components/ui/MultiImageUploadWidget";
 import toast from "react-hot-toast";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function EditCarPage() {
     const navigate = useNavigate();
     const { carId } = useParams<{ carId: string }>();
+    const { user } = useAuth();
     const [formData, setFormData] = useState<CarFormData>({
         name: "",
         color: "",
@@ -63,7 +65,7 @@ export default function EditCarPage() {
         } catch (error) {
             console.error("Error fetching car:", error);
             toast.error("Error al cargar datos del auto");
-            navigate("/collection");
+            navigate(`/collection/${user?.username}`);
         } finally {
             setIsFetching(false);
         }
@@ -90,8 +92,6 @@ export default function EditCarPage() {
         setIsLoading(true);
         try {
             if (carId) {
-                // Ensure carId is passed as number if service expects number, or string if adapted. 
-                // Based on previous steps, service expects number.
                 await updateCar(Number(carId), result.data);
                 toast.success("¡Auto actualizado con éxito!");
                 navigate(`/car/${carId}`);
@@ -105,7 +105,7 @@ export default function EditCarPage() {
     };
 
     const handleCancel = () => {
-        navigate(carId ? `/car/${carId}` : "/collection");
+        navigate(carId ? `/car/${carId}` : `/collection/${user?.username}`);
     };
 
     const updateField = (field: keyof CarFormData, value: string) => {
