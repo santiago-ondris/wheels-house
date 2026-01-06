@@ -16,7 +16,6 @@ export async function createUser(newUser: UserToDB) {
 // Read
 
 export async function getUserFromUsername(username: string) {
-    // Notice that the object is an array of length 1 (or 0).
     const userObject = await db.select().from(user).where(eq(user.username, username));
     // return await db.query.user.findFirst({
     //     where: (user, { eq }) => eq(user.username, username),
@@ -25,20 +24,32 @@ export async function getUserFromUsername(username: string) {
 }
 
 export async function getUserFromEmail(email: string) {
-    // Notice that the object is an array of length 1 (or 0).
     const userObject = await db.select().from(user).where(eq(user.email, email));
     // return await db.query.user.findFirst({
-        //     where: (user, { eq }) => eq(user.email, email),
-        // });
+    //     where: (user, { eq }) => eq(user.email, email),
+    // });
     return userObject[0];
 }
 
 export async function getUserFromUsernameOrEmail(usernameOrEmail: string) {
-    // Try by email. Notice that the object is an array of length 1 (or 0).
+    // Try by email. 
     const userFromEmailObject = await db.select().from(user).where(eq(user.email, usernameOrEmail));
-    if(userFromEmailObject[0]) return userFromEmailObject[0];
+    if (userFromEmailObject[0]) return userFromEmailObject[0];
 
     // Try by username.
     const userFromUsernameObject = await db.select().from(user).where(eq(user.username, usernameOrEmail));
     return userFromUsernameObject[0];
+}
+
+export async function getPublicProfileByUsername(username: string) {
+    const userObject = await db.select({
+        userId: user.userId,
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        picture: user.picture,
+        createdDate: user.createdDate,
+    }).from(user).where(eq(user.username, username));
+
+    return userObject[0] || null;
 }
