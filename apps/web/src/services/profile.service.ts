@@ -12,6 +12,18 @@ export interface PublicProfile {
     cars: CarData[];
 }
 
+export interface BasicUser {
+    userId: number;
+    username: string;
+    firstName: string;
+    lastName: string;
+    picture?: string;
+}
+
 export async function getPublicProfile(username: string): Promise<PublicProfile> {
     return apiRequest<PublicProfile>(`/profile/${username}`);
+}
+
+export async function searchUsers(query: string): Promise<BasicUser[]> {
+    return apiRequest<BasicUser[]>(`/search?q=${encodeURIComponent(query)}`);
 }

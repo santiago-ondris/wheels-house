@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDTO, UserToDB, LoginDTO, LoginResponse } from '../dto/user.dto';
 import { PublicProfileDTO, PublicCarDTO } from '../dto/public-profile.dto';
-import { createUser, getUserFromUsernameOrEmail, getPublicProfileByUsername } from 'src/database/crud/user.crud';
+import { createUser, getUserFromUsernameOrEmail, getPublicProfileByUsername, searchUsers } from 'src/database/crud/user.crud';
 import { getCarsFromUserId, getPicturesFromCar } from 'src/database/crud/car.crud';
 import { ERROR_CREATING_USER } from 'src/utils/user.utils';
 import bcrypt from "bcrypt";
@@ -86,5 +86,34 @@ export class UserService {
             userData.picture ?? undefined,
             userData.createdDate ?? undefined
         );
+    }
+
+    async searchUsersService(query: string) {
+        if (!query || query.length < 2) return [];
+
+        const users = await searchUsers(query);
+        const lowerQuery = query.toLowerCase();
+
+        // Se ordena por relevancia.
+        // 1. match exacto
+        // 2. Empieza con
+        // 3. Contiene
+        return users.sort((a, b) => {
+            const aUsername = a.username.toLowerCase();
+            const bUsername = b.username.toLowerCase();
+
+            // Match exacto
+            if (aUsername === lowerQuery) return -1;
+            if (bUsername === lowerQuery) return 1;
+
+            // Empieza con
+            const aStarts = aUsername.startsWith(lowerQuery);
+            const bStarts = bUsername.startsWith(lowerQuery);
+            if (aStarts && !bStarts) return -1;
+            if (!aStarts && bStarts) return 1;
+
+            // Orden alfabético
+            return aUsername.localeCompare(bUsername);
+        }).slice(0, 10); // Return top 10
     }
 }
