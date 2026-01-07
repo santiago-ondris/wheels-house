@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { CarData, getFeaturedCar } from "../../services/car.service";
+import ImageAdapter from "../ui/ImageAdapter";
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
@@ -88,13 +89,13 @@ export default function FeaturedCar() {
                 transition={{ duration: 0.8, delay: 0.2 }}
                 className="group relative bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] overflow-hidden lg:flex min-h-[600px] hover:border-accent/40 transition-all duration-700 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)]"
             >
-                <div className="lg:w-[55%] relative overflow-hidden bg-black/20">
-                    <img
+                <div className="lg:w-[55%] relative overflow-hidden">
+                    <ImageAdapter
+                        fit="smart"
                         src={featuredCar.pictures?.[0] || "https://placehold.co/1200x800/1A1B4B/D9731A?text=No+Image"}
                         alt={featuredCar.name}
-                        className="w-full h-[400px] lg:h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                        className="w-full h-[420px] lg:h-full"
                     />
-                    <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent lg:bg-linear-to-r lg:from-transparent lg:to-black/20" />
                 </div>
 
                 <div className="lg:w-[45%] p-8 lg:p-16 flex flex-col justify-between relative z-10 bg-linear-to-br from-white/[0.02] to-transparent">

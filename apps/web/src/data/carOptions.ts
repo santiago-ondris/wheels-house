@@ -53,6 +53,7 @@ export const brands = [
     "Honda",
     "Hummer",
     "Hyundai",
+    "Hot Wheels",
     "Infiniti",
     "Jaguar",
     "Jeep",
