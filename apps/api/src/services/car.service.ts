@@ -52,15 +52,12 @@ export class CarService {
         for (const car of carsFromDB) {
             const carPicturesFromDB = await getPicturesFromCar(car.carId);
 
-            let carPicturesURLs: string[] = [];
-            carPicturesFromDB.forEach(picture => {
-                carPicturesURLs.push(picture.url);
-            });
+            const carPictures = carPicturesFromDB.map(picture => picture.url);
 
             listedCars.push(new CarInfo(
                 car.carId, car.name, car.color, car.brand,
                 car.scale, car.manufacturer, car.description,
-                car.designer, car.series, carPicturesURLs, car.country
+                car.designer, car.series, carPictures, car.country
             ));
         }
 
