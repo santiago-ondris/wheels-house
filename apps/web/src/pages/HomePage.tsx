@@ -57,46 +57,74 @@ export default function HomePage() {
   return (
     <div className="flex flex-col">
       <section className="relative min-h-[80vh] flex items-center overflow-hidden">
+        {/* Background Gradients */}
         <div className="absolute inset-0 bg-linear-to-br from-primary/20 via-background to-secondary/20" />
+
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)`,
+            backgroundSize: '40px 40px'
+          }}
+        />
+
         <div className="absolute top-20 right-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
         <div className="absolute bottom-20 left-20 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
 
         <div className="relative z-10 container mx-auto px-6 py-20">
-          <motion.div
-            variants={fadeInUp}
-            initial="initial"
-            animate="animate"
-            transition={{ duration: 0.6 }}
-            className="max-w-2xl"
-          >
-            <span className="text-accent uppercase tracking-widest text-sm font-bold">
-              Collection Manager
-            </span>
-            <h1 className="text-6xl md:text-8xl font-bold text-white mt-4 leading-tight">
-              WHEELS
-              <br />
-              HOUSE
-            </h1>
-            <p className="text-white/60 text-lg mt-6 max-w-md">
-              Tu colección de Hot Wheels organizada, accesible desde cualquier lugar, con imágenes y grupos personalizados.
-            </p>
-            {isAuthenticated ? (
-              <Link
-                to={`/collection/${user?.username}`}
-                className="inline-flex items-center gap-2 mt-8 px-6 py-3 bg-accent hover:bg-accent/80 text-white font-bold rounded-lg transition-colors"
-              >
-                Ir a mi colección
-                <ArrowRight className="w-4 h-4" />n            </Link>
-            ) : (
-              <button
-                onClick={() => setIsLoginOpen(true)}
-                className="inline-flex items-center gap-2 mt-8 px-6 py-3 bg-accent hover:bg-accent/80 text-white font-bold rounded-lg transition-colors"
-              >
-                Login
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            )}
-          </motion.div>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8 lg:gap-16">
+            <motion.div
+              variants={fadeInUp}
+              initial="initial"
+              animate="animate"
+              transition={{ duration: 0.6 }}
+              className="max-w-2xl relative z-10"
+            >
+              <span className="text-accent uppercase tracking-widest text-sm font-bold">
+                Collection Manager
+              </span>
+              <h1 className="text-6xl md:text-8xl font-bold text-white mt-4 leading-tight">
+                WHEELS
+                <br />
+                HOUSE
+              </h1>
+              <p className="text-white/60 text-lg mt-6 max-w-md">
+                Tu colección de vehículos a escala organizada, accesible desde cualquier lugar, con imágenes y grupos personalizados.
+              </p>
+              {isAuthenticated ? (
+                <Link
+                  to={`/collection/${user?.username}`}
+                  className="inline-flex items-center gap-2 mt-8 px-6 py-3 bg-accent hover:bg-accent/80 text-white font-bold rounded-lg transition-colors"
+                >
+                  Ir a mi colección
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              ) : (
+                <button
+                  onClick={() => setIsLoginOpen(true)}
+                  className="inline-flex items-center gap-2 mt-8 px-6 py-3 bg-accent hover:bg-accent/80 text-white font-bold rounded-lg transition-colors"
+                >
+                  Login
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              )}
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="hidden md:block w-1/2 relative"
+            >
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-accent/20 blur-[100px] -z-10 rounded-full" />
+
+              <img
+                src="/heroimage.png"
+                alt="Wheels House Hero"
+                className="w-full h-auto object-contain drop-shadow-2xl relative z-10"
+              />
+            </motion.div>
+          </div>
         </div>
       </section>
 
