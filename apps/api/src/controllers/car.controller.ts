@@ -6,8 +6,8 @@ import { createCarValidator, deleteCarValidator, getCarValidator, listCarsValida
 
 @Controller('car')
 export class CarController {
-    constructor(private readonly carService: CarService) {}
-    
+    constructor(private readonly carService: CarService) { }
+
     @UseGuards(JwtAuthGuard)
     @Post('/create')
     async createCar(@Request() req, @Body() carData: CreateCarDTO) {
@@ -20,7 +20,7 @@ export class CarController {
     @Get('list/:username')
     async listCars(@Request() req, @Param('username') username) {
         await listCarsValidator(req.user, username);
-        
+
         return await this.carService.listCarsService(username);
     }
 
@@ -46,5 +46,10 @@ export class CarController {
         await deleteCarValidator(req.user, carId);
 
         return await this.carService.deleteCarService(carId);
+    }
+
+    @Get('featured')
+    async getFeaturedCar() {
+        return await this.carService.getFeaturedCarService();
     }
 }

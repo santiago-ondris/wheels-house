@@ -5,7 +5,7 @@ import { CarInfo, CarInfoWithOwner, CarPictureToDB, CarToDB, CarUpdateDTO, Creat
 import { ERROR_CREATING_CAR, ERROR_DELETING_CAR, ERROR_UPDATING_CAR } from 'src/utils/car.utils';
 import {
     createCar, deleteCar, getCarById, getCarByIdWithOwner, getCarsFromUserId, updateCar, createCarPicture, getPicturesFromCar,
-    deleteAllCarPictures, deleteCarPicture, updateCarPicture
+    deleteAllCarPictures, deleteCarPicture, updateCarPicture, getTotalCarsCount, getCarByOffset
 } from 'src/database/crud/car.crud';
 
 @Injectable()
@@ -144,5 +144,30 @@ export class CarService {
         }
 
         return true;
+    }
+
+    async getFeaturedCarService() {
+        const totalCars = await getTotalCarsCount();
+        if (totalCars === 0) return null;
+
+        // empieza el 1 de enero del 25
+        const epoch = new Date('2025-01-01T00:00:00Z').getTime();
+        const now = new Date().getTime();
+        const daysSinceEpoch = Math.floor((now - epoch) / (1000 * 60 * 60 * 24));
+
+        const offset = daysSinceEpoch % totalCars;
+        const carFromDB = await getCarByOffset(offset);
+
+        if (!carFromDB) return null;
+
+        const carPicturesFromDB = await getPicturesFromCar(carFromDB.carId);
+        const carPicturesURLs = carPicturesFromDB.map(picture => picture.url);
+
+        return new CarInfoWithOwner(
+            carFromDB.carId, carFromDB.name, carFromDB.color, carFromDB.brand,
+            carFromDB.scale, carFromDB.manufacturer, carFromDB.ownerUsername,
+            carFromDB.description, carFromDB.designer, carFromDB.series,
+            carPicturesURLs, carFromDB.country
+        );
     }
 }

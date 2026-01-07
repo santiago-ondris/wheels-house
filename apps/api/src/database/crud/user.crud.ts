@@ -1,7 +1,7 @@
 import { db } from '../index'
 import { UserToDB } from 'src/dto/user.dto'
 import { user } from 'src/database/schema'
-import { eq } from 'drizzle-orm';
+import { eq, ilike } from 'drizzle-orm';
 
 // Create
 
@@ -52,4 +52,20 @@ export async function getPublicProfileByUsername(username: string) {
     }).from(user).where(eq(user.username, username));
 
     return userObject[0] || null;
+}
+
+export async function searchUsers(query: string) {
+    if (!query) return [];
+
+    // Search strictly by username containing the query string (case insensitive)
+    return await db.select({
+        userId: user.userId,
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        picture: user.picture,
+    })
+        .from(user)
+        .where(ilike(user.username, `%${query}%`))
+        .limit(20);
 }

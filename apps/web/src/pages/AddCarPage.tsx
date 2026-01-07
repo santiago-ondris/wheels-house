@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -36,6 +36,11 @@ export default function AddCarPage() {
         series: "",
         pictures: [],
     });
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
 
     const [errors, setErrors] = useState<Partial<Record<keyof CarFormData, string>>>({});
     const [isLoading, setIsLoading] = useState(false);

@@ -68,3 +68,9 @@ export async function deleteCar(carId: number): Promise<boolean> {
         }
     });
 }
+
+export async function getFeaturedCar(): Promise<CarData | null> {
+    return apiRequest<CarData | null>('/car/featured', {
+        method: 'GET'
+    });
+}

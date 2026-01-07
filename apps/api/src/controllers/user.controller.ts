@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import { RegisterDTO, LoginDTO } from '../dto/user.dto';
 import { loginValidator, registerValidator } from '../validators/user.validator'
@@ -24,5 +24,10 @@ export class UserController {
     @Get('/profile/:username')
     async getPublicProfile(@Param('username') username: string) {
         return await this.userService.getPublicProfileService(username);
+    }
+
+    @Get('/search')
+    async search(@Query('q') query: string) {
+        return await this.userService.searchUsersService(query);
     }
 }
