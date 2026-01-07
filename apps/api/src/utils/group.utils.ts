@@ -44,6 +44,13 @@ export const ERROR_CREATING_GROUP = new HttpException(
     HttpStatus.INTERNAL_SERVER_ERROR
 );
 
+export const INEXISTENT_GROUP = new HttpException(
+    {
+        status: HttpStatus.NOT_FOUND,
+        error: 'Inexistent group.' 
+    },
+    HttpStatus.NOT_FOUND
+);
 
 export function validGroupPicture(url: string): boolean {
     if(url == '') return true;

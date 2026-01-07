@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Param, UseGuards, Request } from '@nestjs/
 import { GroupService } from 'src/services/group.service';
 import { JwtAuthGuard } from 'src/validators/auth.validator';
 import { CreateGroupDTO } from 'src/dto/group.dto';
-import { createGroupValidator } from 'src/validators/group.validator';
+import { createGroupValidator, getGroupValidator } from 'src/validators/group.validator';
 
 @Controller('group')
 export class GroupComtroller {
@@ -14,5 +14,12 @@ export class GroupComtroller {
         await createGroupValidator(groupData, req.user);
 
         return this.groupService.createGroupService(groupData, req.user);
+    }
+
+    @Get('info/:groupId')
+    async getGroup(@Param('groupId') groupId: number) {
+        await getGroupValidator(groupId);
+
+        return this.groupService.getGroupService(groupId);
     }
 }

@@ -26,13 +26,19 @@ export async function createGroupedCars(newCars) {
 
 // Read
 
-export async function groupFromNameAndUserId(name: string, userId: number) {
+export async function getGroupById(groupId: number) {
+    const groupObject = await db.select().from(group).where(eq(group.groupId, groupId));
+
+    return groupObject[0];
+}
+
+export async function getGroupFromNameAndUserId(name: string, userId: number) {
     const groupObject = await db.select().from(group).where(and(eq(group.name, name), eq(group.userId, userId)));
     
     return groupObject[0];
 }
 
-export async function groupsFromCarId(carId: number) {
+export async function getGroupsFromCarId(carId: number) {
     const groups = await db.select({
         groupId: group.groupId,
         name: group.name,
@@ -43,7 +49,7 @@ export async function groupsFromCarId(carId: number) {
     return groups;
 }
 
-export async function carsFromGroupId(groupId: number) {
+export async function getCarsFromGroupId(groupId: number) {
     const cars = await db.select({
         carId: car.carId,
         name: car.name,

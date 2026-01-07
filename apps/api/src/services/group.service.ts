@@ -5,9 +5,10 @@ import { PublicProfileDTO, PublicCarDTO } from '../dto/public-profile.dto';
 import { createUser, getUserFromUsernameOrEmail, getPublicProfileByUsername } from 'src/database/crud/user.crud';
 import { getCarsFromUserId, getPicturesFromCar } from 'src/database/crud/car.crud';
 import { ERROR_CREATING_USER } from 'src/utils/user.utils';
-import { CreateGroupDTO, GroupToDB } from 'src/dto/group.dto';
-import { createGroup, createGroupedCars } from 'src/database/crud/group.crud';
+import { CreateGroupDTO, GroupInfo, GroupToDB } from 'src/dto/group.dto';
+import { createGroup, createGroupedCars, getCarsFromGroupId, getGroupById } from 'src/database/crud/group.crud';
 import { ERROR_CREATING_GROUP } from 'src/utils/group.utils';
+import { CarInfoWoGroups } from 'src/dto/car.dto';
 
 @Injectable()
 export class GroupService {
@@ -37,5 +38,30 @@ export class GroupService {
         if(createdGroupedCars == null) {
             throw ERROR_CREATING_GROUP;
         }
+    }
+
+    async getGroupService(groupId: number) {
+        const group = await getGroupById(groupId);
+
+        const carsFromGroupDB = await getCarsFromGroupId(groupId);
+
+        const carsFromGroup : CarInfoWoGroups[] = [];
+
+        carsFromGroupDB.forEach(async car => {
+            const carPicturesFromDB = await getPicturesFromCar(car.carId);
+            
+            const carPictures = carPicturesFromDB.map(picture => picture.url);
+
+            carsFromGroup.push(new CarInfoWoGroups(
+                car.carId, car.name, car.color, car.brand, car.scale, 
+                car.manufacturer, car.description, car.designer, car.series, 
+                carPictures, car.country
+            ));
+        });
+
+        return new GroupInfo(
+            group.groupId, group.name, carsFromGroup.length, carsFromGroup, 
+            group.description, group.picture
+        );
     }
 }
