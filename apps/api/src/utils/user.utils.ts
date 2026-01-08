@@ -20,6 +20,14 @@ export const INVALID_EMAIL_ADDRESS = new HttpException(
     HttpStatus.BAD_REQUEST
 );
 
+export const INVALID_USERNAME = new HttpException(
+    {
+        status: HttpStatus.BAD_REQUEST,
+        error: 'Username can not contain @.' 
+    },
+    HttpStatus.BAD_REQUEST
+);
+
 export const USERNAME_ALREADY_IN_USE = new HttpException(
     {
         status: HttpStatus.CONFLICT,

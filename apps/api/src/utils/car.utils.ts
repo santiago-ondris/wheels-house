@@ -2,10 +2,10 @@ import { HttpException, HttpStatus  } from "@nestjs/common";
 
 export const ERROR_CREATING_CAR = new HttpException(
     {
-        status: HttpStatus.CONFLICT,
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
         error: 'Error while creating the car.' 
     },
-    HttpStatus.CONFLICT
+    HttpStatus.INTERNAL_SERVER_ERROR
 );
 
 export const CAR_NAME_ALREADY_IN_USE = new HttpException(

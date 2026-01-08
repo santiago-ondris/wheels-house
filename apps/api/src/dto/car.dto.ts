@@ -46,6 +46,10 @@ export class CreateCarDTO {
     @IsString()
     @IsOptional()
     country: string | null = '';
+
+    @IsArray()
+    @IsOptional()
+    groups: number[] | null = []; // Groups Ids.
 }
 
 export class CarToDB {
@@ -86,8 +90,9 @@ export class CarInfo extends CreateCarDTO {
     carId: number;
     constructor(
         carId: number, name: string, color: string, brand: string, scale: string,
-        manufacturer: string, description: string | null = '', designer: string | null = '',
-        series: string | null = '', pictures: string[] | null = [], country: string | null = ''
+        manufacturer: string, description: string | null = '', 
+        designer: string | null = '', series: string | null = '', pictures: string[] | null = [], 
+        country: string | null = ''
     ) {
         super();
         this.carId = carId, this.name = name, this.color = color;
@@ -101,8 +106,8 @@ export class CarInfoWithOwner extends CarInfo {
     ownerUsername: string;
     constructor(
         carId: number, name: string, color: string, brand: string, scale: string,
-        manufacturer: string, ownerUsername: string, description: string | null = '',
-        designer: string | null = '', series: string | null = '',
+        manufacturer: string, ownerUsername: string, 
+        description: string | null = '', designer: string | null = '', series: string | null = '',
         pictures: string[] | null = [], country: string | null = ''
     ) {
         super(carId, name, color, brand, scale, manufacturer, description, designer, series, pictures, country);
@@ -150,4 +155,35 @@ export class CarUpdateDTO {
     @IsString()
     @IsOptional()
     country: string | null = '';
+
+    @IsArray()
+    @IsOptional()
+    groups: number[] | null = [];
+}
+
+
+export class CarInfoWoGroups {
+    carId: number;
+    name: string;
+    color: string;
+    brand: string;
+    scale: string;
+    manufacturer: string;
+    description?: string | null = '';
+    designer?: string | null = '';
+    series?: string | null = '';
+    pictures?: string[] | null = [];
+    country?: string | null = '';
+
+    constructor(
+        carId: number, name: string, color: string, brand: string, scale: string,
+        manufacturer: string, description: string | null = '', 
+        designer: string | null = '', series: string | null = '', pictures: string[] | null = [], 
+        country: string | null = ''
+    ) {
+        this.carId = carId, this.name = name, this.color = color;
+        this.brand = brand, this.scale = scale, this.manufacturer = manufacturer;
+        this.description = description, this.designer = designer, this.series = series;
+        this.pictures = pictures, this.country = country;
+    }
 }

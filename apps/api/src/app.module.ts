@@ -9,6 +9,8 @@ import { UserService } from './services/user.service';
 import { CarService } from './services/car.service';
 import { UploadService } from './services/upload.service';
 import { JwtStrategy } from './validators/auth.validator';
+import { GroupController } from './controllers/group.controller';
+import { GroupService } from './services/group.service';
 
 
 @Module({
@@ -22,7 +24,7 @@ import { JwtStrategy } from './validators/auth.validator';
       signOptions: { expiresIn: '7d' },
     }),
   ],
-  controllers: [UserController, CarController, UploadController],
-  providers: [JwtStrategy, UserService, CarService, UploadService],
+  controllers: [UserController, CarController, UploadController, GroupController],
+  providers: [JwtStrategy, UserService, CarService, UploadService, GroupService],
 })
 export class AppModule {}

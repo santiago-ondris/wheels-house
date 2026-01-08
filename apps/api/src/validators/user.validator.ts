@@ -15,6 +15,10 @@ export async function registerValidator(registerData: RegisterDTO) {
         throw userUtils.USER_PICTURE_FORMAT_NOT_VALID;
     }
 
+    if(registerData.username.includes('@')) {
+        throw userUtils.INVALID_USERNAME;
+    }
+
     // Query username in use.
     const userFromUsername = await getUserFromUsername(registerData.username);
     if(userFromUsername != null) {

@@ -53,7 +53,9 @@ export const group = pgTable("group",{
     userId: integer("userId").references(() => user.userId).notNull(),
     description: text("description"),
     picture: text("picture")
-});
+}, (t) => [
+    unique().on(t.name, t.userId)
+]);
 
 
 // export const carInCollection = pgTable("carInCollection",{
