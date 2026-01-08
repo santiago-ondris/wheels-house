@@ -132,7 +132,7 @@ export const CarDetailPage = () => {
                 {galleryImages.length > 1 && (
                     <div className="mt-10">
                         <h3 className="text-xl font-bold text-white mb-6 px-4 md:px-0">Galería</h3>
-                        <CarMasonryGrid images={galleryImages} />
+                        <CarMasonryGrid images={galleryImages.slice(1)} />
                     </div>
                 )}
             </section>
