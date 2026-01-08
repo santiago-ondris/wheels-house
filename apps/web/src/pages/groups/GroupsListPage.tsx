@@ -124,33 +124,33 @@ export default function GroupsListPage() {
                                         {/* Header Part */}
                                         <div className="flex items-start justify-between">
                                             <div className="relative">
-                                                <div className="w-12 h-12 border border-emerald-400/30 flex items-center justify-center text-emerald-400/40 relative">
+                                                <div className="w-12 h-12 border border-blueprint/30 flex items-center justify-center text-blueprint/40 relative">
                                                     <Folder className="w-6 h-6 stroke-[1.5]" />
                                                     {/* Dimension lines for icon */}
-                                                    <div className="absolute -left-2 top-0 bottom-0 w-[1px] bg-emerald-400/20" />
-                                                    <div className="absolute -left-3 top-1/2 -translate-y-1/2 text-[8px] font-mono -rotate-90 origin-center text-emerald-400/20">48mm</div>
+                                                    <div className="absolute -left-2 top-0 bottom-0 w-[1px] bg-blueprint/20" />
+                                                    <div className="absolute -left-3 top-1/2 -translate-y-1/2 text-[8px] font-mono -rotate-90 origin-center text-blueprint/20">48mm</div>
                                                 </div>
                                             </div>
                                             <div className="text-right font-mono">
-                                                <p className="text-[9px] text-emerald-400/30 uppercase">Ref. Code</p>
-                                                <p className="text-[10px] text-emerald-400/60 font-bold">GRP-{String(group.groupId).padStart(4, '0')}</p>
+                                                <p className="text-[9px] text-blueprint/30 uppercase">Ref. Code</p>
+                                                <p className="text-[10px] text-blueprint/60 font-bold">GRP-{String(group.groupId).padStart(4, '0')}</p>
                                             </div>
                                         </div>
 
                                         {/* Main Content */}
                                         <div className="flex-1 space-y-4">
-                                            <h3 className="text-xl md:text-2xl font-mono font-black text-emerald-50 leading-tight break-words uppercase tracking-tighter group-hover:text-emerald-400 transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+                                            <h3 className="text-xl md:text-2xl font-mono font-black text-white leading-tight break-words uppercase tracking-tighter group-hover:text-blueprint transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
                                                 {group.name}
                                             </h3>
 
-                                            <div className="space-y-1.5 pt-3 border-t border-emerald-400/10">
+                                            <div className="space-y-1.5 pt-3 border-t border-blueprint/10">
                                                 <div className="flex justify-between items-center text-[10px] font-mono">
-                                                    <span className="text-emerald-400/30">STATUS:</span>
-                                                    <span className="text-emerald-400/60">FUNCIONANDO</span>
+                                                    <span className="text-blueprint/30">STATUS:</span>
+                                                    <span className="text-blueprint/60">FUNCIONANDO</span>
                                                 </div>
                                                 <div className="flex justify-between items-center text-[10px] font-mono">
-                                                    <span className="text-emerald-400/30">CANTIDAD:</span>
-                                                    <span className="text-white/80 p-0.5 border border-emerald-400/20 bg-emerald-400/5">
+                                                    <span className="text-blueprint/30">CANTIDAD:</span>
+                                                    <span className="text-white/80 p-0.5 border border-blueprint/20 bg-blueprint/5">
                                                         [ {String(group.totalCars).padStart(3, '0')} AUTOS ]
                                                     </span>
                                                 </div>
@@ -158,12 +158,12 @@ export default function GroupsListPage() {
                                         </div>
 
                                         {/* Footer Decorative */}
-                                        <div className="flex items-center justify-between pt-2 border-t border-emerald-400/10 opacity-40 group-hover:opacity-100 transition-opacity">
+                                        <div className="flex items-center justify-between pt-2 border-t border-blueprint/10 opacity-40 group-hover:opacity-100 transition-opacity">
                                             <div className="flex gap-2">
-                                                <div className="w-10 h-[2px] bg-emerald-400/20" />
-                                                <div className="w-3 h-[2px] bg-emerald-400/20" />
+                                                <div className="w-10 h-[2px] bg-blueprint/20" />
+                                                <div className="w-3 h-[2px] bg-blueprint/20" />
                                             </div>
-                                            <ChevronRight className="w-4 h-4 text-emerald-400 group-hover:translate-x-1 transition-transform" />
+                                            <ChevronRight className="w-4 h-4 text-blueprint group-hover:translate-x-1 transition-transform" />
                                         </div>
                                     </div>
                                 </Link>
@@ -171,18 +171,19 @@ export default function GroupsListPage() {
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center py-20 border border-dashed border-emerald-400/10 rounded-sm bg-emerald-400/[0.01]">
-                        <Folder className="w-12 h-12 mx-auto mb-4 text-emerald-400/20 stroke-[1]" />
-                        <p className="text-sm font-mono text-emerald-400/40 mb-4 tracking-widest uppercase">No data clusters found</p>
+                    <div className="text-center py-20 border border-dashed border-blueprint/10 rounded-sm bg-blueprint/[0.01]">
+                        <Folder className="w-12 h-12 mx-auto mb-4 text-blueprint/20 stroke-[1]" />
+                        <p className="text-sm font-mono text-blueprint/40 mb-4 tracking-widest uppercase">No data clusters found</p>
                         {isOwner && (
                             <button
                                 onClick={() => navigate("/collection/group/new")}
-                                className="px-6 py-2 border border-emerald-400/30 text-emerald-400/60 font-mono text-xs hover:bg-emerald-400/10 transition-colors uppercase tracking-widest"
+                                className="px-6 py-2 border border-blueprint/30 text-blueprint/60 font-mono text-xs hover:bg-blueprint/10 transition-colors uppercase tracking-widest"
                             >
                                 Initialise New Build
                             </button>
                         )}
                     </div>
+
                 )}
 
             </motion.div>

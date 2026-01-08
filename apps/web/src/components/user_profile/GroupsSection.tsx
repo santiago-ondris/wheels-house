@@ -4,14 +4,6 @@ import { Folder, ChevronRight, Plus } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { listFeaturedGroups, GroupBasicInfo } from "../../services/group.service";
 
-// Color variants for groups
-const GROUP_COLORS = [
-    "from-red-500/20 to-red-600/10",
-    "from-rose-500/20 to-rose-600/10",
-    "from-amber-500/20 to-amber-600/10",
-    "from-emerald-500/20 to-emerald-600/10",
-];
-
 interface GroupsSectionProps {
     username: string;
     totalGroups: number;
@@ -102,35 +94,58 @@ export default function GroupsSection({ username, totalGroups, isOwner }: Groups
 
             {featuredGroups.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {featuredGroups.map((group, index) => (
+                    {featuredGroups.map((group) => (
                         <Link
                             key={group.groupId}
                             to={`/collection/${username}/group/${encodeURIComponent(group.name)}`}
-                            className={`relative overflow-hidden rounded-xl bg-gradient-to-br ${GROUP_COLORS[index % GROUP_COLORS.length]} border border-white/10 p-4 hover:border-accent/50 hover:scale-[1.02] transition-all group`}
+                            className="blueprint-card block p-4 group"
                         >
-                            <h3 className="text-white font-bold truncate">{group.name}</h3>
-                            <p className="text-white/60 text-sm mt-1">{group.totalCars} autos</p>
-                            <div className="absolute bottom-2 right-2 text-white/20 group-hover:text-white/40 transition-colors">
-                                <Folder className="w-8 h-8" />
+                            {/* Technical Corner Detail */}
+                            <div className="blueprint-line top-0 right-6 w-[1px] h-2" />
+                            <div className="blueprint-line top-4 right-0 w-2 h-[1px]" />
+
+                            <div className="flex flex-col gap-3">
+                                <div className="flex items-start justify-between">
+                                    <div className="w-8 h-8 border border-blueprint/20 flex items-center justify-center text-blueprint/30">
+                                        <Folder className="w-4 h-4 stroke-[1.5]" />
+                                    </div>
+                                    <span className="text-[14px] font-mono text-blueprint/40 uppercase tracking-tighter text-right">
+                                        GRP-{String(group.groupId).padStart(4, '0')}
+                                    </span>
+                                </div>
+
+                                <div className="space-y-1">
+                                    <h3 className="text-lg font-mono font-bold text-white truncate uppercase tracking-tight group-hover:text-blueprint transition-colors">
+                                        {group.name}
+                                    </h3>
+                                    <div className="flex items-center justify-between pt-1 border-t border-blueprint/10 text-[12px] font-mono">
+                                        <span className="text-blueprint/20 truncate mr-2 uppercase">Cantidad:</span>
+                                        <span className="text-blueprint/60 flex-shrink-0">
+                                            [{String(group.totalCars).padStart(3, '0')} AUTOS]
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </Link>
                     ))}
                 </div>
             ) : (
-                <div className="text-center py-8 text-white/40">
-                    <Folder className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                    <p>No hay grupos destacados</p>
+                <div className="text-center py-8 text-white/40 border border-dashed border-blueprint/10 rounded-xl bg-blueprint/[0.01]">
+                    <Folder className="w-12 h-12 mx-auto mb-2 opacity-30 text-blueprint" />
+                    <p className="text-sm font-mono uppercase tracking-wider">No hay grupos destacados</p>
                     {isOwner && (
                         <button
                             onClick={() => navigate("/collection/group/new")}
-                            className="mt-3 px-4 py-2 text-sm bg-accent/20 text-accent rounded-lg hover:bg-accent/30 transition-colors"
+                            className="mt-3 px-4 py-2 text-xs font-mono border border-blueprint/30 text-blueprint/60 hover:bg-blueprint/10 transition-colors uppercase tracking-widest"
                         >
                             Crear mi primer grupo
                         </button>
                     )}
                 </div>
             )}
+
         </motion.section>
     );
 }
+
 
