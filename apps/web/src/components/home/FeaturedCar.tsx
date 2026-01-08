@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Star } from "lucide-react";
 import { Link } from "react-router-dom";
-import { CarData, getFeaturedCar } from "../../services/car.service";
 import ImageAdapter from "../ui/ImageAdapter";
+import { getCuratedCarForCurrentMonth } from "../../data/curatedCars";
+import { useAuth } from "../../contexts/AuthContext";
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
@@ -11,32 +12,25 @@ const fadeInUp = {
 };
 
 export default function FeaturedCar() {
-    const [featuredCar, setFeaturedCar] = useState<CarData | null>(null);
-    const [loading, setLoading] = useState(true);
+    const { user, isAuthenticated } = useAuth();
+    const featuredCar = getCuratedCarForCurrentMonth();
+    const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
-        getFeaturedCar()
-            .then(setFeaturedCar)
-            .finally(() => setLoading(false));
+        const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+        checkMobile();
+        window.addEventListener("resize", checkMobile);
+        return () => window.removeEventListener("resize", checkMobile);
     }, []);
 
-    if (loading) {
-        return (
-            <div className="container mx-auto px-6 py-20">
-                <div className="h-[500px] bg-white/5 animate-pulse rounded-3xl border border-white/10" />
-            </div>
-        );
-    }
+    // pictures[0] = PC, pictures[1] = Celu
+    const carImage = isMobile && featuredCar.pictures && featuredCar.pictures.length > 1
+        ? featuredCar.pictures[1]
+        : (featuredCar.pictures?.[0] || "https://placehold.co/1200x800/1A1B4B/D9731A?text=No+Image");
 
-    if (!featuredCar) {
-        return (
-            <div className="container mx-auto px-6 py-20">
-                <div className="p-12 text-center bg-white/5 rounded-3xl border border-white/10">
-                    <p className="text-white/40 italic">Aún no hay autos en la comunidad para mostrar.</p>
-                </div>
-            </div>
-        );
-    }
+    const collectionLink = isAuthenticated && user?.username 
+        ? `/collection/${user.username}`
+        : "/collection";
 
     return (
         <section className="container mx-auto px-6 py-10 relative overflow-hidden">
@@ -54,7 +48,7 @@ export default function FeaturedCar() {
                     <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter">
                         Elegido
                         <br />
-                        del día
+                        del mes
                     </h2>
                 </div>
 
@@ -92,7 +86,7 @@ export default function FeaturedCar() {
                 <div className="lg:w-[55%] relative overflow-hidden">
                     <ImageAdapter
                         fit="smart"
-                        src={featuredCar.pictures?.[0] || "https://placehold.co/1200x800/1A1B4B/D9731A?text=No+Image"}
+                        src={carImage}
                         alt={featuredCar.name}
                         className="w-full h-[420px] lg:h-full"
                     />
@@ -149,10 +143,10 @@ export default function FeaturedCar() {
                         </div>
 
                         <Link
-                            to={`/car/${featuredCar.carId}`}
+                            to={collectionLink}
                             className="group/btn relative px-10 py-5 bg-white text-black font-black rounded-2xl transition-all hover:bg-accent hover:text-white hover:scale-105 active:scale-95 shadow-2xl overflow-hidden flex items-center gap-3"
                         >
-                            <span className="relative z-10">VISITAR COLECCION</span>
+                            <span className="relative z-10">IR A MI COLECCION</span>
                             <ArrowRight className="w-6 h-6 relative z-10 transition-transform group-hover/btn:translate-x-1" />
                             <div className="absolute inset-0 bg-accent translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300" />
                         </Link>
