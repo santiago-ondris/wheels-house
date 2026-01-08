@@ -1,8 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;700;900&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-arvo: "Arvo", serif;
-  
+  --font-mono: "JetBrains Mono", monospace;
+  --font-inter: "Inter", sans-serif;
+
   --color-background: #0F0F23;
   --color-dark: #2A2359;
   --color-primary: #BF247A;
@@ -11,4 +14,32 @@
   --color-danger: #BF3939;
   --color-surface: #F5F5F5;
   --color-input-bg: rgba(26, 27, 75, 0.5);
+}
+
+@layer components {
+  .blueprint-card {
+    @apply relative overflow-hidden transition-all duration-300;
+    background-color: #050a0a;
+    background-image:
+      linear-gradient(rgba(16, 185, 129, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(16, 185, 129, 0.03) 1px, transparent 1px);
+    background-size: 20px 20px;
+    border: 1px solid rgba(16, 185, 129, 0.15);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  }
+
+  .blueprint-card:hover {
+    @apply border-emerald-400/40;
+    background-color: #081212;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
+  }
+
+  .blueprint-line {
+    @apply absolute bg-emerald-400/20;
+  }
+
+  .blueprint-stamp {
+    @apply absolute -right-4 -top-4 w-32 py-1 px-4 border-2 border-dashed border-emerald-400/40 text-emerald-400/60 font-mono text-[10px] font-bold uppercase rotate-12 z-10 pointer-events-none;
+    background: rgba(16, 185, 129, 0.02);
+  }
 }
