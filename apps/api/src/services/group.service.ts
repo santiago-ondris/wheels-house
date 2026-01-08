@@ -1,17 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { TokenData } from '../dto/user.dto';
-import { getUserFromUsernameOrEmail } from 'src/database/crud/user.crud';
+import { getUserFromUsername } from 'src/database/crud/user.crud';
 import { getPicturesFromCar } from 'src/database/crud/car.crud';
 import { CreateGroupDTO, GroupInfo, GroupInfoWoCar, GroupToDB, UpdateGroupDTO } from 'src/dto/group.dto';
 import { createGroup, createGroupedCars, deleteGroupedCarFromGroupIdAndCarId, deleteGroupedCarsFromGroupId, deleteGroupFromId, getCarsFromGroupId, getGroupedCarsFromGroupId, getGroupFromId, getGroupFromNameAndUserId, getGroupsFromUserId, getFeaturedGroupsFromUserId, countFeaturedGroupsFromUserId, updateGroup } from 'src/database/crud/group.crud';
 import { ERROR_CREATING_GROUP, ERROR_DELETING_GROUP, ERROR_UPDATING_GROUP, INEXISTENT_GROUP, MAX_FEATURED_GROUPS, MAX_FEATURED_GROUPS_REACHED } from 'src/utils/group.utils';
 import { CarInfoWoGroups } from 'src/dto/car.dto';
-import { groupedCar } from 'src/database/schema';
+import { UploadService } from './upload.service';
+import { getPublicIdFromURL } from 'src/utils/upload.utils';
 
 @Injectable()
 export class GroupService {
+    constructor(private readonly uploadService: UploadService) { }
+
     async createGroupService(groupData: CreateGroupDTO, userData: TokenData) {
-        const user = await getUserFromUsernameOrEmail(userData.username);
+        const user = await getUserFromUsername(userData.username);
 
         // Validate max featured groups
         if (groupData.featured) {
@@ -74,7 +77,7 @@ export class GroupService {
     }
 
     async getGroupByNameService(username: string, groupName: string) {
-        const user = await getUserFromUsernameOrEmail(username);
+        const user = await getUserFromUsername(username);
         if (!user) {
             throw INEXISTENT_GROUP;
         }
@@ -106,7 +109,7 @@ export class GroupService {
     }
 
     async listGroupsService(username: string) {
-        const user = await getUserFromUsernameOrEmail(username);
+        const user = await getUserFromUsername(username);
 
         const groupsFromUserFromDB = await getGroupsFromUserId(user.userId);
 
@@ -124,7 +127,7 @@ export class GroupService {
     }
 
     async listFeaturedGroupsService(username: string) {
-        const user = await getUserFromUsernameOrEmail(username);
+        const user = await getUserFromUsername(username);
 
         const featuredGroupsFromDB = await getFeaturedGroupsFromUserId(user.userId);
 
@@ -196,8 +199,12 @@ export class GroupService {
 
         const deletedGroup = await deleteGroupFromId(groupId);
 
-        if (!deletedGroup) {
+        if (deletedGroup == null) {
             throw ERROR_DELETING_GROUP;
+        }
+
+        if(deletedGroup.picture != null && deletedGroup.picture != '') {
+            await this.uploadService.deleteImage(getPublicIdFromURL(deletedGroup.picture!));
         }
 
         return true;

@@ -2,7 +2,7 @@ import { Controller, Get, Post, Put, Body, UseGuards, Request, Param, Delete } f
 import { CarUpdateDTO, CreateCarDTO } from 'src/dto/car.dto';
 import { CarService } from 'src/services/car.service';
 import { JwtAuthGuard } from 'src/validators/auth.validator';
-import { createCarValidator, deleteCarValidator, getCarValidator, listCarsValidator, updateCarValidator } from 'src/validators/car.validator';
+import { createCarValidator, deleteCarValidator, getCarValidator, listCarsValidator, updateCarGroupsValidator, updateCarValidator } from 'src/validators/car.validator';
 
 @Controller('car')
 export class CarController {
@@ -51,7 +51,7 @@ export class CarController {
     @UseGuards(JwtAuthGuard)
     @Put(':carId/groups')
     async updateCarGroups(@Request() req, @Param('carId') carId, @Body() body: { groups: number[] }) {
-        await deleteCarValidator(req.user, carId);
+        await updateCarGroupsValidator(req.user, carId, body.groups);
 
         return await this.carService.updateCarGroupsService(carId, body.groups);
     }

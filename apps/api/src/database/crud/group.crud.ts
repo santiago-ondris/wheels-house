@@ -122,10 +122,10 @@ export async function updateGroup(groupChanges: UpdateGroupDTO, groupId: number)
 
 export async function deleteGroupFromId(groupId: number) {
     try {
-        await db.delete(group).where(eq(group.groupId, groupId));
-        return true;
+        const deletedGroup = await db.delete(group).where(eq(group.groupId, groupId)).returning();
+        return deletedGroup[0];
     } catch {
-        return false;
+        return null;
     }
 }
 
