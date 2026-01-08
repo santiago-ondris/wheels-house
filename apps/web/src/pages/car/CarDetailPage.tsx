@@ -114,24 +114,8 @@ export const CarDetailPage = () => {
                     </div>
                 </div>
 
-                {galleryImages.length > 0 ? (
-                    <div className="w-full aspect-video rounded-2xl overflow-hidden border border-white/10 relative group">
-                        <img
-                            src={galleryImages[0]}
-                            alt={car.name}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
-                    </div>
-                ) : (
-                    <div className="w-full h-64 flex items-center justify-center bg-white/5 rounded-2xl border border-white/10 text-white/30">
-                        Sin imagen disponible
-                    </div>
-                )}
-
-                {galleryImages.length > 1 && (
-                    <div className="mt-10">
-                        <h3 className="text-xl font-bold text-white mb-6 px-4 md:px-0">Galería</h3>
+                {galleryImages.length > 0 && (
+                    <div className="mt-6">
                         <CarMasonryGrid images={galleryImages} />
                     </div>
                 )}

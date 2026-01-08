@@ -37,10 +37,9 @@ export const CarMasonryGrid = ({ images }: CarMasonryGridProps) => {
         <div className="columns-2 md:columns-3 xl:columns-4 gap-4 space-y-4">
           {images.map((src, index) => (
             <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              key={`${src}-${index}`}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
               className="relative break-inside-avoid rounded-xl overflow-hidden bg-white/5 border border-white/10 group cursor-zoom-in"
               onClick={() => setSelectedIndex(index)}
@@ -49,7 +48,6 @@ export const CarMasonryGrid = ({ images }: CarMasonryGridProps) => {
                 src={src}
                 alt={`Gallery item ${index}`}
                 className="w-full h-auto block transform transition-transform duration-700 group-hover:scale-105"
-                loading="lazy"
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
                 <ZoomIn className="text-white drop-shadow-lg" />
@@ -68,7 +66,7 @@ export const CarMasonryGrid = ({ images }: CarMasonryGridProps) => {
             className="fixed inset-0 z-100 flex items-center justify-center bg-black/60 backdrop-blur-2xl p-4 md:p-8"
             onClick={() => setSelectedIndex(null)}
           >
-            
+
             <button
               className="absolute top-6 right-6 p-2 bg-black/20 hover:bg-white/10 border border-white/10 rounded-full text-white transition-all z-50 backdrop-blur-sm"
               onClick={() => setSelectedIndex(null)}
@@ -83,30 +81,30 @@ export const CarMasonryGrid = ({ images }: CarMasonryGridProps) => {
               <ChevronLeft size={40} />
             </button>
 
-            <div 
-                className="relative w-full h-full flex items-center justify-center"
-                onClick={(e) => e.stopPropagation()} 
+            <div
+              className="relative w-full h-full flex items-center justify-center"
+              onClick={(e) => e.stopPropagation()}
             >
-                <motion.img
-                    key={selectedIndex}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                    
-                    drag="x"
-                    dragConstraints={{ left: 0, right: 0 }}
-                    dragElastic={0.7}
-                    onDragEnd={(_e, { offset }) => {
-                        const swipeThreshold = 50;
-                        if (offset.x > swipeThreshold) handlePrev();
-                        else if (offset.x < -swipeThreshold) handleNext();
-                    }}
-                    
-                    src={images[selectedIndex]}
-                    alt="Full view"
-                    className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl cursor-grab active:cursor-grabbing select-none"
-                />
+              <motion.img
+                key={selectedIndex}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.7}
+                onDragEnd={(_e, { offset }) => {
+                  const swipeThreshold = 50;
+                  if (offset.x > swipeThreshold) handlePrev();
+                  else if (offset.x < -swipeThreshold) handleNext();
+                }}
+
+                src={images[selectedIndex]}
+                alt="Full view"
+                className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl cursor-grab active:cursor-grabbing select-none"
+              />
             </div>
 
             <button
@@ -115,9 +113,9 @@ export const CarMasonryGrid = ({ images }: CarMasonryGridProps) => {
             >
               <ChevronRight size={40} />
             </button>
-            
+
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 bg-black/40 backdrop-blur-md rounded-full text-white/90 text-xs tracking-widest font-mono border border-white/5">
-                {selectedIndex + 1} / {images.length}
+              {selectedIndex + 1} / {images.length}
             </div>
 
           </motion.div>
