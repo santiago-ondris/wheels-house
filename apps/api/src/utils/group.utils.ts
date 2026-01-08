@@ -1,13 +1,23 @@
-import { HttpException, HttpStatus  } from "@nestjs/common";
+import { HttpException, HttpStatus } from "@nestjs/common";
 
 export const NAME_MAX_LENGTH = 25;
 export const DESCRIPTION_MAX_LENGTH = 128;
+export const MAX_FEATURED_GROUPS = 4;
+
+
+export const MAX_FEATURED_GROUPS_REACHED = new HttpException(
+    {
+        status: HttpStatus.BAD_REQUEST,
+        error: `Cannot have more than ${MAX_FEATURED_GROUPS} featured groups.`
+    },
+    HttpStatus.BAD_REQUEST
+);
 
 
 export const GROUP_PICTURE_FORMAT_NOT_VALID = new HttpException(
     {
         status: HttpStatus.BAD_REQUEST,
-        error: 'Picture format not valid.' 
+        error: 'Picture format not valid.'
     },
     HttpStatus.BAD_REQUEST
 );
@@ -23,7 +33,7 @@ export const NAME_TOO_LONG = new HttpException(
 export const GROUP_NAME_IN_USE = new HttpException(
     {
         status: HttpStatus.BAD_REQUEST,
-        error: 'You already have a group with this name.' 
+        error: 'You already have a group with this name.'
     },
     HttpStatus.BAD_REQUEST
 );
@@ -47,7 +57,7 @@ export const DUPLICATED_CAR = new HttpException(
 export const ERROR_CREATING_GROUP = new HttpException(
     {
         status: HttpStatus.INTERNAL_SERVER_ERROR,
-        error: 'Error while creating the group.' 
+        error: 'Error while creating the group.'
     },
     HttpStatus.INTERNAL_SERVER_ERROR
 );
@@ -55,7 +65,7 @@ export const ERROR_CREATING_GROUP = new HttpException(
 export const ERROR_UPDATING_GROUP = new HttpException(
     {
         status: HttpStatus.INTERNAL_SERVER_ERROR,
-        error: 'Error while updating the group.' 
+        error: 'Error while updating the group.'
     },
     HttpStatus.INTERNAL_SERVER_ERROR
 );
@@ -63,7 +73,7 @@ export const ERROR_UPDATING_GROUP = new HttpException(
 export const INEXISTENT_GROUP = new HttpException(
     {
         status: HttpStatus.NOT_FOUND,
-        error: 'Inexistent group.' 
+        error: 'Inexistent group.'
     },
     HttpStatus.NOT_FOUND
 );
@@ -79,15 +89,15 @@ export const GROUP_DO_NOT_BELONG_TO_USER = new HttpException(
 export const ERROR_DELETING_GROUP = new HttpException(
     {
         status: HttpStatus.INTERNAL_SERVER_ERROR,
-        error: 'Error while deleting the group.' 
+        error: 'Error while deleting the group.'
     },
     HttpStatus.INTERNAL_SERVER_ERROR
 );
 
 
 export function validGroupPicture(url: string): boolean {
-    if(url == '') return true;
+    if (url == '') return true;
     const cloudinaryRegex = /^https:\/\/res\.cloudinary\.com\/dyx7kjnjq\/image\/upload\/v\d+\/wheels-house\/cars\/[a-zA-Z0-9_-]+\.(jpg|jpeg|png|webp)$/;
-    
+
     return cloudinaryRegex.test(url);
 }

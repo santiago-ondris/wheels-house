@@ -4,6 +4,7 @@ import { RegisterDTO, UserToDB, LoginDTO, LoginResponse } from '../dto/user.dto'
 import { PublicProfileDTO, PublicCarDTO } from '../dto/public-profile.dto';
 import { createUser, getUserFromUsernameOrEmail, getPublicProfileByUsername, searchUsers } from 'src/database/crud/user.crud';
 import { getCarsFromUserId, getPicturesFromCar } from 'src/database/crud/car.crud';
+import { getGroupsFromUserId } from 'src/database/crud/group.crud';
 import { ERROR_CREATING_USER } from 'src/utils/user.utils';
 import bcrypt from "bcrypt";
 
@@ -56,6 +57,9 @@ export class UserService {
         // Fetch a los autos del usuario.
         const carsFromDB = await getCarsFromUserId(userData.userId);
 
+        // Fetch a los grupos del usuario.
+        const groupsFromDB = await getGroupsFromUserId(userData.userId);
+
         const cars: PublicCarDTO[] = [];
         for (const car of carsFromDB) {
             const carPicturesFromDB = await getPicturesFromCar(car.carId);
@@ -81,7 +85,7 @@ export class UserService {
             userData.firstName,
             userData.lastName,
             cars.length,
-            0, // totalGroups - por ahora hardcodeado pa
+            groupsFromDB.length,
             cars,
             userData.picture ?? undefined,
             userData.createdDate ?? undefined

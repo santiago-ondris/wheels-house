@@ -43,6 +43,13 @@
       "when": 1767825453361,
       "tag": "0005_light_steel_serpent",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1767872669215,
+      "tag": "0006_dry_loners",
+      "breakpoints": true
     }
   ]
 }

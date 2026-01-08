@@ -17,9 +17,9 @@ export interface CarData {
 
 export type CarUpdateDTO = Partial<CarData>;
 
-export async function createCar(data: CarData): Promise<boolean> {
+export async function createCar(data: CarData): Promise<number> {
     const token = localStorage.getItem("auth_token");
-    return apiRequest<boolean>('/car/create', {
+    return apiRequest<number>('/car/create', {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${token}`
@@ -69,3 +69,17 @@ export async function deleteCar(carId: number): Promise<boolean> {
     });
 }
 
+export async function getCarGroups(carId: number): Promise<number[]> {
+    return apiRequest<number[]>(`/car/${carId}/groups`);
+}
+
+export async function updateCarGroups(carId: number, groupIds: number[]): Promise<boolean> {
+    const token = localStorage.getItem("auth_token");
+    return apiRequest<boolean>(`/car/${carId}/groups`, {
+        method: 'PUT',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ groups: groupIds }),
+    });
+}

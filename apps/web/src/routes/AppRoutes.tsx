@@ -2,13 +2,17 @@ import { Routes, Route } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 import HomePage from "../pages/HomePage";
 import NotFoundPage from "../pages/NotFoundPage";
-import ProfilePage from "../pages/ProfilePage";
-import AddCarPage from "../pages/AddCarPage";
-import RegisterPage from "../pages/RegisterPage";
+import ProfilePage from "../pages/user/ProfilePage";
+import AddCarPage from "../pages/car/AddCarPage";
+import RegisterPage from "../pages/login/RegisterPage";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
-import AuthRequiredPage from "../pages/AuthRequiredPage";
-import CarDetailPage from "../pages/CarDetailPage";
-import EditCarPage from "../pages/EditCarPage";
+import AuthRequiredPage from "../pages/login/AuthRequiredPage";
+import CarDetailPage from "../pages/car/CarDetailPage";
+import EditCarPage from "../pages/car/EditCarPage";
+import CreateGroupPage from "../pages/groups/CreateGroupPage";
+import EditGroupPage from "../pages/groups/EditGroupPage";
+import GroupDetailPage from "../pages/groups/GroupDetailPage";
+import GroupsListPage from "../pages/groups/GroupsListPage";
 
 export default function AppRoutes() {
   return (
@@ -18,7 +22,8 @@ export default function AppRoutes() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/auth-required" element={<AuthRequiredPage />} />
         <Route path="/car/:carId" element={<CarDetailPage />} />
-        <Route path="/collection/:username" element={<ProfilePage />} />
+
+        {/* Collection routes - more specific first */}
         <Route path="/collection/add" element={
           <ProtectedRoute>
             <AddCarPage />
@@ -29,6 +34,22 @@ export default function AppRoutes() {
             <EditCarPage />
           </ProtectedRoute>
         } />
+        <Route path="/collection/group/new" element={
+          <ProtectedRoute>
+            <CreateGroupPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/collection/group/edit/:groupId" element={
+          <ProtectedRoute>
+            <EditGroupPage />
+          </ProtectedRoute>
+        } />
+
+        {/* Public collection routes */}
+        <Route path="/collection/:username" element={<ProfilePage />} />
+        <Route path="/collection/:username/groups" element={<GroupsListPage />} />
+        <Route path="/collection/:username/group/:groupName" element={<GroupDetailPage />} />
+
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

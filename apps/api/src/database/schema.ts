@@ -1,8 +1,8 @@
 import { serial, text, integer, date, boolean, unique, pgTable, timestamp } from "drizzle-orm/pg-core";
 
-export const user = pgTable("user",{
+export const user = pgTable("user", {
     userId: serial("userId").primaryKey(),
-    username: text("username").notNull().unique(), 
+    username: text("username").notNull().unique(),
     firstName: text("firstName").notNull(),
     lastName: text("lastName").notNull(),
     email: text("email").notNull().unique(),
@@ -23,7 +23,7 @@ export const user = pgTable("user",{
 //     picture: text("picture"),
 // });
 
-export const car = pgTable("car",{
+export const car = pgTable("car", {
     carId: serial("carId").primaryKey(),
     name: text("name").notNull(),
     color: text("color").notNull(),
@@ -37,7 +37,7 @@ export const car = pgTable("car",{
     country: text("country")
 });
 
-export const carPicture = pgTable("carPicture",{
+export const carPicture = pgTable("carPicture", {
     carPictureId: serial("carPictureId").primaryKey(),
     url: text("url").notNull(),
     carId: integer("carId").references(() => car.carId).notNull(),
@@ -47,12 +47,14 @@ export const carPicture = pgTable("carPicture",{
 ]);
 
 
-export const group = pgTable("group",{
+export const group = pgTable("group", {
     groupId: serial("groupId").primaryKey(),
     name: text("name").notNull(),
     userId: integer("userId").references(() => user.userId).notNull(),
     description: text("description"),
-    picture: text("picture")
+    picture: text("picture"),
+    featured: boolean("featured").default(false),
+    order: integer("order"),
 }, (t) => [
     unique().on(t.name, t.userId)
 ]);
@@ -67,7 +69,7 @@ export const group = pgTable("group",{
 // ]);
 
 
-export const groupedCar = pgTable("groupedCar",{
+export const groupedCar = pgTable("groupedCar", {
     groupedCarId: serial("groupedCarId").primaryKey(),
 
     // when inserting a grouped car it should be verified that the owner of the car is the same as the 
@@ -75,5 +77,5 @@ export const groupedCar = pgTable("groupedCar",{
     carId: integer("carId").references(() => car.carId).notNull(),
     groupId: integer("groupId").references(() => group.groupId).notNull(),
 }, (t) => [
-    unique().on(t.carId,t.groupId)
+    unique().on(t.carId, t.groupId)
 ]);

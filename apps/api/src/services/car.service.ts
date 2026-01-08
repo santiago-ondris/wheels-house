@@ -7,6 +7,7 @@ import {
     createCar, deleteCar, getCarById, getCarByIdWithOwner, getCarsFromUserId, updateCar, createCarPicture, getPicturesFromCar,
     deleteAllCarPictures, deleteCarPicture, updateCarPicture, getTotalCarsCount, getCarByOffset
 } from 'src/database/crud/car.crud';
+import { createGroupedCars, deleteGroupedCarsFromCarId, getGroupsFromCarId } from 'src/database/crud/group.crud';
 
 @Injectable()
 export class CarService {
@@ -39,7 +40,7 @@ export class CarService {
             }
         }
 
-        return true;
+        return createdCar.carId;
     }
 
     async listCarsService(username: string) {
@@ -132,6 +133,8 @@ export class CarService {
     }
 
     async deleteCarService(carId: number) {
+        await deleteGroupedCarsFromCarId(carId);
+
         const picturesDeleted = await deleteAllCarPictures(carId);
 
         const carDeleted = await deleteCar(carId);
@@ -166,5 +169,22 @@ export class CarService {
             carFromDB.description, carFromDB.designer, carFromDB.series,
             carPicturesURLs, carFromDB.country
         );
+    }
+
+    async updateCarGroupsService(carId: number, groupIds: number[]) {
+        // Remove car from all current groups
+        await deleteGroupedCarsFromCarId(carId);
+
+        // Add car to new groups
+        for (const groupId of groupIds) {
+            await createGroupedCars({ groupId, carId });
+        }
+
+        return true;
+    }
+
+    async getCarGroupsService(carId: number) {
+        const groups = await getGroupsFromCarId(carId);
+        return groups.map(g => g.groupId);
     }
 }

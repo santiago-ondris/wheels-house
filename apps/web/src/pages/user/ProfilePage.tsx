@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useAuth } from "../contexts/AuthContext";
-import { getPublicProfile, PublicProfile } from "../services/profile.service";
-import ProfileHero from "../components/user_profile/ProfileHero";
-import GroupsSection from "../components/user_profile/GroupsSection";
-import CollectionSection from "../components/user_profile/CollectionSection";
-import UserNotFoundPage from "./UserNotFoundPage";
+import { useAuth } from "../../contexts/AuthContext";
+import { getPublicProfile, PublicProfile } from "../../services/profile.service";
+import ProfileHero from "../../components/user_profile/ProfileHero";
+import GroupsSection from "../../components/user_profile/GroupsSection";
+import CollectionSection from "../../components/user_profile/CollectionSection";
+import UserNotFoundPage from "../user/UserNotFoundPage";
 
 export default function ProfilePage() {
     const { username } = useParams<{ username: string }>();
@@ -84,6 +84,7 @@ export default function ProfilePage() {
             />
 
             <GroupsSection
+                username={profile.username}
                 totalGroups={profile.totalGroups}
                 isOwner={isOwner}
             />

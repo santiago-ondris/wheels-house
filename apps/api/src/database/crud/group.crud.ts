@@ -1,6 +1,6 @@
 import { db } from '../index'
 import { group, groupedCar, user, car } from 'src/database/schema'
-import { eq, and, sql } from 'drizzle-orm';
+import { eq, and, sql, asc, count } from 'drizzle-orm';
 import { GroupToDB, UpdateGroupDTO } from 'src/dto/group.dto';
 
 
@@ -38,12 +38,30 @@ export async function getGroupsFromUserId(userId: number) {
         name: group.name,
         description: group.description,
         picture: group.picture,
-    }).from(group).where(eq(group.userId, userId));
+        featured: group.featured,
+        order: group.order,
+    }).from(group).where(eq(group.userId, userId)).orderBy(asc(group.order));
+}
+
+export async function getFeaturedGroupsFromUserId(userId: number) {
+    return await db.select({
+        groupId: group.groupId,
+        name: group.name,
+        description: group.description,
+        picture: group.picture,
+        featured: group.featured,
+        order: group.order,
+    }).from(group).where(and(eq(group.userId, userId), eq(group.featured, true))).orderBy(asc(group.order));
+}
+
+export async function countFeaturedGroupsFromUserId(userId: number) {
+    const result = await db.select({ count: count() }).from(group).where(and(eq(group.userId, userId), eq(group.featured, true)));
+    return result[0]?.count ?? 0;
 }
 
 export async function getGroupFromNameAndUserId(name: string, userId: number) {
     const groupObject = await db.select().from(group).where(and(eq(group.name, name), eq(group.userId, userId)));
-    
+
     return groupObject[0];
 }
 
@@ -52,7 +70,9 @@ export async function getGroupsFromCarId(carId: number) {
         groupId: group.groupId,
         name: group.name,
         description: group.description,
-        picture: group.picture
+        picture: group.picture,
+        featured: group.featured,
+        order: group.order,
     }).from(groupedCar).where(eq(groupedCar.carId, carId)).innerJoin(group, eq(group.groupId, groupedCar.groupId));
 
     return groups;
@@ -70,13 +90,13 @@ export async function getCarsFromGroupId(groupId: number) {
         designer: car.designer,
         series: car.series,
         country: car.country,
-    }).from(groupedCar).where(eq(groupedCar.groupId, groupId)).innerJoin(car,eq(groupedCar.carId, car.carId));
+    }).from(groupedCar).where(eq(groupedCar.groupId, groupId)).innerJoin(car, eq(groupedCar.carId, car.carId));
 
     return cars;
 }
 
 export async function getGroupedCarsFromGroupId(groupId: number) {
-    const groupedCars = await db.select({carId: groupedCar.carId}).from(groupedCar).where(eq(groupedCar.groupId, groupId));
+    const groupedCars = await db.select({ carId: groupedCar.carId }).from(groupedCar).where(eq(groupedCar.groupId, groupId));
 
     return groupedCars;
 }
@@ -88,7 +108,9 @@ export async function updateGroup(groupChanges: UpdateGroupDTO, groupId: number)
         await db.update(group).set({
             name: groupChanges.name,
             description: groupChanges.description!,
-            picture: groupChanges.picture!
+            picture: groupChanges.picture!,
+            featured: groupChanges.featured,
+            order: groupChanges.order,
         }).where(eq(group.groupId, groupId));
         return true;
     } catch {
@@ -100,7 +122,7 @@ export async function updateGroup(groupChanges: UpdateGroupDTO, groupId: number)
 
 export async function deleteGroupFromId(groupId: number) {
     try {
-        await db.delete(group).where(eq(group.groupId,groupId));
+        await db.delete(group).where(eq(group.groupId, groupId));
         return true;
     } catch {
         return false;
@@ -109,7 +131,7 @@ export async function deleteGroupFromId(groupId: number) {
 
 export async function deleteGroupedCarsFromGroupId(groupId: number) {
     try {
-        await db.delete(groupedCar).where(eq(groupedCar.groupId,groupId));
+        await db.delete(groupedCar).where(eq(groupedCar.groupId, groupId));
         return true;
     } catch {
         return false;
@@ -118,7 +140,16 @@ export async function deleteGroupedCarsFromGroupId(groupId: number) {
 
 export async function deleteGroupedCarFromGroupIdAndCarId(groupId: number, carId: number) {
     try {
-        await db.delete(groupedCar).where(and(eq(groupedCar.groupId,groupId), eq(groupedCar.carId,carId)));
+        await db.delete(groupedCar).where(and(eq(groupedCar.groupId, groupId), eq(groupedCar.carId, carId)));
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+export async function deleteGroupedCarsFromCarId(carId: number) {
+    try {
+        await db.delete(groupedCar).where(eq(groupedCar.carId, carId));
         return true;
     } catch {
         return false;

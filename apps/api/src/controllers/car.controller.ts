@@ -48,6 +48,19 @@ export class CarController {
         return await this.carService.deleteCarService(carId);
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Put(':carId/groups')
+    async updateCarGroups(@Request() req, @Param('carId') carId, @Body() body: { groups: number[] }) {
+        await deleteCarValidator(req.user, carId);
+
+        return await this.carService.updateCarGroupsService(carId, body.groups);
+    }
+
+    @Get(':carId/groups')
+    async getCarGroups(@Param('carId') carId) {
+        return await this.carService.getCarGroupsService(carId);
+    }
+
     @Get('featured')
     async getFeaturedCar() {
         return await this.carService.getFeaturedCarService();
