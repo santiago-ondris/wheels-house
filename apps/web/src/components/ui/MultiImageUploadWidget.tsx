@@ -183,6 +183,7 @@ export default function MultiImageUploadWidget({
         toast.success('Imagen eliminada');
     };
 
+
     const uploadingEntries = Object.entries(uploadingStates);
     const canAddMore = values.length < maxImages && uploadingEntries.length === 0;
 
@@ -220,11 +221,6 @@ export default function MultiImageUploadWidget({
                                         alt={`Preview ${index + 1}`}
                                         className="w-full h-full object-cover"
                                     />
-                                    {index === 0 && (
-                                        <div className="absolute top-2 left-2 px-2 py-1 bg-accent/90 text-white text-[10px] font-bold rounded-md uppercase tracking-wide">
-                                            Principal
-                                        </div>
-                                    )}
                                     {isDuplicate && (
                                         <div className="absolute top-2 right-2 px-2 py-1 bg-yellow-500/90 text-black text-[10px] font-bold rounded-md uppercase tracking-wide">
                                             Duplicada
