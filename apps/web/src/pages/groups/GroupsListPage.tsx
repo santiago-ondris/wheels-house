@@ -173,13 +173,13 @@ export default function GroupsListPage() {
                 ) : (
                     <div className="text-center py-20 border border-dashed border-blueprint/10 rounded-sm bg-blueprint/[0.01]">
                         <Folder className="w-12 h-12 mx-auto mb-4 text-blueprint/20 stroke-[1]" />
-                        <p className="text-sm font-mono text-blueprint/40 mb-4 tracking-widest uppercase">No data clusters found</p>
+                        <p className="text-sm font-mono text-blueprint/40 mb-4 tracking-widest uppercase">No se encontraron grupos</p>
                         {isOwner && (
                             <button
                                 onClick={() => navigate("/collection/group/new")}
                                 className="px-6 py-2 border border-blueprint/30 text-blueprint/60 font-mono text-xs hover:bg-blueprint/10 transition-colors uppercase tracking-widest"
                             >
-                                Initialise New Build
+                                Crear nuevo grupo
                             </button>
                         )}
                     </div>
