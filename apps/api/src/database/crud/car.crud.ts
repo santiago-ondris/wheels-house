@@ -123,18 +123,18 @@ export async function deleteCar(carId: number) {
 
 export async function deleteCarPicture(carPictureId: number) {
     try {
-        await db.delete(carPicture).where(eq(carPicture.carPictureId, carPictureId));
-        return true;
+        const deletedPicture = await db.delete(carPicture).where(eq(carPicture.carPictureId, carPictureId)).returning();
+        return deletedPicture[0];
     } catch {
-        return false;
+        return null;
     }
 }
 
 export async function deleteAllCarPictures(carId: number) {
     try {
-        await db.delete(carPicture).where(eq(carPicture.carId, carId));
-        return true;
+        const deletedPictures = await db.delete(carPicture).where(eq(carPicture.carId, carId)).returning();
+        return deletedPictures;
     } catch {
-        return false;
+        return null;
     }
 }

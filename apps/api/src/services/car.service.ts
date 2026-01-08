@@ -4,13 +4,17 @@ import { getUserFromUsername } from 'src/database/crud/user.crud';
 import { CarInfo, CarInfoWithOwner, CarPictureToDB, CarToDB, CarUpdateDTO, CreateCarDTO } from 'src/dto/car.dto';
 import { ERROR_CREATING_CAR, ERROR_DELETING_CAR, ERROR_UPDATING_CAR } from 'src/utils/car.utils';
 import {
-    createCar, deleteCar, getCarById, getCarByIdWithOwner, getCarsFromUserId, updateCar, createCarPicture, getPicturesFromCar,
+    createCar, deleteCar, getCarByIdWithOwner, getCarsFromUserId, updateCar, createCarPicture, getPicturesFromCar,
     deleteAllCarPictures, deleteCarPicture, updateCarPicture, getTotalCarsCount, getCarByOffset
 } from 'src/database/crud/car.crud';
 import { createGroupedCars, deleteGroupedCarsFromCarId, getGroupsFromCarId } from 'src/database/crud/group.crud';
+import { UploadService } from './upload.service';
+import { getPublicIdFromURL } from 'src/utils/upload.utils';
 
 @Injectable()
 export class CarService {
+    constructor(private readonly uploadService: UploadService) { }
+
     async createCarService(carData: CreateCarDTO, userData: TokenData) {
         const user = await getUserFromUsername(userData.username);
 
@@ -103,6 +107,9 @@ export class CarService {
             if (!pictureUpdated) {
                 throw ERROR_UPDATING_CAR;
             }
+
+            // URL not used anymore.
+            await this.uploadService.deleteImage(getPublicIdFromURL(carPicturesFromDB[idx].url));
         }
 
         if (carChanges.pictures!.length > carPicturesFromDB.length) {
@@ -123,9 +130,11 @@ export class CarService {
             for (let idx = carChanges.pictures!.length; idx < carPicturesFromDB.length; ++idx) {
                 const pictureDeleted = await deleteCarPicture(carPicturesFromDB[idx].carPictureId);
 
-                if (!pictureDeleted) {
+                if (pictureDeleted == null) {
                     throw ERROR_UPDATING_CAR;
                 }
+
+                await this.uploadService.deleteImage(getPublicIdFromURL(pictureDeleted.url));
             }
         }
 
@@ -133,14 +142,18 @@ export class CarService {
     }
 
     async deleteCarService(carId: number) {
-        await deleteGroupedCarsFromCarId(carId);
+        const groupedCarDeleted = await deleteGroupedCarsFromCarId(carId);
 
         const picturesDeleted = await deleteAllCarPictures(carId);
 
         const carDeleted = await deleteCar(carId);
 
-        if (!carDeleted || !picturesDeleted) {
+        if (!carDeleted || (picturesDeleted == null) || !groupedCarDeleted) {
             throw ERROR_DELETING_CAR;
+        }
+
+        for(const picture of picturesDeleted) {
+            await this.uploadService.deleteImage(getPublicIdFromURL(picture.url));
         }
 
         return true;
