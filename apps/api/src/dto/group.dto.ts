@@ -62,3 +62,7 @@ export class GroupInfo extends GroupInfoWoCar {
         this.cars = cars;
     }
 }
+
+export class UpdateGroupDTO extends CreateGroupDTO {
+    
+}

@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus  } from "@nestjs/common";
 
-export const NAME_MAX_LENGTH = 15;
+export const NAME_MAX_LENGTH = 25;
 export const DESCRIPTION_MAX_LENGTH = 128;
 
 
@@ -36,10 +36,26 @@ export const DESCRIPTION_TOO_LONG = new HttpException(
     HttpStatus.BAD_REQUEST
 );
 
+export const DUPLICATED_CAR = new HttpException(
+    {
+        status: HttpStatus.BAD_REQUEST,
+        error: `Can not add a car to a group twice.`
+    },
+    HttpStatus.BAD_REQUEST
+);
+
 export const ERROR_CREATING_GROUP = new HttpException(
     {
         status: HttpStatus.INTERNAL_SERVER_ERROR,
         error: 'Error while creating the group.' 
+    },
+    HttpStatus.INTERNAL_SERVER_ERROR
+);
+
+export const ERROR_UPDATING_GROUP = new HttpException(
+    {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: 'Error while updating the group.' 
     },
     HttpStatus.INTERNAL_SERVER_ERROR
 );
@@ -51,6 +67,23 @@ export const INEXISTENT_GROUP = new HttpException(
     },
     HttpStatus.NOT_FOUND
 );
+
+export const GROUP_DO_NOT_BELONG_TO_USER = new HttpException(
+    {
+        status: HttpStatus.UNAUTHORIZED,
+        error: 'Group do not belong to user.'
+    },
+    HttpStatus.UNAUTHORIZED
+);
+
+export const ERROR_DELETING_GROUP = new HttpException(
+    {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: 'Error while deleting the group.' 
+    },
+    HttpStatus.INTERNAL_SERVER_ERROR
+);
+
 
 export function validGroupPicture(url: string): boolean {
     if(url == '') return true;
