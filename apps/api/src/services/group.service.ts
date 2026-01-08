@@ -3,8 +3,8 @@ import { TokenData } from '../dto/user.dto';
 import { getUserFromUsernameOrEmail } from 'src/database/crud/user.crud';
 import { getPicturesFromCar } from 'src/database/crud/car.crud';
 import { CreateGroupDTO, GroupInfo, GroupInfoWoCar, GroupToDB, UpdateGroupDTO } from 'src/dto/group.dto';
-import { createGroup, createGroupedCars, deleteGroupedCarFromGroupIdAndCarId, deleteGroupedCarsFromGroupId, deleteGroupFromId, getCarsFromGroupId, getGroupedCarsFromGroupId, getGroupFromId, getGroupsFromUserId, updateGroup } from 'src/database/crud/group.crud';
-import { ERROR_CREATING_GROUP, ERROR_DELETING_GROUP, ERROR_UPDATING_GROUP } from 'src/utils/group.utils';
+import { createGroup, createGroupedCars, deleteGroupedCarFromGroupIdAndCarId, deleteGroupedCarsFromGroupId, deleteGroupFromId, getCarsFromGroupId, getGroupedCarsFromGroupId, getGroupFromId, getGroupFromNameAndUserId, getGroupsFromUserId, getFeaturedGroupsFromUserId, countFeaturedGroupsFromUserId, updateGroup } from 'src/database/crud/group.crud';
+import { ERROR_CREATING_GROUP, ERROR_DELETING_GROUP, ERROR_UPDATING_GROUP, INEXISTENT_GROUP, MAX_FEATURED_GROUPS, MAX_FEATURED_GROUPS_REACHED } from 'src/utils/group.utils';
 import { CarInfoWoGroups } from 'src/dto/car.dto';
 import { groupedCar } from 'src/database/schema';
 
@@ -13,14 +13,22 @@ export class GroupService {
     async createGroupService(groupData: CreateGroupDTO, userData: TokenData) {
         const user = await getUserFromUsernameOrEmail(userData.username);
 
-        const newGroup = new GroupToDB (
+        // Validate max featured groups
+        if (groupData.featured) {
+            const featuredCount = await countFeaturedGroupsFromUserId(user.userId);
+            if (featuredCount >= MAX_FEATURED_GROUPS) {
+                throw MAX_FEATURED_GROUPS_REACHED;
+            }
+        }
+
+        const newGroup = new GroupToDB(
             user.userId, groupData.name, groupData.description,
-            groupData.picture
+            groupData.picture, groupData.featured, groupData.order
         );
 
         const createdGroup = await createGroup(newGroup);
 
-        if(createdGroup == null) {
+        if (createdGroup == null) {
             throw ERROR_CREATING_GROUP;
         }
 
@@ -33,10 +41,10 @@ export class GroupService {
 
         const createdGroupedCars = await createGroupedCars(newGroupedCars);
 
-        if(groupData.cars!.length > 0 && createdGroupedCars == null) {
+        if (groupData.cars!.length > 0 && createdGroupedCars == null) {
             throw ERROR_CREATING_GROUP;
         }
-        
+
         return true;
     }
 
@@ -45,23 +53,55 @@ export class GroupService {
 
         const carsFromGroupDB = await getCarsFromGroupId(groupId);
 
-        const carsFromGroup : CarInfoWoGroups[] = [];
+        const carsFromGroup: CarInfoWoGroups[] = [];
 
         for (const car of carsFromGroupDB) {
             const carPicturesFromDB = await getPicturesFromCar(car.carId);
-            
+
             const carPictures = carPicturesFromDB.map(picture => picture.url);
 
             carsFromGroup.push(new CarInfoWoGroups(
-                car.carId, car.name, car.color, car.brand, car.scale, 
-                car.manufacturer, car.description, car.designer, car.series, 
+                car.carId, car.name, car.color, car.brand, car.scale,
+                car.manufacturer, car.description, car.designer, car.series,
                 carPictures, car.country
             ));
         }
 
         return new GroupInfo(
-            group.groupId, group.name, carsFromGroup.length, carsFromGroup, 
-            group.description, group.picture
+            group.groupId, group.name, carsFromGroup.length, carsFromGroup,
+            group.description, group.picture, group.featured, group.order
+        );
+    }
+
+    async getGroupByNameService(username: string, groupName: string) {
+        const user = await getUserFromUsernameOrEmail(username);
+        if (!user) {
+            throw INEXISTENT_GROUP;
+        }
+
+        const group = await getGroupFromNameAndUserId(groupName, user.userId);
+        if (!group) {
+            throw INEXISTENT_GROUP;
+        }
+
+        const carsFromGroupDB = await getCarsFromGroupId(group.groupId);
+
+        const carsFromGroup: CarInfoWoGroups[] = [];
+
+        for (const car of carsFromGroupDB) {
+            const carPicturesFromDB = await getPicturesFromCar(car.carId);
+            const carPictures = carPicturesFromDB.map(picture => picture.url);
+
+            carsFromGroup.push(new CarInfoWoGroups(
+                car.carId, car.name, car.color, car.brand, car.scale,
+                car.manufacturer, car.description, car.designer, car.series,
+                carPictures, car.country
+            ));
+        }
+
+        return new GroupInfo(
+            group.groupId, group.name, carsFromGroup.length, carsFromGroup,
+            group.description, group.picture, group.featured, group.order
         );
     }
 
@@ -69,56 +109,77 @@ export class GroupService {
         const user = await getUserFromUsernameOrEmail(username);
 
         const groupsFromUserFromDB = await getGroupsFromUserId(user.userId);
- 
-        const groupsFromUser : GroupInfoWoCar[] = [];
-        
-        for(const group of groupsFromUserFromDB) {
+
+        const groupsFromUser: GroupInfoWoCar[] = [];
+
+        for (const group of groupsFromUserFromDB) {
             const totalCars = (await getCarsFromGroupId(group.groupId)).length;
             groupsFromUser.push(new GroupInfoWoCar(
-                group.groupId, group.name, totalCars, group.description, 
-                group.picture
+                group.groupId, group.name, totalCars, group.description,
+                group.picture, group.featured, group.order
             ));
         }
 
         return groupsFromUser;
     }
 
-    async updateGroupService(groupId: number, groupChanges: UpdateGroupDTO) {
-        const updatedGroup = await updateGroup(groupChanges, groupId);
+    async listFeaturedGroupsService(username: string) {
+        const user = await getUserFromUsernameOrEmail(username);
 
-        console.log("ACA");
+        const featuredGroupsFromDB = await getFeaturedGroupsFromUserId(user.userId);
 
-        if(!updatedGroup) {
-            throw ERROR_UPDATING_GROUP;
+        const featuredGroups: GroupInfoWoCar[] = [];
+
+        for (const group of featuredGroupsFromDB) {
+            const totalCars = (await getCarsFromGroupId(group.groupId)).length;
+            featuredGroups.push(new GroupInfoWoCar(
+                group.groupId, group.name, totalCars, group.description,
+                group.picture, group.featured, group.order
+            ));
         }
 
-        console.log("ARAFUE");
+        return featuredGroups;
+    }
 
+    async updateGroupService(groupId: number, groupChanges: UpdateGroupDTO) {
+        // Validate max featured groups if trying to set as featured
+        if (groupChanges.featured) {
+            const currentGroup = await getGroupFromId(groupId);
+            // Only validate if the group wasn't already featured
+            if (!currentGroup.featured) {
+                const featuredCount = await countFeaturedGroupsFromUserId(currentGroup.userId);
+                if (featuredCount >= MAX_FEATURED_GROUPS) {
+                    throw MAX_FEATURED_GROUPS_REACHED;
+                }
+            }
+        }
+
+        const updatedGroup = await updateGroup(groupChanges, groupId);
+
+        if (!updatedGroup) {
+            throw ERROR_UPDATING_GROUP;
+        }
 
         const groupedCars = await getGroupedCarsFromGroupId(groupId);
 
         const setGroupedCars = new Set(groupedCars.map(car => car.carId));
 
-        console.log(setGroupedCars);
-
-        for(const carId of groupChanges.cars!) {
-            if(setGroupedCars.has(carId)) {
+        for (const carId of groupChanges.cars!) {
+            if (setGroupedCars.has(carId)) {
                 setGroupedCars.delete(carId);
             } else {
-                const createdGroupedCar = await createGroupedCars({groupId: groupId, carId: carId});
+                const createdGroupedCar = await createGroupedCars({ groupId: groupId, carId: carId });
 
-                // console.log("ATRODEN", setGroupedCars.has({carId: carId}));
-
-                if(createdGroupedCar == null) {
+                if (createdGroupedCar == null) {
                     throw ERROR_UPDATING_GROUP;
                 }
             }
         }
 
-        for(const car of setGroupedCars) {
+        for (const car of setGroupedCars) {
             const deletedGroupedCar = await deleteGroupedCarFromGroupIdAndCarId(groupId, car);
 
-            if(!deletedGroupedCar) {
+            if (!deletedGroupedCar) {
                 throw ERROR_UPDATING_GROUP;
             }
         }
@@ -127,15 +188,15 @@ export class GroupService {
     }
 
     async deleteGroupService(groupId: number) {
-        const deletedGroup = await deleteGroupFromId(groupId);
+        const deletedGroupedCars = await deleteGroupedCarsFromGroupId(groupId);
 
-        if(!deletedGroup) {
+        if (!deletedGroupedCars) {
             throw ERROR_DELETING_GROUP;
         }
 
-        const deletedGroupedCars = await deleteGroupedCarsFromGroupId(groupId);
+        const deletedGroup = await deleteGroupFromId(groupId);
 
-        if(!deletedGroupedCars) {
+        if (!deletedGroup) {
             throw ERROR_DELETING_GROUP;
         }
 

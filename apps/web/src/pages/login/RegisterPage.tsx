@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
 import { Car } from "lucide-react";
-import RegisterForm from "../components/auth/RegisterForm";
+import RegisterForm from "../../components/auth/RegisterForm";
 
 export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 md:p-8">
       <div className="w-full max-w-6xl grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-        
+
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
     ArrowLeft,
@@ -13,17 +13,21 @@ import {
     Factory,
     Save,
     Sparkles,
+    Folder,
+    Check,
 } from "lucide-react";
-import { carSchema, CarFormData } from "../lib/validations/car";
-import { createCar } from "../services/car.service";
-import { scales, manufacturers, brands, colors } from "../data/carOptions";
-import FieldSelector from "../components/cars/addcar/FieldSelector";
-import MultiImageUploadWidget from "../components/ui/MultiImageUploadWidget";
+import { carSchema, CarFormData } from "../../lib/validations/car";
+import { updateCar, getCar, getCarGroups, updateCarGroups } from "../../services/car.service";
+import { listGroups, GroupBasicInfo } from "../../services/group.service";
+import { scales, manufacturers, brands, colors } from "../../data/carOptions";
+import FieldSelector from "../../components/cars/addcar/FieldSelector";
+import MultiImageUploadWidget from "../../components/ui/MultiImageUploadWidget";
 import toast from "react-hot-toast";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 
-export default function AddCarPage() {
+export default function EditCarPage() {
     const navigate = useNavigate();
+    const { carId } = useParams<{ carId: string }>();
     const { user } = useAuth();
     const [formData, setFormData] = useState<CarFormData>({
         name: "",
@@ -37,13 +41,47 @@ export default function AddCarPage() {
         pictures: [],
     });
 
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
-
-
     const [errors, setErrors] = useState<Partial<Record<keyof CarFormData, string>>>({});
     const [isLoading, setIsLoading] = useState(false);
+    const [isFetching, setIsFetching] = useState(true);
+    const [userGroups, setUserGroups] = useState<GroupBasicInfo[]>([]);
+    const [selectedGroups, setSelectedGroups] = useState<number[]>([]);
+
+    useEffect(() => {
+        if (carId && user?.username) {
+            fetchData(carId);
+        }
+    }, [carId, user?.username]);
+
+    const fetchData = async (id: string) => {
+        try {
+            const [carData, groups, carGroups] = await Promise.all([
+                getCar(id),
+                listGroups(user!.username),
+                getCarGroups(Number(id)),
+            ]);
+
+            setFormData({
+                name: carData.name,
+                color: carData.color,
+                brand: carData.brand,
+                scale: carData.scale,
+                manufacturer: carData.manufacturer,
+                description: carData.description || "",
+                designer: carData.designer || "",
+                series: carData.series || "",
+                pictures: carData.pictures || [],
+            });
+            setUserGroups(groups);
+            setSelectedGroups(carGroups);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            toast.error("Error al cargar datos");
+            navigate(`/collection/${user?.username}`);
+        } finally {
+            setIsFetching(false);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -65,11 +103,14 @@ export default function AddCarPage() {
 
         setIsLoading(true);
         try {
-            await createCar(result.data);
-            toast.success("¡Auto agregado a tu colección!");
-            navigate(`/collection/${user?.username}`);
+            if (carId) {
+                await updateCar(Number(carId), result.data);
+                await updateCarGroups(Number(carId), selectedGroups);
+                toast.success("¡Auto actualizado con éxito!");
+                navigate(`/car/${carId}`, { replace: true });
+            }
         } catch (error: any) {
-            toast.error("Error al agregar el auto. Intentá de nuevo.");
+            toast.error("Error al actualizar el auto. Intentá de nuevo.");
             console.error(error);
         } finally {
             setIsLoading(false);
@@ -77,7 +118,7 @@ export default function AddCarPage() {
     };
 
     const handleCancel = () => {
-        navigate(`/collection/${user?.username}`);
+        navigate(carId ? `/car/${carId}` : `/collection/${user?.username}`);
     };
 
     const updateField = (field: keyof CarFormData, value: string) => {
@@ -86,6 +127,18 @@ export default function AddCarPage() {
             setErrors((prev) => ({ ...prev, [field]: undefined }));
         }
     };
+
+    const toggleGroup = (groupId: number) => {
+        setSelectedGroups((prev) =>
+            prev.includes(groupId)
+                ? prev.filter((id) => id !== groupId)
+                : [...prev, groupId]
+        );
+    };
+
+    if (isFetching) {
+        return <div className="min-h-screen flex items-center justify-center text-white">Cargando...</div>;
+    }
 
     return (
         <div className="min-h-screen pb-32 md:pb-8">
@@ -104,10 +157,10 @@ export default function AddCarPage() {
                         </button>
                         <div className="flex-1">
                             <h1 className="text-xl md:text-2xl font-bold text-white">
-                                Agregar Auto
+                                Editar Auto
                             </h1>
                             <p className="text-white/40 text-xs md:text-sm">
-                                Sumá un nuevo modelo a tu colección
+                                Modificá los detalles de tu colección
                             </p>
                         </div>
                         <button
@@ -116,7 +169,7 @@ export default function AddCarPage() {
                             className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-accent hover:bg-accent/80 disabled:bg-accent/50 text-white font-bold rounded-xl transition-all hover:scale-105 active:scale-95"
                         >
                             <Save className="w-4 h-4" />
-                            {isLoading ? "Guardando..." : "Guardar"}
+                            {isLoading ? "Guardando..." : "Guardar Cambios"}
                         </button>
                     </div>
                 </div>
@@ -276,6 +329,51 @@ export default function AddCarPage() {
                         </div>
                     </div>
 
+                    {/* Group Selector Section */}
+                    {userGroups.length > 0 && (
+                        <div className="mb-8">
+                            <div className="flex items-center gap-2 mb-4">
+                                <Folder className="w-4 h-4 text-white/40" />
+                                <h2 className="text-sm font-bold text-white/40 uppercase tracking-widest">
+                                    Grupos
+                                </h2>
+                                <span className="text-[10px] text-white/20 ml-2">({selectedGroups.length} seleccionados)</span>
+                            </div>
+
+                            <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 md:p-6">
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                                    {userGroups.map((group) => (
+                                        <div
+                                            key={group.groupId}
+                                            onClick={() => toggleGroup(group.groupId)}
+                                            className={`relative cursor-pointer rounded-xl p-4 border-2 transition-all ${selectedGroups.includes(group.groupId)
+                                                    ? "border-accent bg-accent/10"
+                                                    : "border-white/10 bg-white/[0.02] hover:border-white/20"
+                                                }`}
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${selectedGroups.includes(group.groupId)
+                                                        ? "bg-accent text-white"
+                                                        : "bg-white/5 text-white/40"
+                                                    }`}>
+                                                    <Folder className="w-4 h-4" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-white font-medium truncate">{group.name}</p>
+                                                    <p className="text-white/40 text-xs">{group.totalCars} autos</p>
+                                                </div>
+                                            </div>
+                                            {selectedGroups.includes(group.groupId) && (
+                                                <div className="absolute top-2 right-2 w-5 h-5 bg-accent rounded-full flex items-center justify-center">
+                                                    <Check className="w-3 h-3 text-white" />
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
                     <div className="hidden md:flex justify-end gap-4">
                         <button
                             type="button"
@@ -309,7 +407,7 @@ export default function AddCarPage() {
                         className="flex-[2] flex items-center justify-center gap-2 px-6 py-4 bg-accent hover:bg-accent/80 disabled:bg-accent/50 text-white font-bold rounded-xl transition-all active:scale-95 shadow-lg shadow-accent/30"
                     >
                         <Save className="w-5 h-5" />
-                        {isLoading ? "Guardando..." : "Guardar Auto"}
+                        {isLoading ? "Guardando..." : "Guardar Cambios"}
                     </button>
                 </div>
             </motion.div>

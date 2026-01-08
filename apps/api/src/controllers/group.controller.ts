@@ -23,11 +23,25 @@ export class GroupController {
         return await this.groupService.getGroupService(groupId);
     }
 
+    @Get('by-name/:username/:groupName')
+    async getGroupByName(@Param('username') username: string, @Param('groupName') groupName: string) {
+        // Decode URL-encoded group name
+        const decodedName = decodeURIComponent(groupName);
+        return await this.groupService.getGroupByNameService(username, decodedName);
+    }
+
     @Get('list/:username')
     async listGroups(@Param('username') username: string) {
         await listGroupsValidator(username);
 
         return await this.groupService.listGroupsService(username);
+    }
+
+    @Get('featured/:username')
+    async listFeaturedGroups(@Param('username') username: string) {
+        await listGroupsValidator(username);
+
+        return await this.groupService.listFeaturedGroupsService(username);
     }
 
     @UseGuards(JwtAuthGuard)

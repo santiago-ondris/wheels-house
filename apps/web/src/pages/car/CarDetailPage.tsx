@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowDown, ArrowUp, Edit, Trash2, ArrowLeft } from "lucide-react";
-import { getCar, deleteCar, CarData } from "../services/car.service";
+import { getCar, deleteCar, CarData } from "../../services/car.service";
 
-import { CarMasonryGrid } from "../components/cars/CarMasonryGrid";
-import Modal from "../components/ui/Modal";
+import { CarMasonryGrid } from "../../components/cars/CarMasonryGrid";
+import Modal from "../../components/ui/Modal";
 import toast from "react-hot-toast";
 
 export const CarDetailPage = () => {
