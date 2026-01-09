@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { getCarsForStats } from '../database/crud/stats.crud';
+import { getCarsForStats, getTotalPhotosCount } from '../database/crud/stats.crud';
 import { getPublicProfileByUsername } from '../database/crud/user.crud';
 import { UserStatsDTO, DistributionItem } from '../dto/stats.dto';
 
@@ -25,7 +25,7 @@ export class StatsService {
         const colorCounts: Record<string, number> = {};
         const conditionCounts: Record<string, number> = {};
         const countryCounts: Record<string, number> = {};
-        let carsInGroups = 0;
+        const totalPhotos = await getTotalPhotosCount(userData.userId);
 
         cars.forEach(car => {
             brandCounts[car.brand] = (brandCounts[car.brand] || 0) + 1;
@@ -37,9 +37,6 @@ export class StatsService {
             }
             if (car.country) {
                 countryCounts[car.country] = (countryCounts[car.country] || 0) + 1;
-            }
-            if (car.isInGroup) {
-                carsInGroups++;
             }
         });
 
@@ -54,8 +51,6 @@ export class StatsService {
             }
         }
 
-        const carsInGroupsPercentage = Math.round((carsInGroups / totalCars) * 100);
-
         const getSortedDistribution = (counts: Record<string, number>): DistributionItem[] => {
             return Object.entries(counts)
                 .map(([name, count]) => new DistributionItem(name, count))
@@ -66,7 +61,7 @@ export class StatsService {
             totalCars,
             distinctBrands,
             favoriteNationality,
-            carsInGroupsPercentage,
+            totalPhotos,
             getSortedDistribution(brandCounts),
             getSortedDistribution(manufacturerCounts),
             getSortedDistribution(scaleCounts),

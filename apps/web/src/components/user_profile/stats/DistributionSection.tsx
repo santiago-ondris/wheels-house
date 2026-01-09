@@ -37,7 +37,7 @@ export default function DistributionSection({ title, subTitle, items, total, col
                                 <span className="text-xs text-white/50 font-bold uppercase tracking-wider group-hover:text-white transition-colors">
                                     {item.name}
                                 </span>
-                                <span className="text-xs font-mono text-white/20 group-hover:text-accent transition-colors">
+                                <span className="text-sm font-mono text-emerald-500 group-hover:text-accent transition-colors">
                                     {item.count} U.
                                 </span>
                             </div>

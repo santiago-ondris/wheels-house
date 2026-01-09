@@ -1,5 +1,5 @@
 import { db } from "../index";
-import { car, groupedCar, user } from "../schema";
+import { car, carPicture } from "../schema";
 import { eq, sql } from 'drizzle-orm';
 
 export async function getCarsForStats(userId: number) {
@@ -11,11 +11,22 @@ export async function getCarsForStats(userId: number) {
             scale: car.scale,
             color: car.color,
             condition: car.condition,
-            country: car.country,
-            isInGroup: sql<boolean>`EXISTS (SELECT 1 FROM ${groupedCar} WHERE ${groupedCar.carId} = ${car.carId})`
+            country: car.country
         })
         .from(car)
         .where(eq(car.userId, userId));
 
     return result;
+}
+
+export async function getTotalPhotosCount(userId: number) {
+    const result = await db
+        .select({
+            count: sql<number>`cast(count(${carPicture.carPictureId}) as int)`
+        })
+        .from(carPicture)
+        .innerJoin(car, eq(car.carId, carPicture.carId))
+        .where(eq(car.userId, userId));
+
+    return result[0]?.count || 0;
 }

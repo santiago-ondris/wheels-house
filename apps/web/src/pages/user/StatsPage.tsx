@@ -7,12 +7,12 @@ import {
     Car,
     Layers,
     Globe,
-    Folders,
     Info
 } from "lucide-react";
 import { getUserStats, UserStats } from "../../services/profile.service";
 import StatsCard from "../../components/user_profile/stats/StatsCard";
 import DistributionSection from "../../components/user_profile/stats/DistributionSection";
+import { colorMap } from "../../data/carOptions";
 import toast from "react-hot-toast";
 
 export default function StatsPage() {
@@ -111,10 +111,10 @@ export default function StatsPage() {
                         index={2}
                     />
                     <StatsCard
-                        label="En Grupos"
-                        subLabel="VEHICULOS_EN_GRUPOS"
-                        value={`${stats.carsInGroupsPercentage}%`}
-                        icon={Folders}
+                        label="Total Fotos"
+                        subLabel="GALERIA"
+                        value={stats.totalPhotos.toString().padStart(3, '0')}
+                        icon={Layers}
                         index={3}
                         showDivider={false}
                     />
@@ -123,7 +123,7 @@ export default function StatsPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
                     {/* Distributions */}
                     <DistributionSection
-                        title="Top_Marcas"
+                        title="Top_5_Marcas"
                         subTitle="PRIMER_ANALITICA"
                         items={stats.brandDistribution}
                         total={stats.totalCars}
@@ -171,16 +171,10 @@ export default function StatsPage() {
                         </p>
                     </div>
 
-                    <div className="flex items-center justify-start py-10 overflow-x-auto no-scrollbar">
+                    {/* Desktop View: Overlapping Paint Chips */}
+                    <div className="hidden md:flex items-center justify-start py-10 overflow-x-auto no-scrollbar">
                         <div className="flex pl-10">
                             {stats.colorDistribution.map((item, idx) => {
-                                // Simple mapping for common colors to hex
-                                const colorMap: Record<string, string> = {
-                                    'Rojo': '#ef4444', 'Azul': '#3b82f6', 'Verde': '#22c55e',
-                                    'Negro': '#111111', 'Blanco': '#fcfcfc', 'Gris': '#71717a',
-                                    'Amarillo': '#eab308', 'Naranja': '#f97316', 'Violeta': '#a855f7',
-                                    'Rosa': '#ec4899', 'Oro': '#fbbf24', 'Plata': '#e4e4e7'
-                                };
                                 const hexColor = colorMap[item.name] || '#444';
 
                                 return (
@@ -192,7 +186,7 @@ export default function StatsPage() {
                                         className="relative group -ml-8 first:ml-0"
                                     >
                                         <div
-                                            className="w-20 h-20 md:w-28 md:h-28 rounded-full shadow-[5px_5px_20px_rgba(0,0,0,0.4)] border border-white/10 transition-transform duration-300 group-hover:-translate-y-4 group-hover:scale-110 cursor-help"
+                                            className="w-28 h-28 rounded-full shadow-[5px_5px_20px_rgba(0,0,0,0.4)] border border-white/10 transition-transform duration-300 group-hover:-translate-y-4 group-hover:scale-110 cursor-help"
                                             style={{
                                                 background: `radial-gradient(circle at 35% 35%, ${hexColor}, #000 95%)`,
                                                 zIndex: stats.colorDistribution.length - idx
@@ -202,8 +196,8 @@ export default function StatsPage() {
                                             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-full" />
                                         </div>
 
-                                        <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
-                                            <p className="text-[10px] font-mono font-bold text-white bg-black/80 px-2 py-1 rounded">
+                                        <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 transition-opacity pointer-events-none whitespace-nowrap">
+                                            <p className="text-[10px] font-mono font-bold text-white/50 px-2 py-1 rounded group-hover:text-white transition-colors">
                                                 {item.name}: {item.count}
                                             </p>
                                         </div>
@@ -211,6 +205,47 @@ export default function StatsPage() {
                                 );
                             })}
                         </div>
+                    </div>
+
+                    {/* Mobile View: Vertical List */}
+                    <div className="flex md:hidden flex-col gap-4 mt-6">
+                        {stats.colorDistribution.map((item, idx) => {
+                            const hexColor = colorMap[item.name] || '#444';
+                            return (
+                                <motion.div
+                                    key={item.name}
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: idx * 0.05 }}
+                                    className="flex items-center gap-4 bg-white/[0.02] border border-white/5 p-3 rounded-xl"
+                                >
+                                    <div
+                                        className="w-10 h-10 rounded-full border border-white/10 shadow-lg"
+                                        style={{
+                                            background: `radial-gradient(circle at 35% 35%, ${hexColor}, #000 95%)`
+                                        }}
+                                    />
+                                    <div className="flex-1">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+                                                {item.name}
+                                            </span>
+                                            <span className="text-[10px] font-mono font-bold text-accent">
+                                                {item.count} UNIDADES
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-white/5 h-1 mt-2 rounded-full overflow-hidden">
+                                            <motion.div
+                                                initial={{ width: 0 }}
+                                                animate={{ width: `${(item.count / stats.totalCars) * 100}%` }}
+                                                className="h-full bg-accent"
+                                                transition={{ duration: 1, delay: idx * 0.1 }}
+                                            />
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            );
+                        })}
                     </div>
                 </div>
 

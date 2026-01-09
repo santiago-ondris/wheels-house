@@ -21,7 +21,7 @@ export interface UserStats {
     totalCars: number;
     distinctBrands: number;
     favoriteNationality: string | null;
-    carsInGroupsPercentage: number;
+    totalPhotos: number;
     brandDistribution: DistributionItem[];
     manufacturerDistribution: DistributionItem[];
     scaleDistribution: DistributionItem[];

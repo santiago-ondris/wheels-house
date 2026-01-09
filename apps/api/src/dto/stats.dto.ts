@@ -12,7 +12,7 @@ export class UserStatsDTO {
     totalCars: number;
     distinctBrands: number;
     favoriteNationality: string | null;
-    carsInGroupsPercentage: number;
+    totalPhotos: number;
 
     brandDistribution: DistributionItem[];
     manufacturerDistribution: DistributionItem[];
@@ -24,7 +24,7 @@ export class UserStatsDTO {
         totalCars: number,
         distinctBrands: number,
         favoriteNationality: string | null,
-        carsInGroupsPercentage: number,
+        totalPhotos: number,
         brandDistribution: DistributionItem[],
         manufacturerDistribution: DistributionItem[],
         scaleDistribution: DistributionItem[],
@@ -34,7 +34,7 @@ export class UserStatsDTO {
         this.totalCars = totalCars;
         this.distinctBrands = distinctBrands;
         this.favoriteNationality = favoriteNationality;
-        this.carsInGroupsPercentage = carsInGroupsPercentage;
+        this.totalPhotos = totalPhotos;
         this.brandDistribution = brandDistribution;
         this.manufacturerDistribution = manufacturerDistribution;
         this.scaleDistribution = scaleDistribution;
