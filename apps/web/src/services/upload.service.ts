@@ -36,3 +36,20 @@ export async function uploadImage(file: File): Promise<string> {
     const data = await response.json();
     return data.url;
 }
+
+export async function deleteRemoteImage(publicId: string): Promise<void> {
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+
+    try {
+        await fetch(`${API_URL}/upload/image/${encodeURIComponent(publicId)}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+    } catch (error) {
+        console.error('Error deleting image:', error);
+    }
+}
+

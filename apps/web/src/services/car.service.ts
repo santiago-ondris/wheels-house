@@ -12,7 +12,14 @@ export interface CarData {
     series?: string;
     pictures?: string[];
     country?: string;
+    condition?: string;
     ownerUsername?: string;
+}
+
+export interface CarSuggestions {
+    names: string[];
+    series: string[];
+    designers: string[];
 }
 
 export type CarUpdateDTO = Partial<CarData>;
@@ -81,5 +88,15 @@ export async function updateCarGroups(carId: number, groupIds: number[]): Promis
             'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ groups: groupIds }),
+    });
+}
+
+export async function getSuggestions(): Promise<CarSuggestions> {
+    const token = localStorage.getItem("auth_token");
+    return apiRequest<CarSuggestions>(`/car/suggestions`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
     });
 }

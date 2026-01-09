@@ -50,6 +50,13 @@
       "when": 1767872669215,
       "tag": "0006_dry_loners",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1767923752114,
+      "tag": "0007_elite_pet_avengers",
+      "breakpoints": true
     }
   ]
 }

@@ -90,6 +90,7 @@ export async function getCarsFromGroupId(groupId: number) {
         designer: car.designer,
         series: car.series,
         country: car.country,
+        condition: car.condition,
     }).from(groupedCar).where(eq(groupedCar.groupId, groupId)).innerJoin(car, eq(groupedCar.carId, car.carId));
 
     return cars;

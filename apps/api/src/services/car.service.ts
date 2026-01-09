@@ -5,7 +5,7 @@ import { CarInfo, CarInfoWithOwner, CarPictureToDB, CarToDB, CarUpdateDTO, Creat
 import { ERROR_CREATING_CAR, ERROR_DELETING_CAR, ERROR_UPDATING_CAR } from 'src/utils/car.utils';
 import {
     createCar, deleteCar, getCarByIdWithOwner, getCarsFromUserId, updateCar, createCarPicture, getPicturesFromCar,
-    deleteAllCarPictures, deleteCarPicture, updateCarPicture, getTotalCarsCount, getCarByOffset
+    deleteAllCarPictures, deleteCarPicture, updateCarPicture, getTotalCarsCount, getCarByOffset, getUniqueCarValues
 } from 'src/database/crud/car.crud';
 import { createGroupedCars, deleteGroupedCarsFromCarId, getGroupsFromCarId } from 'src/database/crud/group.crud';
 import { UploadService } from './upload.service';
@@ -20,7 +20,7 @@ export class CarService {
 
         const newCar: CarToDB = new CarToDB(
             user.userId, carData.name, carData.color, carData.brand,
-            carData.scale, carData.manufacturer, carData.description,
+            carData.scale, carData.manufacturer, carData.condition, carData.description,
             carData.designer, carData.series, carData.country
         );
 
@@ -61,7 +61,7 @@ export class CarService {
 
             listedCars.push(new CarInfo(
                 car.carId, car.name, car.color, car.brand,
-                car.scale, car.manufacturer, car.description,
+                car.scale, car.manufacturer, car.condition || "", car.description,
                 car.designer, car.series, carPictures, car.country
             ));
         }
@@ -78,7 +78,7 @@ export class CarService {
 
         const car: CarInfoWithOwner = new CarInfoWithOwner(
             carFromDB.carId, carFromDB.name, carFromDB.color, carFromDB.brand,
-            carFromDB.scale, carFromDB.manufacturer, carFromDB.ownerUsername,
+            carFromDB.scale, carFromDB.manufacturer, carFromDB.condition || "", carFromDB.ownerUsername,
             carFromDB.description, carFromDB.designer, carFromDB.series,
             carPicturesURLs, carFromDB.country
         );
@@ -159,6 +159,27 @@ export class CarService {
         return true;
     }
 
+    async getSuggestionsService(userData: TokenData) {
+        const user = await getUserFromUsername(userData.username);
+        const cars = await getUniqueCarValues(user.userId);
+
+        const names = new Set<string>();
+        const series = new Set<string>();
+        const designers = new Set<string>();
+
+        cars.forEach(car => {
+            if (car.name) names.add(car.name);
+            if (car.series) series.add(car.series);
+            if (car.designer) designers.add(car.designer);
+        });
+
+        return {
+            names: Array.from(names).sort(),
+            series: Array.from(series).sort(),
+            designers: Array.from(designers).sort(),
+        };
+    }
+
     async getFeaturedCarService() {
         const totalCars = await getTotalCarsCount();
         if (totalCars === 0) return null;
@@ -178,7 +199,7 @@ export class CarService {
 
         return new CarInfoWithOwner(
             carFromDB.carId, carFromDB.name, carFromDB.color, carFromDB.brand,
-            carFromDB.scale, carFromDB.manufacturer, carFromDB.ownerUsername,
+            carFromDB.scale, carFromDB.manufacturer, carFromDB.condition || "", carFromDB.ownerUsername,
             carFromDB.description, carFromDB.designer, carFromDB.series,
             carPicturesURLs, carFromDB.country
         );

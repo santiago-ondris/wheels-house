@@ -61,6 +61,12 @@ export class CarController {
         return await this.carService.getCarGroupsService(carId);
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Get('suggestions')
+    async getSuggestions(@Request() req) {
+        return await this.carService.getSuggestionsService(req.user);
+    }
+
     @Get('featured')
     async getFeaturedCar() {
         return await this.carService.getFeaturedCarService();

@@ -19,11 +19,13 @@ import {
 import { carSchema, CarFormData } from "../../lib/validations/car";
 import { updateCar, getCar, getCarGroups, updateCarGroups } from "../../services/car.service";
 import { listGroups, GroupBasicInfo } from "../../services/group.service";
-import { scales, manufacturers, brands, colors } from "../../data/carOptions";
+import { scales, manufacturers, brands, colors, carConditions, brandNationalities } from "../../data/carOptions";
 import FieldSelector from "../../components/cars/addcar/FieldSelector";
 import MultiImageUploadWidget from "../../components/ui/MultiImageUploadWidget";
 import toast from "react-hot-toast";
 import { useAuth } from "../../contexts/AuthContext";
+import { useCarSuggestions } from "../../hooks/useCarSuggestions";
+import SuggestionInput from "../../components/ui/SuggestionInput";
 
 export default function EditCarPage() {
     const navigate = useNavigate();
@@ -35,6 +37,8 @@ export default function EditCarPage() {
         brand: "",
         scale: "",
         manufacturer: "",
+        condition: "Abierto",
+        country: "",
         description: "",
         designer: "",
         series: "",
@@ -46,6 +50,7 @@ export default function EditCarPage() {
     const [isFetching, setIsFetching] = useState(true);
     const [userGroups, setUserGroups] = useState<GroupBasicInfo[]>([]);
     const [selectedGroups, setSelectedGroups] = useState<number[]>([]);
+    const { suggestions } = useCarSuggestions();
 
     useEffect(() => {
         if (carId && user?.username) {
@@ -67,6 +72,8 @@ export default function EditCarPage() {
                 brand: carData.brand,
                 scale: carData.scale,
                 manufacturer: carData.manufacturer,
+                condition: carData.condition || "Abierto",
+                country: carData.country || "",
                 description: carData.description || "",
                 designer: carData.designer || "",
                 series: carData.series || "",
@@ -122,7 +129,17 @@ export default function EditCarPage() {
     };
 
     const updateField = (field: keyof CarFormData, value: string) => {
-        setFormData((prev) => ({ ...prev, [field]: value }));
+        setFormData((prev) => {
+            const newData = { ...prev, [field]: value };
+            
+            // Auto-detect nationality if brand changes
+            if (field === "brand") {
+                newData.country = brandNationalities[value] || "";
+            }
+            
+            return newData;
+        });
+
         if (errors[field]) {
             setErrors((prev) => ({ ...prev, [field]: undefined }));
         }
@@ -195,16 +212,14 @@ export default function EditCarPage() {
                                 <label className="block text-accent uppercase tracking-widest text-[10px] font-bold mb-1.5 ml-1">
                                     Nombre del Modelo <span className="text-danger">*</span>
                                 </label>
-                                <div className="relative">
-                                    <Car className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40 z-10" />
-                                    <input
-                                        type="text"
-                                        placeholder="Ej: '71 Datsun 510"
-                                        value={formData.name}
-                                        onChange={(e) => updateField("name", e.target.value)}
-                                        className={`w-full bg-input-bg border ${errors.name ? "border-danger" : "border-white/5"} pl-12 pr-4 py-3.5 rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-base md:text-lg`}
-                                    />
-                                </div>
+                                <SuggestionInput
+                                    options={suggestions.names}
+                                    value={formData.name}
+                                    onChange={(value) => updateField("name", value)}
+                                    placeholder="Ej: '71 Datsun 510"
+                                    icon={<Car className="w-5 h-5" />}
+                                    error={errors.name}
+                                />
                                 {errors.name && <p className="text-danger text-[10px] mt-1 ml-1">{errors.name}</p>}
                             </div>
 
@@ -253,6 +268,27 @@ export default function EditCarPage() {
                                     required
                                 />
                             </div>
+
+                            <div>
+                                <label className="block text-accent uppercase tracking-widest text-[10px] font-bold mb-1.5 ml-1">
+                                    Estado del Auto <span className="text-danger">*</span>
+                                </label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    {carConditions.map((condition) => (
+                                        <button
+                                            key={condition}
+                                            type="button"
+                                            onClick={() => updateField("condition", condition)}
+                                            className={`py-3 px-4 rounded-xl text-sm font-bold transition-all border ${formData.condition === condition
+                                                ? "bg-accent border-accent text-white shadow-lg shadow-accent/25"
+                                                : "bg-white/[0.02] border-white/5 text-white/40 hover:border-white/20"
+                                                }`}
+                                        >
+                                            {condition}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -272,32 +308,26 @@ export default function EditCarPage() {
                                     <label className="block text-white/50 uppercase tracking-widest text-[10px] font-bold mb-1.5 ml-1">
                                         Serie
                                     </label>
-                                    <div className="relative">
-                                        <Layers className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
-                                        <input
-                                            type="text"
-                                            placeholder="Ej: Japan Historics"
-                                            value={formData.series}
-                                            onChange={(e) => updateField("series", e.target.value)}
-                                            className="w-full bg-input-bg border border-white/5 pl-12 pr-4 py-3.5 rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-base"
-                                        />
-                                    </div>
+                                    <SuggestionInput
+                                        options={suggestions.series}
+                                        value={formData.series || ""}
+                                        onChange={(value) => updateField("series", value)}
+                                        placeholder="Ej: Japan Historics"
+                                        icon={<Layers className="w-5 h-5" />}
+                                    />
                                 </div>
-
+ 
                                 <div>
                                     <label className="block text-white/50 uppercase tracking-widest text-[10px] font-bold mb-1.5 ml-1">
                                         Diseñador
                                     </label>
-                                    <div className="relative">
-                                        <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
-                                        <input
-                                            type="text"
-                                            placeholder="Ej: Ryu Asada"
-                                            value={formData.designer}
-                                            onChange={(e) => updateField("designer", e.target.value)}
-                                            className="w-full bg-input-bg border border-white/5 pl-12 pr-4 py-3.5 rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-base"
-                                        />
-                                    </div>
+                                    <SuggestionInput
+                                        options={suggestions.designers}
+                                        value={formData.designer || ""}
+                                        onChange={(value) => updateField("designer", value)}
+                                        placeholder="Ej: Ryu Asada"
+                                        icon={<User className="w-5 h-5" />}
+                                    />
                                 </div>
                             </div>
 

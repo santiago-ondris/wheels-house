@@ -5,11 +5,13 @@ import {
     UseInterceptors,
     UploadedFile,
     BadRequestException,
+    Delete,
+    Param,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from '../validators/auth.validator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { UploadService } from 'src/services/upload.service';
+import { UploadService } from '../services/upload.service';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -17,7 +19,7 @@ import * as path from 'path';
 export class UploadController {
     constructor(private readonly uploadService: UploadService) {}
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtAuthGuard)
     @Post('image')
     @UseInterceptors(
         FileInterceptor('file', {
@@ -55,19 +57,37 @@ export class UploadController {
         }
 
         try {
-            const url = await this.uploadService.uploadImage(file.path);
+            const data = await this.uploadService.uploadImage(file.path);
 
             fs.unlinkSync(file.path);
 
             return {
                 success: true,
-                url: url,
+                url: data.url,
+                publicId: data.publicId,
             };
         } catch (error) {
             if (file?.path && fs.existsSync(file.path)) {
                 fs.unlinkSync(file.path);
             }
             throw error;
+        }
+    }
+    @UseGuards(JwtAuthGuard)
+    @Delete('image/:publicId')
+    async deleteImage(@Param('publicId') publicId: string) {
+        if (!publicId) {
+            throw new BadRequestException('Public ID is required');
+        }
+
+        try {
+            await this.uploadService.deleteImage(publicId);
+            return {
+                success: true,
+                message: 'Image deleted successfully',
+            };
+        } catch (error) {
+            throw new BadRequestException('Failed to delete image');
         }
     }
 }

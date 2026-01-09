@@ -47,6 +47,10 @@ export class CreateCarDTO {
     @IsOptional()
     country: string | null = '';
 
+    @IsString()
+    @IsNotEmpty()
+    condition: string;
+
     @IsArray()
     @IsOptional()
     groups: number[] | null = []; // Groups Ids.
@@ -63,14 +67,16 @@ export class CarToDB {
     designer: string | null;
     series: string | null;
     country: string | null;
+    condition: string;
 
     constructor(
         userId: number, name: string, color: string, brand: string, scale: string,
-        manufacturer: string, description: string | null = '', designer: string | null = '',
+        manufacturer: string, condition: string, description: string | null = '', designer: string | null = '',
         series: string | null = '', country: string | null = ''
     ) {
         this.userId = userId, this.name = name, this.color = color;
         this.brand = brand, this.scale = scale, this.manufacturer = manufacturer;
+        this.condition = condition;
         this.description = description, this.designer = designer, this.series = series;
         this.country = country;
     }
@@ -88,15 +94,17 @@ export class CarPictureToDB {
 
 export class CarInfo extends CreateCarDTO {
     carId: number;
+    condition: string;
     constructor(
         carId: number, name: string, color: string, brand: string, scale: string,
-        manufacturer: string, description: string | null = '', 
+        manufacturer: string, condition: string, description: string | null = '', 
         designer: string | null = '', series: string | null = '', pictures: string[] | null = [], 
         country: string | null = ''
     ) {
         super();
         this.carId = carId, this.name = name, this.color = color;
         this.brand = brand, this.scale = scale, this.manufacturer = manufacturer;
+        this.condition = condition;
         this.description = description, this.designer = designer, this.series = series;
         this.pictures = pictures, this.country = country;
     }
@@ -106,11 +114,11 @@ export class CarInfoWithOwner extends CarInfo {
     ownerUsername: string;
     constructor(
         carId: number, name: string, color: string, brand: string, scale: string,
-        manufacturer: string, ownerUsername: string, 
+        manufacturer: string, condition: string, ownerUsername: string, 
         description: string | null = '', designer: string | null = '', series: string | null = '',
         pictures: string[] | null = [], country: string | null = ''
     ) {
-        super(carId, name, color, brand, scale, manufacturer, description, designer, series, pictures, country);
+        super(carId, name, color, brand, scale, manufacturer, condition, description, designer, series, pictures, country);
         this.ownerUsername = ownerUsername;
     }
 }
@@ -156,6 +164,10 @@ export class CarUpdateDTO {
     @IsOptional()
     country: string | null = '';
 
+    @IsString()
+    @IsOptional()
+    condition: string;
+
     @IsArray()
     @IsOptional()
     groups: number[] | null = [];
@@ -174,15 +186,17 @@ export class CarInfoWoGroups {
     series?: string | null = '';
     pictures?: string[] | null = [];
     country?: string | null = '';
+    condition: string;
 
     constructor(
         carId: number, name: string, color: string, brand: string, scale: string,
-        manufacturer: string, description: string | null = '', 
+        manufacturer: string, condition: string, description: string | null = '', 
         designer: string | null = '', series: string | null = '', pictures: string[] | null = [], 
         country: string | null = ''
     ) {
         this.carId = carId, this.name = name, this.color = color;
         this.brand = brand, this.scale = scale, this.manufacturer = manufacturer;
+        this.condition = condition;
         this.description = description, this.designer = designer, this.series = series;
         this.pictures = pictures, this.country = country;
     }
