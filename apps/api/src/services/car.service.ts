@@ -61,7 +61,7 @@ export class CarService {
 
             listedCars.push(new CarInfo(
                 car.carId, car.name, car.color, car.brand,
-                car.scale, car.manufacturer, car.condition || "", car.description,
+                car.scale, car.manufacturer, car.condition, car.description,
                 car.designer, car.series, carPictures, car.country
             ));
         }
@@ -78,7 +78,7 @@ export class CarService {
 
         const car: CarInfoWithOwner = new CarInfoWithOwner(
             carFromDB.carId, carFromDB.name, carFromDB.color, carFromDB.brand,
-            carFromDB.scale, carFromDB.manufacturer, carFromDB.condition || "", carFromDB.ownerUsername,
+            carFromDB.scale, carFromDB.manufacturer, carFromDB.condition, carFromDB.ownerUsername,
             carFromDB.description, carFromDB.designer, carFromDB.series,
             carPicturesURLs, carFromDB.country
         );
@@ -199,7 +199,7 @@ export class CarService {
 
         return new CarInfoWithOwner(
             carFromDB.carId, carFromDB.name, carFromDB.color, carFromDB.brand,
-            carFromDB.scale, carFromDB.manufacturer, carFromDB.condition || "", carFromDB.ownerUsername,
+            carFromDB.scale, carFromDB.manufacturer, carFromDB.condition, carFromDB.ownerUsername,
             carFromDB.description, carFromDB.designer, carFromDB.series,
             carPicturesURLs, carFromDB.country
         );
