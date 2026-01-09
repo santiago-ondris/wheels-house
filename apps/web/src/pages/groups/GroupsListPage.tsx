@@ -146,7 +146,9 @@ export default function GroupsListPage() {
                                             <div className="space-y-1.5 pt-3 border-t border-blueprint/10">
                                                 <div className="flex justify-between items-center text-[10px] font-mono">
                                                     <span className="text-blueprint/30">STATUS:</span>
-                                                    <span className="text-blueprint/60">FUNCIONANDO</span>
+                                                    <span className={group.featured ? "text-sm text-emerald-400 font-bold" : "text-blueprint/60"}>
+                                                        {group.featured ? "DESTACADO" : "FUNCIONANDO"}
+                                                    </span>
                                                 </div>
                                                 <div className="flex justify-between items-center text-[10px] font-mono">
                                                     <span className="text-blueprint/30">CANTIDAD:</span>

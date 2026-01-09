@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowDown, ArrowUp, Edit, Trash2, ArrowLeft } from "lucide-react";
 import { getCar, deleteCar, CarData } from "../../services/car.service";
+import { useAuth } from "../../contexts/AuthContext";
 
 import { CarMasonryGrid } from "../../components/cars/CarMasonryGrid";
 import Modal from "../../components/ui/Modal";
@@ -11,9 +12,12 @@ import toast from "react-hot-toast";
 export const CarDetailPage = () => {
     const { carId } = useParams<{ carId: string }>();
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [car, setCar] = useState<CarData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+    const isOwner = user?.username === car?.ownerUsername;
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -48,7 +52,7 @@ export const CarDetailPage = () => {
     };
 
     const handleBack = () => {
-        navigate(`/collection/${car?.ownerUsername}`);
+        navigate(-1);
     };
 
     const galleryRef = useRef<HTMLDivElement>(null);
@@ -98,20 +102,22 @@ export const CarDetailPage = () => {
                         </motion.button>
                     </div>
 
-                    <div className="flex gap-3">
-                        <button
-                            onClick={() => navigate(`/collection/edit/${car.carId}`)}
-                            className="p-2 border border-white/10 rounded-lg hover:bg-white/10 transition-colors text-white/70 hover:text-white"
-                        >
-                            <Edit size={18} />
-                        </button>
-                        <button
-                            onClick={() => setIsDeleteModalOpen(true)}
-                            className="p-2 border border-red-500/30 rounded-lg hover:bg-red-500/10 transition-colors text-red-400 hover:text-red-300"
-                        >
-                            <Trash2 size={18} />
-                        </button>
-                    </div>
+                    {isOwner && (
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => navigate(`/collection/edit/${car.carId}`)}
+                                className="p-2 border border-white/10 rounded-lg hover:bg-white/10 transition-colors text-white/70 hover:text-white"
+                            >
+                                <Edit size={18} />
+                            </button>
+                            <button
+                                onClick={() => setIsDeleteModalOpen(true)}
+                                className="p-2 border border-red-500/30 rounded-lg hover:bg-red-500/10 transition-colors text-red-400 hover:text-red-300"
+                            >
+                                <Trash2 size={18} />
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 {galleryImages.length > 0 && (

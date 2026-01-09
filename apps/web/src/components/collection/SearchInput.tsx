@@ -7,7 +7,7 @@ export default function SearchInput() {
       <input
         type="text"
         placeholder="Buscar en mi colección..."
-        className="w-full bg-input-bg pl-11 pr-4 py-3 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-accent"
+        className="w-full bg-input-bg pl-11 pr-4 py-3 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-accent text-base"
       />
     </div>
   );
