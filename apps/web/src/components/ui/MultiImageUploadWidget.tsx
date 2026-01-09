@@ -1,11 +1,12 @@
-import { useState, useRef, DragEvent, useEffect, useMemo } from "react";
-import { Upload, X, Loader2, ImageIcon, AlertTriangle } from "lucide-react";
-import { uploadImage } from "../../services/upload.service";
+import { useState, useRef, DragEvent, useMemo } from "react";
+import { Upload, X, Loader2 } from "lucide-react";
+import { uploadImage, deleteRemoteImage } from "../../services/upload.service";
+import { resizeImage } from "../../lib/image-utils";
 import toast from "react-hot-toast";
 
 interface MultiImageUploadWidgetProps {
     values: string[];
-    onChange: (urls: string[]) => void;
+    onChange: (values: string[]) => void;
     maxImages?: number;
 }
 
@@ -14,139 +15,138 @@ export default function MultiImageUploadWidget({
     onChange,
     maxImages = 10
 }: MultiImageUploadWidgetProps) {
-    const [uploadingStates, setUploadingStates] = useState<Record<string, number>>({});
+    const [uploadingStates, setUploadingStates] = useState<Record<string, { progress: number, status: 'processing' | 'uploading' }>>({});
     const [isDragging, setIsDragging] = useState(false);
-    const [uploadBatchInfo, setUploadBatchInfo] = useState<{ current: number, total: number } | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const fileMetadataRef = useRef<Map<string, { name: string, size: number }>>(new Map());
-
-    const currentImagesRef = useRef<string[]>(values);
-
-    useEffect(() => {
-        currentImagesRef.current = values;
-    }, [values]);
-
-    const duplicateInfo = useMemo(() => {
-        const urlCounts = new Map<string, number>();
-        const duplicateUrls = new Set<string>();
-        const fileSignatures = new Map<string, string[]>();
-
-        values.forEach(url => {
-            const count = (urlCounts.get(url) || 0) + 1;
-            urlCounts.set(url, count);
-            if (count > 1) {
-                duplicateUrls.add(url);
-            }
-
-            const metadata = fileMetadataRef.current.get(url);
-            if (metadata) {
-                const signature = `${metadata.name}_${metadata.size}`;
-                const urlsWithSignature = fileSignatures.get(signature) || [];
-                urlsWithSignature.push(url);
-                fileSignatures.set(signature, urlsWithSignature);
-
-                if (urlsWithSignature.length > 1) {
-                    urlsWithSignature.forEach(u => duplicateUrls.add(u));
-                }
-            }
-        });
-
-        const totalDuplicates = duplicateUrls.size;
-
-        return {
-            hasDuplicates: duplicateUrls.size > 0,
-            duplicateUrls,
-            totalDuplicates
-        };
-    }, [values]);
+    // Normalize values to strings (redundant but safe)
+    const normalizedValues = useMemo(() => values, [values]);
 
     const handleFileSelect = async (files: FileList) => {
         const filesArray = Array.from(files);
 
-        if (currentImagesRef.current.length + filesArray.length > maxImages) {
+        if (normalizedValues.length + filesArray.length > maxImages) {
             toast.error(`Podés subir hasta ${maxImages} imágenes como máximo`);
             return;
         }
 
         const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/heic', 'image/heif'];
-        const maxSize = 10 * 1024 * 1024; // 10MB
+        const maxSize = 20 * 1024 * 1024; // Increased to 20MB because we'll resize it anyway
 
         const validFiles = filesArray.filter(file => {
             if (!allowedTypes.includes(file.type)) {
                 toast.error(`${file.name}: Solo se permiten imágenes (JPG, PNG, GIF, WEBP, HEIC)`);
                 return false;
             }
-
             if (file.size > maxSize) {
-                toast.error(`${file.name}: La imagen no puede superar 10MB`);
+                toast.error(`${file.name}: La imagen es demasiado grande`);
                 return false;
             }
-
             return true;
         });
 
         if (validFiles.length === 0) return;
 
-        for (let i = 0; i < validFiles.length; i++) {
-            setUploadBatchInfo({ current: i + 1, total: validFiles.length });
-            await uploadFile(validFiles[i]);
+        // Process and upload in parallel, collecting results
+        const results = await Promise.all(validFiles.map(file => processAndUploadFile(file)));
+        
+        // Filter out nulls (failures) and add to current values
+        const successfulUrls = results.filter((url): url is string => url !== null);
+        
+        if (successfulUrls.length > 0) {
+            onChange([...values, ...successfulUrls]);
         }
-
-        setUploadBatchInfo(null);
     };
 
-    const uploadFile = async (file: File) => {
-        const uploadId = `${Date.now()}_${Math.random()}`;
-
+    const processAndUploadFile = async (file: File): Promise<string | null> => {
+        const tempId = `${Date.now()}_${Math.random()}`;
+        
         try {
-            setUploadingStates(prev => ({ ...prev, [uploadId]: 0 }));
+            // Stage 1: Processing (Resizing)
+            setUploadingStates(prev => ({ 
+                ...prev, 
+                [tempId]: { progress: 0, status: 'processing' } 
+            }));
 
+            const resizedFile = await resizeImage(file);
+            
+            // Stage 2: Uploading
+            setUploadingStates(prev => ({ 
+                ...prev, 
+                [tempId]: { progress: 10, status: 'uploading' } 
+            }));
+
+            // Simulate progress since fetch doesn't support it easily without XHR
             const progressInterval = setInterval(() => {
-                setUploadingStates(prev => ({
-                    ...prev,
-                    [uploadId]: Math.min((prev[uploadId] || 0) + 10, 90)
-                }));
-            }, 200);
+                setUploadingStates(prev => {
+                    if (!prev[tempId]) return prev; // Prevent error if item is removed before interval clears
+                    return {
+                        ...prev,
+                        [tempId]: { 
+                            ...prev[tempId], 
+                            progress: Math.min((prev[tempId]?.progress || 10) + 10, 90) 
+                        }
+                    };
+                });
+            }, 300);
 
-            const url = await uploadImage(file);
-
+            const result = await uploadImage(resizedFile);
+            
             clearInterval(progressInterval);
-            setUploadingStates(prev => ({ ...prev, [uploadId]: 100 }));
-
-            fileMetadataRef.current.set(url, {
-                name: file.name,
-                size: file.size
-            });
-
-            const updatedImages = [...currentImagesRef.current, url];
-            currentImagesRef.current = updatedImages;
-            onChange(updatedImages);
-
-            toast.success('¡Imagen subida exitosamente!');
+            setUploadingStates(prev => ({ 
+                ...prev, 
+                [tempId]: { progress: 100, status: 'uploading' } 
+            }));
 
             setTimeout(() => {
                 setUploadingStates(prev => {
                     const newStates = { ...prev };
-                    delete newStates[uploadId];
+                    delete newStates[tempId];
                     return newStates;
                 });
             }, 500);
+
+            return result;
+
         } catch (error: any) {
             console.error('Upload error:', error);
-            toast.error(error.message || 'Error al subir la imagen');
+            toast.error(`${file.name}: Error al subir`);
             setUploadingStates(prev => {
                 const newStates = { ...prev };
-                delete newStates[uploadId];
+                delete newStates[tempId];
                 return newStates;
             });
+            return null;
         }
+    };
+
+    const handleRemove = async (index: number) => {
+        const urlToRemove = values[index];
+        
+        // Optimistic UI update
+        const newValues = values.filter((_, i) => i !== index);
+        onChange(newValues);
+
+        // Extract publicId if it looks like a Cloudinary URL from our app
+        // Logic: http.../wheels-house/cars/id.jpg -> wheels-house/cars/id
+        if (urlToRemove.includes('wheels-house/cars/')) {
+            try {
+                const parts = urlToRemove.split('/');
+                const idWithExtension = parts[parts.length - 1];
+                const publicId = idWithExtension.split('.')[0];
+                const fullPublicId = `wheels-house/cars/${publicId}`;
+                await deleteRemoteImage(fullPublicId);
+            } catch (error) {
+                console.error("Failed to delete remote image:", error);
+            }
+        }
+        
+        toast.success('Imagen eliminada');
     };
 
     const handleDrop = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         setIsDragging(false);
-
         if (e.dataTransfer.files.length > 0) {
             handleFileSelect(e.dataTransfer.files);
         }
@@ -176,93 +176,54 @@ export default function MultiImageUploadWidget({
         e.target.value = '';
     };
 
-    const handleRemove = (index: number) => {
-        const newValues = currentImagesRef.current.filter((_, i) => i !== index);
-        currentImagesRef.current = newValues;
-        onChange(newValues);
-        toast.success('Imagen eliminada');
-    };
-
-
     const uploadingEntries = Object.entries(uploadingStates);
-    const canAddMore = values.length < maxImages && uploadingEntries.length === 0;
+    const canAddMore = values.length < maxImages && uploadingEntries.length < maxImages;
 
     return (
         <div className="space-y-3">
-            {duplicateInfo.hasDuplicates && (
-                <div className="flex items-start gap-3 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-xl">
-                    <AlertTriangle className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
-                    <div className="flex-1">
-                        <p className="text-yellow-500 font-semibold text-sm mb-1">
-                            ¡Atención! Subiste {duplicateInfo.totalDuplicates === 1 ? 'la misma imagen' : 'imágenes repetidas'}
-                        </p>
-                        <p className="text-yellow-100/80 text-xs">
-                            {duplicateInfo.totalDuplicates === 1
-                                ? 'Hay 1 imagen duplicada. '
-                                : `Hay ${duplicateInfo.totalDuplicates} imágenes duplicadas. `}
-                            Si estás seguro, guardá sin problema. Sino, borrá las duplicadas.
-                        </p>
-                    </div>
-                </div>
-            )}
-
             {values.length > 0 && (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {values.map((url, index) => {
-                        const isDuplicate = duplicateInfo.duplicateUrls.has(url);
-                        return (
-                            <div key={`${url}_${index}`} className="relative group aspect-square">
-                                <div className={`relative w-full h-full rounded-xl overflow-hidden bg-white/5 ${isDuplicate
-                                    ? 'border-2 border-yellow-500/70 ring-2 ring-yellow-500/20'
-                                    : 'border border-white/10'
-                                    }`}>
-                                    <img
-                                        src={url}
-                                        alt={`Preview ${index + 1}`}
-                                        className="w-full h-full object-cover"
-                                    />
-                                    {isDuplicate && (
-                                        <div className="absolute top-2 right-2 px-2 py-1 bg-yellow-500/90 text-black text-[10px] font-bold rounded-md uppercase tracking-wide">
-                                            Duplicada
-                                        </div>
-                                    )}
-                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                        <button
-                                            type="button"
-                                            onClick={() => handleRemove(index)}
-                                            className="p-3 bg-danger hover:bg-danger/80 rounded-full text-white transition-all transform hover:scale-110 active:scale-95"
-                                        >
-                                            <X className="w-4 h-4" />
-                                        </button>
-                                    </div>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    {values.map((url, index) => (
+                        <div key={`${url}_${index}`} className="relative group aspect-square">
+                            <div className="relative w-full h-full rounded-xl overflow-hidden bg-white/5 border border-white/10">
+                                <img
+                                    src={url}
+                                    alt={`Preview ${index + 1}`}
+                                    className="w-full h-full object-cover"
+                                />
+                                {/* Mobile Friendly: Always show delete button or at least make it easier to see than just hover */}
+                                <div className="absolute top-2 right-2 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                                    <button
+                                        type="button"
+                                        onClick={() => handleRemove(index)}
+                                        className="p-2 bg-danger/90 hover:bg-danger rounded-lg text-white shadow-lg active:scale-90 transition-all"
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
                                 </div>
                             </div>
-                        );
-                    })}
+                        </div>
+                    ))}
                 </div>
             )}
 
             {uploadingEntries.length > 0 && (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {uploadingEntries.map(([id, progress]) => (
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    {uploadingEntries.map(([id, state]) => (
                         <div key={id} className="aspect-square">
                             <div className="w-full h-full rounded-xl border border-white/10 bg-white/5 flex flex-col items-center justify-center gap-2 p-4">
-                                <Loader2 className="w-8 h-8 text-accent animate-spin" />
-                                <div className="w-full">
-                                    <div className="flex items-center justify-between text-xs text-white/50 mb-1">
-                                        <span>
-                                            {uploadBatchInfo
-                                                ? `Subiendo ${uploadBatchInfo.current}/${uploadBatchInfo.total}`
-                                                : 'Subiendo...'}
-                                        </span>
-                                        <span>{progress}%</span>
-                                    </div>
+                                <Loader2 className={`w-8 h-8 ${state.status === 'processing' ? 'text-blue-400' : 'text-accent'} animate-spin`} />
+                                <div className="w-full text-center">
+                                    <p className="text-[10px] text-white/50 mb-1 font-medium uppercase tracking-wider">
+                                        {state.status === 'processing' ? 'Procesando...' : 'Subiendo...'}
+                                    </p>
                                     <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
                                         <div
-                                            className="bg-accent h-full transition-all duration-300"
-                                            style={{ width: `${progress}%` }}
+                                            className={`h-full transition-all duration-300 ${state.status === 'processing' ? 'bg-blue-400' : 'bg-accent'}`}
+                                            style={{ width: `${state.progress}%` }}
                                         />
                                     </div>
+                                    <p className="text-[10px] text-white/30 mt-1">{state.progress}%</p>
                                 </div>
                             </div>
                         </div>
@@ -299,37 +260,22 @@ export default function MultiImageUploadWidget({
                             p-3 rounded-full transition-colors
                             ${isDragging ? 'bg-accent/20' : 'bg-white/5'}
                         `}>
-                            {values.length === 0 ? (
-                                <Upload className={`
-                                    w-6 h-6 transition-colors
-                                    ${isDragging ? 'text-accent' : 'text-white/40'}
-                                `} />
-                            ) : (
-                                <ImageIcon className={`
-                                    w-6 h-6 transition-colors
-                                    ${isDragging ? 'text-accent' : 'text-white/40'}
-                                `} />
-                            )}
+                            <Upload className={`
+                                w-6 h-6 transition-colors
+                                ${isDragging ? 'text-accent' : 'text-white/40'}
+                            `} />
                         </div>
                         <div className="text-center px-4">
                             <p className="text-white text-sm font-medium">
-                                {isDragging ? '¡Soltá las imágenes aquí!' :
+                                {isDragging ? '¡Soltá las imágenes!' :
                                     values.length === 0 ? 'Subir imágenes del auto' : 'Agregar más imágenes'}
                             </p>
-                            <p className="text-white/30 text-[10px] mt-0.5">
-                                {values.length}/{maxImages} imágenes • {isDragging ? '' : 'Hacé clic o arrastrá'}
+                            <p className="text-white/30 text-[10px] mt-0.5 uppercase tracking-wider font-semibold">
+                                {values.length}/{maxImages} • {isDragging ? 'SOLTAR' : 'AQUÍ'}
                             </p>
                         </div>
                     </div>
                 </>
-            )}
-
-            {!canAddMore && uploadingEntries.length === 0 && (
-                <div className="w-full p-3 border border-white/10 rounded-xl bg-white/5 text-center">
-                    <p className="text-white/40 text-xs">
-                        Llegaste al límite de {maxImages} imágenes
-                    </p>
-                </div>
             )}
         </div>
     );

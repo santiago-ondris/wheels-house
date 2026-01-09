@@ -26,6 +26,7 @@ export const manufacturers = [
     "Kyosho",
     "MiniGT",
     "Tarmac Works",
+    "Pop Race",
     "Inno64",
     "Schuco",
     "Siku",
@@ -89,6 +90,7 @@ export const brands = [
     "Toyota",
     "Volkswagen",
     "Volvo",
+    "W Motors"
 ];
 
 export const colors = [
@@ -110,6 +112,13 @@ export const colors = [
     "Beige",
     "Celeste",
     "Turquesa",
+    "Fucsia",
+    "Magenta",
+    "Aqua",
+    "Crema",
+    "Oliva",
+    "Mostaza",
+    "Cian",
     // Spectraflame (Hot Wheels)
     "Spectraflame Red",
     "Spectraflame Blue",
