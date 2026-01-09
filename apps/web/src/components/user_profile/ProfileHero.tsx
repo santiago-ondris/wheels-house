@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import { User, Calendar } from "lucide-react";
+import { User, Calendar, BarChart3 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface ProfileHeroProps {
     username: string;
@@ -52,9 +53,18 @@ export default function ProfileHero({
 
                 {/* User info */}
                 <div className="flex-1 text-center md:text-left">
-                    <h1 className="text-2xl md:text-3xl font-bold text-white">
-                        {firstName} {lastName}
-                    </h1>
+                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+                        <h1 className="text-2xl md:text-3xl font-bold text-white">
+                            {firstName} {lastName}
+                        </h1>
+                        <Link
+                            to={`/collection/${username}/stats`}
+                            className="inline-flex items-center gap-1.5 px-3 py-1 bg-accent/10 hover:bg-accent/20 text-accent text-xs font-bold rounded-full transition-colors border border-accent/20 w-fit"
+                        >
+                            <BarChart3 className="w-3.5 h-3.5" />
+                            VER ESTADÍSTICAS
+                        </Link>
+                    </div>
                     <p className="text-accent text-sm mt-1">@{username}</p>
 
                     {/* Stats */}

@@ -3,6 +3,7 @@ import MainLayout from "../layouts/MainLayout";
 import HomePage from "../pages/HomePage";
 import NotFoundPage from "../pages/NotFoundPage";
 import ProfilePage from "../pages/user/ProfilePage";
+import StatsPage from "../pages/user/StatsPage";
 import AddCarPage from "../pages/car/AddCarPage";
 import RegisterPage from "../pages/login/RegisterPage";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
@@ -28,7 +29,6 @@ export default function AppRoutes() {
         <Route path="/auth-required" element={<AuthRequiredPage />} />
         <Route path="/car/:carId" element={<CarDetailPage />} />
 
-        {/* Collection routes - more specific first */}
         <Route path="/collection/add" element={
           <ProtectedRoute>
             <AddCarPage />
@@ -50,17 +50,16 @@ export default function AppRoutes() {
           </ProtectedRoute>
         } />
 
-        {/* Public collection routes */}
         <Route path="/collection/:username" element={<ProfilePage />} />
+        <Route path="/collection/:username/stats" element={<StatsPage />} />
         <Route path="/collection/:username/groups" element={<GroupsListPage />} />
         <Route path="/collection/:username/group/:groupName" element={<GroupDetailPage />} />
-        +
-        +        {/* Hall of Fame routes */}
-        +        <Route path="/hall-of-fame" element={<HallOfFamePage />} />
-        +        <Route path="/hall-of-fame/founders" element={<FoundersPage />} />
-        +        <Route path="/hall-of-fame/contributors" element={<ContributorsPage />} />
-        +        <Route path="/hall-of-fame/ambassadors" element={<AmbassadorsPage />} />
-        +        <Route path="/hall-of-fame/legends" element={<LegendsPage />} />
+
+        <Route path="/hall-of-fame" element={<HallOfFamePage />} />
+        <Route path="/hall-of-fame/founders" element={<FoundersPage />} />
+        <Route path="/hall-of-fame/contributors" element={<ContributorsPage />} />
+        <Route path="/hall-of-fame/ambassadors" element={<AmbassadorsPage />} />
+        <Route path="/hall-of-fame/legends" element={<LegendsPage />} />
 
         <Route path="*" element={<NotFoundPage />} />
       </Route>
