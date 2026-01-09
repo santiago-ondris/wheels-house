@@ -43,6 +43,7 @@ export async function getCarByIdWithOwner(carId: number) {
             designer: car.designer,
             series: car.series,
             country: car.country,
+            condition: car.condition,
             ownerUsername: user.username,
         })
         .from(car)
@@ -89,6 +90,7 @@ export async function getCarByOffset(offset: number) {
             designer: car.designer,
             series: car.series,
             country: car.country,
+            condition: car.condition,
             ownerUsername: user.username,
         })
         .from(car)

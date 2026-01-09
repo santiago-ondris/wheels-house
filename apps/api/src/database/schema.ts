@@ -34,7 +34,8 @@ export const car = pgTable("car", {
     description: text("description"),
     designer: text("designer"),
     series: text("series"),
-    country: text("country")
+    country: text("country"),
+    condition: text("condition")
 });
 
 export const carPicture = pgTable("carPicture", {

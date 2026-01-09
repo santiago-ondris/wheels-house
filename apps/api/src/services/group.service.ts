@@ -65,7 +65,7 @@ export class GroupService {
 
             carsFromGroup.push(new CarInfoWoGroups(
                 car.carId, car.name, car.color, car.brand, car.scale,
-                car.manufacturer, car.description, car.designer, car.series,
+                car.manufacturer, car.condition || "", car.description, car.designer, car.series,
                 carPictures, car.country
             ));
         }
@@ -97,7 +97,7 @@ export class GroupService {
 
             carsFromGroup.push(new CarInfoWoGroups(
                 car.carId, car.name, car.color, car.brand, car.scale,
-                car.manufacturer, car.description, car.designer, car.series,
+                car.manufacturer, car.condition || "", car.description, car.designer, car.series,
                 carPictures, car.country
             ));
         }

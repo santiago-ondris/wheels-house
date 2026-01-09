@@ -19,7 +19,7 @@ import {
 import { carSchema, CarFormData } from "../../lib/validations/car";
 import { updateCar, getCar, getCarGroups, updateCarGroups } from "../../services/car.service";
 import { listGroups, GroupBasicInfo } from "../../services/group.service";
-import { scales, manufacturers, brands, colors } from "../../data/carOptions";
+import { scales, manufacturers, brands, colors, carConditions, brandNationalities } from "../../data/carOptions";
 import FieldSelector from "../../components/cars/addcar/FieldSelector";
 import MultiImageUploadWidget from "../../components/ui/MultiImageUploadWidget";
 import toast from "react-hot-toast";
@@ -37,6 +37,8 @@ export default function EditCarPage() {
         brand: "",
         scale: "",
         manufacturer: "",
+        condition: "Abierto",
+        country: "",
         description: "",
         designer: "",
         series: "",
@@ -70,6 +72,8 @@ export default function EditCarPage() {
                 brand: carData.brand,
                 scale: carData.scale,
                 manufacturer: carData.manufacturer,
+                condition: carData.condition || "Abierto",
+                country: carData.country || "",
                 description: carData.description || "",
                 designer: carData.designer || "",
                 series: carData.series || "",
@@ -125,7 +129,17 @@ export default function EditCarPage() {
     };
 
     const updateField = (field: keyof CarFormData, value: string) => {
-        setFormData((prev) => ({ ...prev, [field]: value }));
+        setFormData((prev) => {
+            const newData = { ...prev, [field]: value };
+            
+            // Auto-detect nationality if brand changes
+            if (field === "brand") {
+                newData.country = brandNationalities[value] || "";
+            }
+            
+            return newData;
+        });
+
         if (errors[field]) {
             setErrors((prev) => ({ ...prev, [field]: undefined }));
         }
@@ -253,6 +267,27 @@ export default function EditCarPage() {
                                     error={errors.manufacturer}
                                     required
                                 />
+                            </div>
+
+                            <div>
+                                <label className="block text-accent uppercase tracking-widest text-[10px] font-bold mb-1.5 ml-1">
+                                    Estado del Auto <span className="text-danger">*</span>
+                                </label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    {carConditions.map((condition) => (
+                                        <button
+                                            key={condition}
+                                            type="button"
+                                            onClick={() => updateField("condition", condition)}
+                                            className={`py-3 px-4 rounded-xl text-sm font-bold transition-all border ${formData.condition === condition
+                                                ? "bg-accent border-accent text-white shadow-lg shadow-accent/25"
+                                                : "bg-white/[0.02] border-white/5 text-white/40 hover:border-white/20"
+                                                }`}
+                                        >
+                                            {condition}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </div>
