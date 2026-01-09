@@ -1,8 +1,9 @@
 import { useState, useRef, DragEvent, useMemo } from "react";
-import { Upload, X, Loader2 } from "lucide-react";
+import { Upload, X, Loader2, Star, Crop } from "lucide-react";
 import { uploadImage, deleteRemoteImage } from "../../services/upload.service";
 import { resizeImage } from "../../lib/image-utils";
 import toast from "react-hot-toast";
+import ImageCropperModal from "./ImageCropperModal";
 
 interface MultiImageUploadWidgetProps {
     values: string[];
@@ -17,6 +18,8 @@ export default function MultiImageUploadWidget({
 }: MultiImageUploadWidgetProps) {
     const [uploadingStates, setUploadingStates] = useState<Record<string, { progress: number, status: 'processing' | 'uploading' }>>({});
     const [isDragging, setIsDragging] = useState(false);
+    const [croppingIndex, setCroppingIndex] = useState<number | null>(null);
+    const [isSavingCrop, setIsSavingCrop] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Normalize values to strings (redundant but safe)
@@ -49,10 +52,10 @@ export default function MultiImageUploadWidget({
 
         // Process and upload in parallel, collecting results
         const results = await Promise.all(validFiles.map(file => processAndUploadFile(file)));
-        
+
         // Filter out nulls (failures) and add to current values
         const successfulUrls = results.filter((url): url is string => url !== null);
-        
+
         if (successfulUrls.length > 0) {
             onChange([...values, ...successfulUrls]);
         }
@@ -60,20 +63,20 @@ export default function MultiImageUploadWidget({
 
     const processAndUploadFile = async (file: File): Promise<string | null> => {
         const tempId = `${Date.now()}_${Math.random()}`;
-        
+
         try {
             // Stage 1: Processing (Resizing)
-            setUploadingStates(prev => ({ 
-                ...prev, 
-                [tempId]: { progress: 0, status: 'processing' } 
+            setUploadingStates(prev => ({
+                ...prev,
+                [tempId]: { progress: 0, status: 'processing' }
             }));
 
             const resizedFile = await resizeImage(file);
-            
+
             // Stage 2: Uploading
-            setUploadingStates(prev => ({ 
-                ...prev, 
-                [tempId]: { progress: 10, status: 'uploading' } 
+            setUploadingStates(prev => ({
+                ...prev,
+                [tempId]: { progress: 10, status: 'uploading' }
             }));
 
             // Simulate progress since fetch doesn't support it easily without XHR
@@ -82,20 +85,20 @@ export default function MultiImageUploadWidget({
                     if (!prev[tempId]) return prev; // Prevent error if item is removed before interval clears
                     return {
                         ...prev,
-                        [tempId]: { 
-                            ...prev[tempId], 
-                            progress: Math.min((prev[tempId]?.progress || 10) + 10, 90) 
+                        [tempId]: {
+                            ...prev[tempId],
+                            progress: Math.min((prev[tempId]?.progress || 10) + 10, 90)
                         }
                     };
                 });
             }, 300);
 
             const result = await uploadImage(resizedFile);
-            
+
             clearInterval(progressInterval);
-            setUploadingStates(prev => ({ 
-                ...prev, 
-                [tempId]: { progress: 100, status: 'uploading' } 
+            setUploadingStates(prev => ({
+                ...prev,
+                [tempId]: { progress: 100, status: 'uploading' }
             }));
 
             setTimeout(() => {
@@ -122,7 +125,7 @@ export default function MultiImageUploadWidget({
 
     const handleRemove = async (index: number) => {
         const urlToRemove = values[index];
-        
+
         // Optimistic UI update
         const newValues = values.filter((_, i) => i !== index);
         onChange(newValues);
@@ -140,8 +143,53 @@ export default function MultiImageUploadWidget({
                 console.error("Failed to delete remote image:", error);
             }
         }
-        
+
         toast.success('Imagen eliminada');
+    };
+
+    const handleSetPrimary = (index: number) => {
+        if (index === 0) return;
+        const newValues = [...values];
+        const [selected] = newValues.splice(index, 1);
+        newValues.unshift(selected);
+        onChange(newValues);
+        toast.success('Imagen principal actualizada');
+    };
+
+    const handleCropSave = async (blob: Blob) => {
+        if (croppingIndex === null) return;
+
+        setIsSavingCrop(true);
+        const toastId = toast.loading('Guardando recorte...');
+
+        try {
+            const oldUrl = values[croppingIndex];
+            const file = new File([blob], `cropped_${Date.now()}.jpg`, { type: 'image/jpeg' });
+
+            // Upload new cropped version
+            const newUrl = await uploadImage(file);
+
+            // Update values
+            const newValues = [...values];
+            newValues[croppingIndex] = newUrl;
+            onChange(newValues);
+
+            // Cleanup old image if possible
+            if (oldUrl.includes('wheels-house/cars/')) {
+                const parts = oldUrl.split('/');
+                const idWithExtension = parts[parts.length - 1];
+                const publicId = idWithExtension.split('.')[0];
+                await deleteRemoteImage(`wheels-house/cars/${publicId}`);
+            }
+
+            toast.success('Imagen recortada con éxito', { id: toastId });
+        } catch (error) {
+            console.error('Error saving crop:', error);
+            toast.error('Error al guardar el recorte', { id: toastId });
+        } finally {
+            setIsSavingCrop(false);
+            setCroppingIndex(null);
+        }
     };
 
     const handleDrop = (e: DragEvent<HTMLDivElement>) => {
@@ -182,6 +230,11 @@ export default function MultiImageUploadWidget({
     return (
         <div className="space-y-3">
             {values.length > 0 && (
+                <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold ml-1">
+                    La foto que selecciones como principal será la portada del vehículo
+                </p>
+            )}
+            {values.length > 0 && (
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                     {values.map((url, index) => (
                         <div key={`${url}_${index}`} className="relative group aspect-square">
@@ -192,15 +245,41 @@ export default function MultiImageUploadWidget({
                                     className="w-full h-full object-cover"
                                 />
                                 {/* Mobile Friendly: Always show delete button or at least make it easier to see than just hover */}
-                                <div className="absolute top-2 right-2 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                                <div className="absolute top-2 right-2 flex gap-2 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                                    <button
+                                        type="button"
+                                        onClick={() => setCroppingIndex(index)}
+                                        className="p-2 bg-accent/90 hover:bg-accent rounded-lg text-white shadow-lg active:scale-90 transition-all"
+                                        title="Recortar"
+                                    >
+                                        <Crop className="w-4 h-4" />
+                                    </button>
                                     <button
                                         type="button"
                                         onClick={() => handleRemove(index)}
                                         className="p-2 bg-danger/90 hover:bg-danger rounded-lg text-white shadow-lg active:scale-90 transition-all"
+                                        title="Eliminar"
                                     >
                                         <X className="w-4 h-4" />
                                     </button>
                                 </div>
+
+                                {index === 0 ? (
+                                    <div className="absolute top-2 left-2 px-2 py-1 bg-accent/90 text-[10px] font-bold text-white rounded-md shadow-lg flex items-center gap-1">
+                                        <Star className="w-3 h-3 fill-white" />
+                                        PRINCIPAL
+                                    </div>
+                                ) : (
+                                    <div className="absolute inset-0 bg-black/40 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleSetPrimary(index)}
+                                            className="pointer-events-auto px-3 py-1.5 bg-white text-dark text-[10px] font-bold rounded-lg hover:bg-accent hover:text-white transition-all active:scale-95 shadow-xl"
+                                        >
+                                            HACER PRINCIPAL
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ))}
@@ -276,6 +355,14 @@ export default function MultiImageUploadWidget({
                         </div>
                     </div>
                 </>
+            )}
+
+            {croppingIndex !== null && (
+                <ImageCropperModal
+                    image={values[croppingIndex]}
+                    onSave={handleCropSave}
+                    onCancel={() => !isSavingCrop && setCroppingIndex(null)}
+                />
             )}
         </div>
     );
