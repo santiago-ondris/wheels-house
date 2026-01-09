@@ -47,6 +47,7 @@ export class PublicProfileDTO {
     totalCars: number;
     totalGroups: number;
     cars: PublicCarDTO[];
+    biography?: string;
 
     constructor(
         username: string,
@@ -56,7 +57,8 @@ export class PublicProfileDTO {
         totalGroups: number,
         cars: PublicCarDTO[],
         picture?: string,
-        createdDate?: Date
+        createdDate?: Date,
+        biography?: string
     ) {
         this.username = username;
         this.firstName = firstName;
@@ -66,5 +68,6 @@ export class PublicProfileDTO {
         this.totalCars = totalCars;
         this.totalGroups = totalGroups;
         this.cars = cars;
+        this.biography = biography;
     }
 }

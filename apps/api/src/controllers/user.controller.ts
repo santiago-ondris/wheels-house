@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Delete, Param, Query, UseGuards, Request } from '@nestjs/common';
 import { UserService } from '../services/user.service';
-import { RegisterDTO, LoginDTO } from '../dto/user.dto';
-import { loginValidator, registerValidator } from '../validators/user.validator'
+import { RegisterDTO, LoginDTO, UpdateUserProfileDTO, UpdatePasswordDTO } from '../dto/user.dto';
+import { loginValidator, registerValidator, updatePasswordValidator, updateUserValidator } from '../validators/user.validator'
+import { JwtAuthGuard } from 'src/validators/auth.validator';
 
 @Controller()
 export class UserController {
@@ -29,5 +30,27 @@ export class UserController {
     @Get('/search')
     async search(@Query('q') query: string) {
         return await this.userService.searchUsersService(query);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Put('user/update-info')
+    async updateUser(@Request() req, @Body() userChanges: UpdateUserProfileDTO) {
+        await updateUserValidator(req.user, userChanges);
+
+        return await this.userService.updateUserService(req.user, userChanges);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Put('user/update-password')
+    async updatePassword(@Request() req, @Body() updatePasswordData: UpdatePasswordDTO) {
+        await updatePasswordValidator(req.user, updatePasswordData);
+
+        return await this.userService.updatePasswordService(req.user, updatePasswordData);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Delete('user')
+    async deleteUser(@Request() req) {
+        return await this.userService.deleteUserService(req.user);
     }
 }

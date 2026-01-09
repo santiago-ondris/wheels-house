@@ -1,4 +1,4 @@
-import { LoginDTO, RegisterDTO } from "../dto/user.dto";
+import { LoginDTO, RegisterDTO, TokenData, UpdatePasswordDTO, UpdateUserProfileDTO } from "../dto/user.dto";
 import { getUserFromEmail, getUserFromUsername, getUserFromUsernameOrEmail } from "src/database/crud/user.crud";
 import * as userUtils from "../utils/user.utils";
 
@@ -45,5 +45,25 @@ export async function loginValidator(loginData: LoginDTO){
 
     if(!validPassword) {
         throw userUtils.INVALID_CREDENTIALS;
+    }
+}
+
+export async function updateUserValidator(userData: TokenData, userChanges: UpdateUserProfileDTO) {
+    if(!userUtils.validUserPicture(userChanges.picture)) {
+        throw userUtils.USER_PICTURE_FORMAT_NOT_VALID;
+    }
+}
+
+export async function updatePasswordValidator(userData: TokenData, updatePasswordData: UpdatePasswordDTO) {
+    const user = await getUserFromUsername(userData.username);
+
+    const validOldPassword = await userUtils.verifyPassword(updatePasswordData.oldPassword, user.hashedPassword);
+
+    if(!validOldPassword) {
+        throw userUtils.INVALID_CREDENTIALS;
+    }
+
+    if (!userUtils.validatePassword(updatePasswordData.newPassword)) {
+        throw userUtils.INVALID_PASSWORD_EXCEPTION;
     }
 }

@@ -156,3 +156,12 @@ export async function deleteGroupedCarsFromCarId(carId: number) {
         return false;
     }
 }
+
+export async function deleteGroupsFromUserId(userId: number) {
+    try {
+        const deletedGroups = await db.delete(group).where(eq(group.userId, userId)).returning();
+        return deletedGroups;
+    } catch {
+        return null;
+    }
+}

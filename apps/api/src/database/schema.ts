@@ -9,6 +9,7 @@ export const user = pgTable("user", {
     hashedPassword: text("hashedPassword").notNull(),
     createdDate: timestamp("createdDate").defaultNow(),
     picture: text("picture"),
+    biography: text("biography")
     // for the future:
     // verificationCode: integer("verificationCode").notNull(),
     // verified: boolean("verified"),
@@ -35,7 +36,7 @@ export const car = pgTable("car", {
     designer: text("designer"),
     series: text("series"),
     country: text("country"),
-    condition: text("condition")
+    condition: text("condition").notNull()
 });
 
 export const carPicture = pgTable("carPicture", {

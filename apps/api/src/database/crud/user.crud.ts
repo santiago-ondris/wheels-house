@@ -1,5 +1,5 @@
 import { db } from '../index'
-import { UserToDB } from 'src/dto/user.dto'
+import { UpdateUserProfileDTO, UserToDB } from 'src/dto/user.dto'
 import { user } from 'src/database/schema'
 import { eq, ilike } from 'drizzle-orm';
 
@@ -49,6 +49,7 @@ export async function getPublicProfileByUsername(username: string) {
         lastName: user.lastName,
         picture: user.picture,
         createdDate: user.createdDate,
+        biography: user.biography
     }).from(user).where(eq(user.username, username));
 
     return userObject[0] || null;
@@ -68,4 +69,35 @@ export async function searchUsers(query: string) {
         .from(user)
         .where(ilike(user.username, `%${query}%`))
         .limit(20);
+}
+
+// Update
+
+export async function updateUserFromUserId(userId: number, userChanges: UpdateUserProfileDTO) {
+    try {
+        await db.update(user).set(userChanges).where(eq(user.userId, userId));
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+export async function updatePasswordFromUserId(userId: number, newHashedPassword: string) {
+    try {
+        await db.update(user).set({hashedPassword: newHashedPassword}).where(eq(user.userId, userId));
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+// Delete
+
+export async function deleteUserFromUsername(username: string) {
+    try {
+        const deletedUser = await db.delete(user).where(eq(user.username, username)).returning();
+        return deletedUser[0];
+    } catch {
+        return null;
+    }
 }

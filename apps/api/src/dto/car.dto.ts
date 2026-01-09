@@ -165,7 +165,7 @@ export class CarUpdateDTO {
     country: string | null = '';
 
     @IsString()
-    @IsOptional()
+    @IsNotEmpty()
     condition: string;
 
     @IsArray()

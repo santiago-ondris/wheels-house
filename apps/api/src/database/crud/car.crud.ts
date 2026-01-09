@@ -153,3 +153,12 @@ export async function deleteAllCarPictures(carId: number) {
         return null;
     }
 }
+
+export async function deleteCarsFromUserId(userId: number) {
+    try {
+        const deletedCars = await db.delete(car).where(eq(car.userId, userId)).returning();
+        return deletedCars;
+    } catch {
+        return null;
+    }
+}

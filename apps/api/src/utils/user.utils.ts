@@ -76,6 +76,22 @@ export const USER_PICTURE_FORMAT_NOT_VALID = new HttpException(
     HttpStatus.BAD_REQUEST
 );
 
+export const ERROR_UPDATING_USER = new HttpException(
+    {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: 'Error while updating the user.' 
+    },
+    HttpStatus.INTERNAL_SERVER_ERROR
+);
+
+export const ERROR_DELETING_USER = new HttpException(
+    {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: 'Error while deleting the user.' 
+    },
+    HttpStatus.INTERNAL_SERVER_ERROR
+);
+
 export function isValidEmail(email: string): boolean {
     const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return pattern.test(email);
