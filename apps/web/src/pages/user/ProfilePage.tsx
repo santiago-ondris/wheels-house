@@ -70,7 +70,7 @@ export default function ProfilePage() {
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="container mx-auto px-4 py-8"
+            className="container mx-auto px-4"
         >
             <ProfileHero
                 username={profile.username}

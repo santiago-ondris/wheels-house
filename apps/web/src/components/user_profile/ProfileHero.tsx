@@ -28,65 +28,108 @@ export default function ProfileHero({
 
     return (
         <motion.section
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md border border-white/10 p-6 md:p-8"
+            transition={{ duration: 0.4 }}
+            className="w-full"
         >
-            {/* Background decoration */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-accent/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+            {/* Desktop Layout */}
+            <div className="hidden md:flex items-center justify-between gap-8 py-10 border-b border-white/5">
+                <div className="flex items-center gap-6">
+                    {/* Avatar */}
+                    <div className="w-24 h-24 rounded-full bg-white/5 border border-white/10 overflow-hidden flex-shrink-0">
+                        {picture ? (
+                            <img
+                                src={picture}
+                                alt={`${firstName} ${lastName}`}
+                                className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500"
+                            />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-white/[0.02]">
+                                <User className="w-10 h-10 text-white/20" />
+                            </div>
+                        )}
+                    </div>
+                    
+                    <div>
+                        <h1 className="text-4xl font-black text-white tracking-tighter uppercase mb-1">
+                            {firstName} {lastName}
+                        </h1>
+                        <p className="text-white/40 font-mono text-sm tracking-widest uppercase flex items-center gap-2">
+                             <span className="text-accent">@</span>{username}
+                             {isOwner && (
+                                <button className="ml-4 text-[10px] text-accent/60 hover:text-accent font-bold transition-colors border-b border-accent/20 hover:border-accent">
+                                    EDIT_PROFILE
+                                </button>
+                             )}
+                        </p>
+                    </div>
+                </div>
 
-            <div className="relative flex flex-col md:flex-row items-center md:items-start gap-6">
-                {/* Avatar */}
-                <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-white/10 border-2 border-accent/50 overflow-hidden flex items-center justify-center flex-shrink-0">
+                {/* Dashboard Stats */}
+                <div className="flex items-center gap-12 font-mono">
+                    <div className="flex flex-col items-end">
+                        <span className="text-[10px] text-white/20 uppercase tracking-[0.2em] mb-1">Vehículos</span>
+                        <span className="text-3xl font-black text-white">{String(totalCars).padStart(3, '0')}</span>
+                    </div>
+                    
+                    <div className="h-10 w-[1px] bg-white/10" />
+                    
+                    <div className="flex flex-col items-end">
+                        <span className="text-[10px] text-white/20 uppercase tracking-[0.2em] mb-1">Grupos</span>
+                        <span className="text-3xl font-black text-white">{String(totalGroups).padStart(2, '0')}</span>
+                    </div>
+
+                    <div className="h-10 w-[1px] bg-white/10" />
+
+                    <div className="flex flex-col items-end">
+                        <span className="text-[10px] text-white/20 uppercase tracking-[0.2em] mb-1">Registro</span>
+                        <div className="flex items-center gap-2 text-white/60">
+                            <Calendar size={14} className="opacity-40" />
+                            <span className="text-xl font-bold">{memberSince || "----"}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Mobile Layout (Compact) */}
+            <div className="md:hidden flex items-center gap-5 py-6">
+                <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 overflow-hidden flex-shrink-0">
                     {picture ? (
                         <img
                             src={picture}
                             alt={`${firstName} ${lastName}`}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover grayscale"
                         />
                     ) : (
-                        <User className="w-12 h-12 md:w-16 md:h-16 text-white/40" />
+                        <div className="w-full h-full flex items-center justify-center">
+                            <User className="w-8 h-8 text-white/20" />
+                        </div>
                     )}
                 </div>
 
-                {/* User info */}
-                <div className="flex-1 text-center md:text-left">
-                    <h1 className="text-2xl md:text-3xl font-bold text-white">
-                        {firstName} {lastName}
-                    </h1>
-                    <p className="text-accent text-sm mt-1">@{username}</p>
-
-                    {/* Stats */}
-                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-4 text-white/70 text-sm">
-                        <span className="flex items-center gap-1">
-                            <span className="font-bold text-white">{totalCars}</span> autos
+                <div className="flex-1 min-w-0">
+                    <div className="flex items-baseline gap-2 overflow-hidden">
+                        <h1 className="text-lg font-bold text-white truncate">
+                            {firstName} {lastName}
+                        </h1>
+                        <span className="text-white/30 text-xs font-mono truncate lowercase">@{username}</span>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 mt-1.5 font-mono text-[11px] tracking-wider uppercase text-white/50">
+                        <span className="flex items-center gap-1.5">
+                            <span className="text-white font-bold">{totalCars}</span> AUTOS
                         </span>
-                        <span className="text-white/30">•</span>
-                        <span className="flex items-center gap-1">
-                            <span className="font-bold text-white">{totalGroups}</span> grupos
+                        <span className="text-white/10">|</span>
+                        <span className="flex items-center gap-1.5">
+                            <span className="text-white font-bold">{totalGroups}</span> GRUPOS
                         </span>
-                        {memberSince && (
-                            <>
-                                <span className="text-white/30">•</span>
-                                <span className="flex items-center gap-1">
-                                    <Calendar className="w-4 h-4" />
-                                    Coleccionista desde {memberSince}
-                                </span>
-                            </>
-                        )}
                     </div>
 
-                    {/* Owner actions */}
                     {isOwner && (
-                        <div className="mt-4">
-                            <button
-                                disabled
-                                className="px-4 py-2 text-sm bg-white/10 text-white/50 rounded-lg cursor-not-allowed"
-                            >
-                                Editar Perfil (próximamente)
-                            </button>
-                        </div>
+                        <button className="mt-2 text-[10px] text-accent/60 font-mono tracking-tighter uppercase hover:text-accent transition-colors">
+                            [ EDIT_DATA ]
+                        </button>
                     )}
                 </div>
             </div>
