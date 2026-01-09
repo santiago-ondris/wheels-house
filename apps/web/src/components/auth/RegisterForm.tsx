@@ -48,15 +48,15 @@ export default function RegisterForm() {
         email: result.data.email,
         firstName: result.data.firstName,
         lastName: result.data.lastName,
-        password: result.data.password,        
+        password: result.data.password,
       });
-    
+
       await login(result.data.username, result.data.password);
       toast.success("¡Cuenta creada exitosamente!");
-      navigate(`/collection/`);
+      navigate(`/collection/${result.data.username}`);
     } catch (error: any) {
       const errorMsg = error?.error || "";
-      
+
       if (errorMsg.includes("Username")) {
         setErrors({ username: "Este usuario ya está en uso" });
       } else if (errorMsg.includes("Email already")) {
