@@ -36,7 +36,7 @@ export const car = pgTable("car", {
     designer: text("designer"),
     series: text("series"),
     country: text("country"),
-    condition: text("condition").notNull()
+    condition: text("condition").notNull().default("Abierto")
 });
 
 export const carPicture = pgTable("carPicture", {
