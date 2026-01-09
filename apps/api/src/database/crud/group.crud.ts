@@ -1,6 +1,6 @@
 import { db } from '../index'
 import { group, groupedCar, user, car } from 'src/database/schema'
-import { eq, and, sql, asc, count } from 'drizzle-orm';
+import { eq, and, sql, asc, count, desc } from 'drizzle-orm';
 import { GroupToDB, UpdateGroupDTO } from 'src/dto/group.dto';
 
 
@@ -40,7 +40,7 @@ export async function getGroupsFromUserId(userId: number) {
         picture: group.picture,
         featured: group.featured,
         order: group.order,
-    }).from(group).where(eq(group.userId, userId)).orderBy(asc(group.order));
+    }).from(group).where(eq(group.userId, userId)).orderBy(desc(group.featured), desc(group.groupId));
 }
 
 export async function getFeaturedGroupsFromUserId(userId: number) {
@@ -51,7 +51,7 @@ export async function getFeaturedGroupsFromUserId(userId: number) {
         picture: group.picture,
         featured: group.featured,
         order: group.order,
-    }).from(group).where(and(eq(group.userId, userId), eq(group.featured, true))).orderBy(asc(group.order));
+    }).from(group).where(and(eq(group.userId, userId), eq(group.featured, true))).orderBy(desc(group.groupId));
 }
 
 export async function countFeaturedGroupsFromUserId(userId: number) {

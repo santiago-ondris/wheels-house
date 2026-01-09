@@ -118,6 +118,9 @@ export default function GroupsSection({ username, totalGroups, isOwner }: Groups
                                     <h3 className="text-lg font-mono font-bold text-white truncate uppercase tracking-tight group-hover:text-blueprint transition-colors">
                                         {group.name}
                                     </h3>
+                                    <div className="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider">
+                                        * Destacado *
+                                    </div>
                                     <div className="flex items-center justify-between pt-1 border-t border-blueprint/10 text-[12px] font-mono">
                                         <span className="text-blueprint/20 truncate mr-2 uppercase">Cantidad:</span>
                                         <span className="text-blueprint/60 flex-shrink-0">

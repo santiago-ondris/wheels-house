@@ -125,18 +125,18 @@ export default function EditCarPage() {
     };
 
     const handleCancel = () => {
-        navigate(carId ? `/car/${carId}` : `/collection/${user?.username}`);
+        navigate(-1);
     };
 
     const updateField = (field: keyof CarFormData, value: string) => {
         setFormData((prev) => {
             const newData = { ...prev, [field]: value };
-            
+
             // Auto-detect nationality if brand changes
             if (field === "brand") {
                 newData.country = brandNationalities[value] || "";
             }
-            
+
             return newData;
         });
 
@@ -316,7 +316,7 @@ export default function EditCarPage() {
                                         icon={<Layers className="w-5 h-5" />}
                                     />
                                 </div>
- 
+
                                 <div>
                                     <label className="block text-white/50 uppercase tracking-widest text-[10px] font-bold mb-1.5 ml-1">
                                         Diseñador
@@ -377,14 +377,14 @@ export default function EditCarPage() {
                                             key={group.groupId}
                                             onClick={() => toggleGroup(group.groupId)}
                                             className={`relative cursor-pointer rounded-xl p-4 border-2 transition-all ${selectedGroups.includes(group.groupId)
-                                                    ? "border-accent bg-accent/10"
-                                                    : "border-white/10 bg-white/[0.02] hover:border-white/20"
+                                                ? "border-accent bg-accent/10"
+                                                : "border-white/10 bg-white/[0.02] hover:border-white/20"
                                                 }`}
                                         >
                                             <div className="flex items-center gap-3">
                                                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${selectedGroups.includes(group.groupId)
-                                                        ? "bg-accent text-white"
-                                                        : "bg-white/5 text-white/40"
+                                                    ? "bg-accent text-white"
+                                                    : "bg-white/5 text-white/40"
                                                     }`}>
                                                     <Folder className="w-4 h-4" />
                                                 </div>

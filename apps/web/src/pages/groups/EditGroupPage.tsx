@@ -127,7 +127,7 @@ export default function EditGroupPage() {
     };
 
     const handleCancel = () => {
-        navigate(`/collection/${user?.username}/group/${encodeURIComponent(formData.name)}`);
+        navigate(-1);
     };
 
     const toggleCar = (carId: number) => {

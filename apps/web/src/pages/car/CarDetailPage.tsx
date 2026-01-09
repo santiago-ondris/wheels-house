@@ -52,7 +52,7 @@ export const CarDetailPage = () => {
     };
 
     const handleBack = () => {
-        navigate(`/collection/${car?.ownerUsername}`);
+        navigate(-1);
     };
 
     const galleryRef = useRef<HTMLDivElement>(null);
