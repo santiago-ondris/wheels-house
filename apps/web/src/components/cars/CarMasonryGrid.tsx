@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ZoomIn, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, ZoomIn, ChevronLeft, ChevronRight, ZoomOut, RefreshCw } from "lucide-react";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 interface CarMasonryGridProps {
   images: string[];
@@ -8,15 +9,21 @@ interface CarMasonryGridProps {
 
 export const CarMasonryGrid = ({ images }: CarMasonryGridProps) => {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [isPinching, setIsPinching] = useState(false);
 
   const handleNext = useCallback(() => {
     if (selectedIndex === null) return;
     setSelectedIndex((prev) => (prev! + 1) % images.length);
+    setIsZoomed(false);
+    setIsPinching(false);
   }, [selectedIndex, images.length]);
 
   const handlePrev = useCallback(() => {
     if (selectedIndex === null) return;
     setSelectedIndex((prev) => (prev! - 1 + images.length) % images.length);
+    setIsZoomed(false);
+    setIsPinching(false);
   }, [selectedIndex, images.length]);
 
   // soporte para el teclado 
@@ -57,13 +64,13 @@ export const CarMasonryGrid = ({ images }: CarMasonryGridProps) => {
         </div>
       </div>
 
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {selectedIndex !== null && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-100 flex items-center justify-center bg-black/60 backdrop-blur-2xl p-4 md:p-8"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-2xl p-4 md:p-8"
             onClick={() => setSelectedIndex(null)}
           >
 
@@ -82,29 +89,82 @@ export const CarMasonryGrid = ({ images }: CarMasonryGridProps) => {
             </button>
 
             <div
-              className="relative w-full h-full flex items-center justify-center"
+              className="relative w-full h-full flex items-center justify-center overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
-              <motion.img
-                key={selectedIndex}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-
-                drag="x"
-                dragConstraints={{ left: 0, right: 0 }}
-                dragElastic={0.7}
-                onDragEnd={(_e, { offset }) => {
-                  const swipeThreshold = 50;
-                  if (offset.x > swipeThreshold) handlePrev();
-                  else if (offset.x < -swipeThreshold) handleNext();
+              <TransformWrapper
+                initialScale={1}
+                minScale={1}
+                maxScale={4}
+                centerOnInit={true}
+                onTransformed={(ref) => {
+                  setIsZoomed(ref.state.scale > 1);
                 }}
+                onPinchingStart={() => setIsPinching(true)}
+                onPinchingStop={() => setIsPinching(false)}
+                key={selectedIndex}
+              >
+                {({ zoomIn, zoomOut, resetTransform }) => (
+                  <>
+                    <div className="absolute top-6 left-6 flex flex-col gap-2 z-50">
+                      <button
+                        onClick={() => zoomIn()}
+                        className="p-2 bg-white/10 hover:bg-white/20 rounded-lg text-white backdrop-blur-md border border-white/10 active:scale-90 transition-all"
+                        title="Acercar"
+                      >
+                        <ZoomIn size={20} />
+                      </button>
+                      <button
+                        onClick={() => zoomOut()}
+                        className="p-2 bg-white/10 hover:bg-white/20 rounded-lg text-white backdrop-blur-md border border-white/10 active:scale-90 transition-all"
+                        title="Alejar"
+                      >
+                        <ZoomOut size={20} />
+                      </button>
+                      <button
+                        onClick={() => resetTransform()}
+                        className="p-2 bg-white/10 hover:bg-white/20 rounded-lg text-white backdrop-blur-md border border-white/10 active:scale-90 transition-all"
+                        title="Reiniciar"
+                      >
+                        <RefreshCw size={20} />
+                      </button>
+                    </div>
 
-                src={images[selectedIndex]}
-                alt="Full view"
-                className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl cursor-grab active:cursor-grabbing select-none"
-              />
+                    <TransformComponent
+                      wrapperClass="!w-full !h-full"
+                      contentClass="!w-full !h-full flex items-center justify-center p-4"
+                    >
+                      <motion.div
+                        key={selectedIndex}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{ duration: 0.2 }}
+
+                        drag={!isZoomed && !isPinching ? "x" : false}
+                        dragConstraints={{ left: 0, right: 0 }}
+                        dragElastic={0.7}
+                        onDragEnd={(_e, { offset }) => {
+                          const swipeThreshold = 80;
+                          if (offset.x > swipeThreshold) {
+                            handlePrev();
+                          }
+                          else if (offset.x < -swipeThreshold) {
+                            handleNext();
+                          }
+                        }}
+                        className="w-full h-full flex items-center justify-center"
+                      >
+                        <img
+                          src={images[selectedIndex]}
+                          alt="Full view"
+                          className={`max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl select-none ${isZoomed ? 'cursor-move' : 'cursor-grab active:cursor-grabbing'}`}
+                        />
+                      </motion.div>
+                    </TransformComponent>
+                  </>
+                )}
+              </TransformWrapper>
             </div>
 
             <button
