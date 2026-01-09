@@ -63,6 +63,19 @@ export async function getTotalCarsCount() {
     return result[0].value;
 }
 
+export async function getUniqueCarValues(userId: number) {
+    const result = await db
+        .select({
+            name: car.name,
+            series: car.series,
+            designer: car.designer,
+        })
+        .from(car)
+        .where(eq(car.userId, userId));
+    
+    return result;
+}
+
 export async function getCarByOffset(offset: number) {
     const result = await db
         .select({

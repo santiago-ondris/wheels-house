@@ -119,6 +119,7 @@ export const colors = [
     "Oliva",
     "Mostaza",
     "Cian",
+    "Púrpura",
     // Spectraflame (Hot Wheels)
     "Spectraflame Red",
     "Spectraflame Blue",
