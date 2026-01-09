@@ -55,9 +55,9 @@ export default function FeaturedCar() {
                 <div className="flex-1 hidden lg:flex items-center justify-center overflow-hidden pointer-events-none">
                     <motion.span
                         initial={{ opacity: 0, x: -20 }}
-                        whileInView={{ opacity: 0.03, x: 0 }}
+                        whileInView={{ opacity: 0.5, x: 0 }}
                         transition={{ duration: 1 }}
-                        className="text-[10rem] font-black tracking-tighter text-white whitespace-nowrap select-none"
+                        className="text-[10rem] font-black tracking-tighter text-emerald-400 whitespace-nowrap select-none"
                     >
                         COLLECTION
                     </motion.span>
