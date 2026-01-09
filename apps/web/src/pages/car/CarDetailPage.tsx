@@ -181,7 +181,10 @@ export const CarDetailPage = () => {
                 <div className="p-6">
                     <p className="text-white/80 mb-8 max-w-sm">
                         ¿Estás seguro que querés eliminar el <span className="font-bold text-white">{car.name}</span>?
-                        Esta acción no se puede deshacer.
+                        <br /><br />
+                        <span className="text-danger font-medium italic">
+                            Esta acción eliminará el auto de toda tu colección (no solo de este grupo) y no se puede deshacer.
+                        </span>
                     </p>
                     <div className="flex gap-3">
                         <button

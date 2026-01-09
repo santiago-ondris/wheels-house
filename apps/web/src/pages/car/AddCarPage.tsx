@@ -99,7 +99,7 @@ export default function AddCarPage() {
             }
 
             toast.success("¡Auto agregado a tu colección!");
-            navigate(`/collection/${user?.username}`);
+            navigate(`/collection/${user?.username}`, { replace: true });
         } catch (error: any) {
             toast.error("Error al agregar el auto. Intentá de nuevo.");
             console.error(error);
@@ -109,7 +109,7 @@ export default function AddCarPage() {
     };
 
     const handleCancel = () => {
-        navigate(`/collection/${user?.username}`);
+        navigate(-1);
     };
 
     const updateField = (field: keyof CarFormData, value: string) => {
@@ -394,33 +394,26 @@ export default function AddCarPage() {
                             Cancelar
                         </button>
                     </div>
-                </form>
-            </motion.div>
 
-            <motion.div
-                initial={{ y: 100 }}
-                animate={{ y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="md:hidden fixed bottom-0 left-0 right-0 bg-dark/95 backdrop-blur-xl border-t border-white/10 p-4 z-50"
-            >
-                <div className="flex gap-3">
-                    <button
-                        type="button"
-                        onClick={handleCancel}
-                        disabled={isLoading}
-                        className="flex-1 px-6 py-4 border border-white/10 text-white font-bold rounded-xl hover:bg-white/5 transition-all active:scale-95"
-                    >
-                        Cancelar
-                    </button>
-                    <button
-                        onClick={handleSubmit}
-                        disabled={isLoading}
-                        className="flex-[2] flex items-center justify-center gap-2 px-6 py-4 bg-accent hover:bg-accent/80 disabled:bg-accent/50 text-white font-bold rounded-xl transition-all active:scale-95 shadow-lg shadow-accent/30"
-                    >
-                        <Save className="w-5 h-5" />
-                        {isLoading ? "Guardando..." : "Guardar Auto"}
-                    </button>
-                </div>
+                    <div className="md:hidden mt-8 grid grid-cols-2 gap-3">
+                        <button
+                            type="button"
+                            onClick={handleCancel}
+                            disabled={isLoading}
+                            className="px-6 py-4 border border-white/10 text-white font-bold rounded-xl hover:bg-white/5 transition-all active:scale-95"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                            className="flex items-center justify-center gap-2 px-6 py-4 bg-accent hover:bg-accent/80 disabled:bg-accent/50 text-white font-bold rounded-xl transition-all active:scale-95 shadow-lg shadow-accent/30"
+                        >
+                            <Save className="w-5 h-5" />
+                            {isLoading ? "Guardando..." : "Guardar Auto"}
+                        </button>
+                    </div>
+                </form>
             </motion.div>
         </div>
     );

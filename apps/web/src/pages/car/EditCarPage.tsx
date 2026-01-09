@@ -114,7 +114,7 @@ export default function EditCarPage() {
                 await updateCar(Number(carId), result.data);
                 await updateCarGroups(Number(carId), selectedGroups);
                 toast.success("¡Auto actualizado con éxito!");
-                navigate(`/car/${carId}`, { replace: true });
+                navigate(-1);
             }
         } catch (error: any) {
             toast.error("Error al actualizar el auto. Intentá de nuevo.");
@@ -132,7 +132,6 @@ export default function EditCarPage() {
         setFormData((prev) => {
             const newData = { ...prev, [field]: value };
 
-            // Auto-detect nationality if brand changes
             if (field === "brand") {
                 newData.country = brandNationalities[value] || "";
             }
@@ -413,34 +412,29 @@ export default function EditCarPage() {
                             Cancelar
                         </button>
                     </div>
+
+                    {/* Mobile buttons at the end of scroll */}
+                    <div className="md:hidden mt-8 grid grid-cols-2 gap-3">
+                        <button
+                            type="button"
+                            onClick={handleCancel}
+                            disabled={isLoading}
+                            className="px-6 py-4 border border-white/10 text-white font-bold rounded-xl hover:bg-white/5 transition-all active:scale-95"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                            className="flex items-center justify-center gap-2 px-6 py-4 bg-accent hover:bg-accent/80 disabled:bg-accent/50 text-white font-bold rounded-xl transition-all active:scale-95 shadow-lg shadow-accent/30"
+                        >
+                            <Save className="w-5 h-5" />
+                            {isLoading ? "Guardando..." : "Guardar"}
+                        </button>
+                    </div>
                 </form>
             </motion.div>
 
-            <motion.div
-                initial={{ y: 100 }}
-                animate={{ y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="md:hidden fixed bottom-0 left-0 right-0 bg-dark/95 backdrop-blur-xl border-t border-white/10 p-4 z-50"
-            >
-                <div className="flex gap-3">
-                    <button
-                        type="button"
-                        onClick={handleCancel}
-                        disabled={isLoading}
-                        className="flex-1 px-6 py-4 border border-white/10 text-white font-bold rounded-xl hover:bg-white/5 transition-all active:scale-95"
-                    >
-                        Cancelar
-                    </button>
-                    <button
-                        onClick={handleSubmit}
-                        disabled={isLoading}
-                        className="flex-[2] flex items-center justify-center gap-2 px-6 py-4 bg-accent hover:bg-accent/80 disabled:bg-accent/50 text-white font-bold rounded-xl transition-all active:scale-95 shadow-lg shadow-accent/30"
-                    >
-                        <Save className="w-5 h-5" />
-                        {isLoading ? "Guardando..." : "Guardar Cambios"}
-                    </button>
-                </div>
-            </motion.div>
         </div>
     );
 }
