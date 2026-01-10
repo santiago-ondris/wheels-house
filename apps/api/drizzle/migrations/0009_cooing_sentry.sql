@@ -1,0 +1,1 @@
+ALTER TABLE "car" ALTER COLUMN "condition" SET DEFAULT 'Abierto';

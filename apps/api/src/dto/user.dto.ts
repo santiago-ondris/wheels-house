@@ -23,12 +23,14 @@ export class BaseUser {
     @IsString()
     lastName: string;
 
-    constructor(username: string, email: string, firstName: string, lastName: string, picture: string = "") {
-        this.username = username;
-        this.email = email;
-        this.picture = picture;
-        this.firstName = firstName;
-        this.lastName = lastName;
+    @Transform(({ value }) => value ?? '')
+    @IsString()
+    @IsOptional()
+    biography: string = '';
+
+    constructor(username: string, email: string, firstName: string, lastName: string, picture: string = "", biography: string = "") {
+        this.username = username, this.email = email, this.picture = picture;
+        this.firstName = firstName, this.lastName = lastName, this.biography = biography;
     }
 }
 
@@ -38,8 +40,8 @@ export class RegisterDTO extends BaseUser {
     password: string;
 
     constructor(username: string, email: string, firstName: string, lastName: string, 
-                password: string, picture: string = "") {
-        super(username, email, firstName, lastName, picture);
+                password: string, picture: string = "", biography: string = "") {
+        super(username, email, firstName, lastName, picture, biography);
         this.password = password;
     }
 }
@@ -48,8 +50,8 @@ export class UserToDB extends BaseUser {
     hashedPassword: string;
 
     constructor(username: string, email: string, firstName: string, lastName: string, 
-                hashedPassword: string, picture: string = "") {
-        super(username, email, firstName, lastName, picture);
+                hashedPassword: string, picture: string = "", biography: string = "") {
+        super(username, email, firstName, lastName, picture, biography);
         this.hashedPassword = hashedPassword;
     }
 }
@@ -83,4 +85,46 @@ export class TokenData {
     constructor(username: string) {
         this.username = username;
     }
+}
+
+export class UpdateUserProfileDTO {
+    @IsNotEmpty()
+    @IsString()
+    firstName: string
+
+    @IsNotEmpty()
+    @IsString()
+    lastName: string
+
+    @Transform(({ value }) => value ?? '')
+    @IsString()
+    @IsOptional()
+    picture: string = '';
+
+    @Transform(({ value }) => value ?? '')
+    @IsString()
+    @IsOptional()
+    biography: string = '';
+}
+
+export class UpdatePasswordDTO {
+    @IsNotEmpty()
+    @IsString()
+    oldPassword: string;
+    
+    @IsNotEmpty()
+    @IsString()
+    newPassword: string;
+}
+
+export class ForgotPasswordDTO {
+    @IsNotEmpty()
+    @IsString()
+    email: string;
+}
+
+export class ResetPasswordDTO {
+    @IsNotEmpty()
+    @IsString()
+    newPassword: string;
 }

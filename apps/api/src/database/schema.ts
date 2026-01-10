@@ -7,12 +7,15 @@ export const user = pgTable("user", {
     lastName: text("lastName").notNull(),
     email: text("email").notNull().unique(),
     hashedPassword: text("hashedPassword").notNull(),
-    createdDate: timestamp("createdDate").defaultNow(),
+    createdDate: timestamp("createdDate", {withTimezone: true}).defaultNow(),
     picture: text("picture"),
+    biography: text("biography"),
+    resetPasswordRequestSelector: text("resetPasswordRequestSelector"),
+    resetPasswordHashedValidator: text("resetPasswordHashedValidator"),
+    resetPasswordTokenExpires: timestamp("resetPasswordTokenExpires", {withTimezone: true})
     // for the future:
     // verificationCode: integer("verificationCode").notNull(),
     // verified: boolean("verified"),
-    // restorePasswordCode: integer("restorePasswordCode"),
 });
 
 // export const collection = pgTable("collection",{
@@ -35,7 +38,7 @@ export const car = pgTable("car", {
     designer: text("designer"),
     series: text("series"),
     country: text("country"),
-    condition: text("condition")
+    condition: text("condition").notNull().default("Abierto")
 });
 
 export const carPicture = pgTable("carPicture", {

@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import { User, Calendar } from "lucide-react";
+import { User, Calendar, BarChart3 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface ProfileHeroProps {
     username: string;

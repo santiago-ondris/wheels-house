@@ -1,23 +1,38 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { RegisterDTO, UserToDB, LoginDTO, LoginResponse } from '../dto/user.dto';
+import { RegisterDTO, UserToDB, LoginDTO, LoginResponse, TokenData, UpdateUserProfileDTO, UpdatePasswordDTO, ResetPasswordDTO, ForgotPasswordDTO } from '../dto/user.dto';
 import { PublicProfileDTO, PublicCarDTO } from '../dto/public-profile.dto';
-import { createUser, getUserFromUsernameOrEmail, getPublicProfileByUsername, searchUsers } from 'src/database/crud/user.crud';
-import { getCarsFromUserId, getPicturesFromCar } from 'src/database/crud/car.crud';
-import { getGroupsFromUserId } from 'src/database/crud/group.crud';
-import { ERROR_CREATING_USER } from 'src/utils/user.utils';
+import { createUser, getUserFromUsernameOrEmail, getPublicProfileByUsername, searchUsers, updateUserFromUserId, getUserFromUsername, 
+    updatePasswordFromUserId, deleteUserFromUsername, 
+    getUserFromEmail,
+    updateResetPasswordToken,
+    getUserFromRequestTokenSelector,
+    updatePasswordFromReset} from 'src/database/crud/user.crud';
+import { deleteAllCarPictures, deleteCarsFromUserId, getCarsFromUserId, getPicturesFromCar } from 'src/database/crud/car.crud';
+import { deleteGroupedCarsFromCarId, deleteGroupsFromUserId, getGroupsFromUserId } from 'src/database/crud/group.crud';
+import { ERROR_CREATING_USER, ERROR_DELETING_USER, ERROR_SENDING_EMAIL, ERROR_UPDATING_USER, INEXISTENT_USER } from 'src/utils/user.utils';
 import bcrypt from "bcrypt";
+import { randomBytes } from 'crypto';
+import { UploadService } from './upload.service';
+import { getPublicIdFromURL } from 'src/utils/upload.utils';
+import { MailerService } from '@nestjs-modules/mailer';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
-    constructor(private readonly jwtService: JwtService) { }
+    constructor(
+        private readonly jwtService: JwtService, 
+        private readonly uploadService: UploadService,
+        private readonly mailerService: MailerService,
+        private readonly configService: ConfigService
+    ) { }
 
     async registerService(registerData: RegisterDTO) {
-        const hashedPassword = await bcrypt.hash(registerData.password, 10);
+        const hashedPassword = await bcrypt.hash(registerData.password, Number(this.configService.get<string>('HASH_SALT')!));
 
         const newUser: UserToDB = new UserToDB(
             registerData.username, registerData.email, registerData.firstName,
-            registerData.lastName, hashedPassword, registerData.picture
+            registerData.lastName, hashedPassword, registerData.picture, registerData.biography
         );
 
         // TO DO: User verification.
@@ -51,7 +66,7 @@ export class UserService {
         const userData = await getPublicProfileByUsername(username);
 
         if (!userData) {
-            throw new NotFoundException('Usuario no encontrado');
+            throw INEXISTENT_USER;
         }
 
         // Fetch a los autos del usuario.
@@ -88,7 +103,8 @@ export class UserService {
             groupsFromDB.length,
             cars,
             userData.picture ?? undefined,
-            userData.createdDate ?? undefined
+            userData.createdDate ?? undefined,
+            userData.biography ?? undefined
         );
     }
 
@@ -119,5 +135,149 @@ export class UserService {
             // Orden alfabético
             return aUsername.localeCompare(bUsername);
         }).slice(0, 10); // Return top 10
+    }
+
+    async updateUserService(userData: TokenData, userChanges: UpdateUserProfileDTO) {
+        const user = await getUserFromUsernameOrEmail(userData.username);
+
+        if(user.picture != null && user.picture != '' && user.picture != userChanges.picture) {
+            await this.uploadService.deleteImage(getPublicIdFromURL(user.picture));
+        }
+
+        const updated = await updateUserFromUserId(user.userId, userChanges);
+        
+        if(!updated) {
+            throw ERROR_UPDATING_USER;
+        }
+
+        return true;
+    }
+
+    async updatePasswordService(userData: TokenData, updatePasswordData: UpdatePasswordDTO) {
+        const user = await getUserFromUsername(userData.username);
+
+        const hashedPassword = await bcrypt.hash(updatePasswordData.newPassword, 10);
+
+        const passwordUpdated = await updatePasswordFromUserId(user.userId, hashedPassword);
+
+        if(!passwordUpdated) {
+            throw ERROR_UPDATING_USER;
+        }
+
+        return true;
+    }
+
+    async deleteUserService(userData: TokenData) {
+        const deletedUser = await deleteUserFromUsername(userData.username);
+
+        if(deletedUser == null) {
+            throw ERROR_DELETING_USER;
+        }
+
+        if(deletedUser.picture != null && deletedUser.picture != '') {
+            await this.uploadService.deleteImage(getPublicIdFromURL(deletedUser.picture));
+        }
+
+        // Delete their cars.
+        const deletedCars = await deleteCarsFromUserId(deletedUser.userId);
+
+        if(deletedCars == null) {
+            throw ERROR_DELETING_USER;
+        }
+
+        for(const car of deletedCars) {
+            const deletedPictures = await deleteAllCarPictures(car.carId);
+
+            if(deletedPictures == null) {
+                throw ERROR_DELETING_USER;
+            }
+
+            for(const picture of deletedPictures) {
+                await this.uploadService.deleteImage(getPublicIdFromURL(picture.url));
+            }
+
+            const deletedGroupedCars = await deleteGroupedCarsFromCarId(car.carId);
+            
+            if(!deletedGroupedCars) {
+                throw ERROR_DELETING_USER;
+            }
+        }
+
+        // Delete their groups.
+        const deletedGroups = await deleteGroupsFromUserId(deletedUser.userId);
+
+        if(deletedGroups == null) {
+            throw ERROR_DELETING_USER;
+        }
+
+        for(const group of deletedGroups) {
+            if(group.picture != null && group.picture != '') {
+                await this.uploadService.deleteImage(getPublicIdFromURL(group.picture));
+            }
+        }
+
+        return true;
+    }
+
+    async forgotPasswordService(forgotPasswordData: ForgotPasswordDTO) {
+        const user = await getUserFromEmail(forgotPasswordData.email);
+    
+        // selector + validator.
+        const resetToken = randomBytes(16).toString('hex');
+
+        const selector = resetToken.slice(0,16);
+
+        const validator = resetToken.slice(16);
+
+        const hashedValidator = await bcrypt.hash(validator, Number(this.configService.get<string>('HASH_SALT')!));
+
+        const updatedResetToken = await updateResetPasswordToken(user.userId, selector, hashedValidator);
+
+        if(!updatedResetToken) {
+            throw ERROR_UPDATING_USER;
+        }
+
+        
+        // Send email with url with token=selector.validator
+        const domain = this.configService.get<string>('APP_DOMAIN')!;
+        console.log(domain);
+        
+        const url = `${domain}/reset-password?token=${selector+'.'+validator}`;
+
+        try {
+            await this.mailerService.sendMail({
+                to: forgotPasswordData.email,
+                subject: 'Wheels House - Recuperación de contraseña',
+                // You can use 'text' for plain text or 'html' for a styled email
+                html: `
+                    <p>Hola, ${user.username}.</p>
+                    <p>Ingresá al link a continuación para cambiar tu contraseña: <a href=${url}>${url}</a>.</p>
+                    <p>Si no solicitaste este cambio, ignorá este correo.</p>
+                    <p>El equipo de Wheels House.</p>
+                `,
+            });
+        } catch {
+            throw ERROR_SENDING_EMAIL;
+        }
+
+        return true;
+    }
+
+    async resetPasswordService(requestToken: string, resetPasswordData: ResetPasswordDTO) {
+        const splitToken = requestToken.split('.');
+        
+        const selector = splitToken[0];
+
+        const user = await getUserFromRequestTokenSelector(selector);
+
+        const hashedPassword = await bcrypt.hash(resetPasswordData.newPassword, Number(this.configService.get<string>('HASH_SALT')!));
+    
+        const updatedPassword = await updatePasswordFromReset(user!.userId, hashedPassword);
+
+        if(!updatedPassword) {
+            throw ERROR_UPDATING_USER;
+        }
+
+        return true;
     }
 }
