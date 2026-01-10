@@ -52,9 +52,6 @@ export class UserController {
     @UseGuards(ThrottlerGuard)
     @Post('user/forgot-password')
     async forgotPassword(@Body() forgotPasswordeData: ForgotPasswordDTO) {
-        console.log(process.env.EMAIL_PASSWORD!);
-        console.log(process.env.EMAIL_ADDRESS!);
-        console.log(process.env.EMAIL_PROVIDER!);
         await forgotPasswordValidator(forgotPasswordeData);
 
         return await this.userService.forgotPasswordService(forgotPasswordeData);

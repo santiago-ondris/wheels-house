@@ -26,7 +26,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
         },
       },
       defaults: {
-        from: '"No Reply" <noreply@wheelshouse.com>',
+        from: '"Wheels House - No Reply" <noreply@wheelshouse.com>',
       },
     }),
     ThrottlerModule.forRoot([{

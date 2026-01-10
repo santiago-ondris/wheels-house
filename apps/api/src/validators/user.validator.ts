@@ -1,8 +1,6 @@
 import { LoginDTO, RegisterDTO, ResetPasswordDTO, ForgotPasswordDTO, TokenData, UpdatePasswordDTO, UpdateUserProfileDTO } from "../dto/user.dto";
 import { getUserFromEmail, getUserFromRequestTokenSelector, getUserFromUsername, getUserFromUsernameOrEmail } from "src/database/crud/user.crud";
 import * as userUtils from "../utils/user.utils";
-import bcrypt from "bcrypt";
-import { endWith } from "rxjs";
 
 export async function registerValidator(registerData: RegisterDTO) {
     if (!userUtils.validatePassword(registerData.password)) {

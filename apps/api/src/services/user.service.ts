@@ -16,17 +16,19 @@ import { randomBytes } from 'crypto';
 import { UploadService } from './upload.service';
 import { getPublicIdFromURL } from 'src/utils/upload.utils';
 import { MailerService } from '@nestjs-modules/mailer';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
     constructor(
         private readonly jwtService: JwtService, 
         private readonly uploadService: UploadService,
-        private readonly mailerService: MailerService
+        private readonly mailerService: MailerService,
+        private readonly configService: ConfigService
     ) { }
 
     async registerService(registerData: RegisterDTO) {
-        const hashedPassword = await bcrypt.hash(registerData.password, 10);
+        const hashedPassword = await bcrypt.hash(registerData.password, Number(this.configService.get<string>('HASH_SALT')!));
 
         const newUser: UserToDB = new UserToDB(
             registerData.username, registerData.email, registerData.firstName,
@@ -221,15 +223,13 @@ export class UserService {
         const user = await getUserFromEmail(forgotPasswordData.email);
     
         // selector + validator.
-        const resetToken = randomBytes(32).toString('hex');
+        const resetToken = randomBytes(16).toString('hex');
 
-        const selector = resetToken.slice(0,24);
+        const selector = resetToken.slice(0,16);
 
-        const validator = resetToken.slice(24);
+        const validator = resetToken.slice(16);
 
-        console.log(selector+'.'+validator)
-
-        const hashedValidator = await bcrypt.hash(validator, Number(process.env.HASH_SALT!));
+        const hashedValidator = await bcrypt.hash(validator, Number(this.configService.get<string>('HASH_SALT')!));
 
         const updatedResetToken = await updateResetPasswordToken(user.userId, selector, hashedValidator);
 
@@ -237,9 +237,12 @@ export class UserService {
             throw ERROR_UPDATING_USER;
         }
 
-        // Send email with url with token=selector.validator
         
-        const url = `https://your-app.com/reset-password?token=${selector+'.'+validator}`;
+        // Send email with url with token=selector.validator
+        const domain = this.configService.get<string>('APP_DOMAIN')!;
+        console.log(domain);
+        
+        const url = `${domain}/reset-password?token=${selector+'.'+validator}`;
 
         try {
             await this.mailerService.sendMail({
@@ -247,11 +250,9 @@ export class UserService {
                 subject: 'Wheels House - Recuperación de contraseña',
                 // You can use 'text' for plain text or 'html' for a styled email
                 html: `
-                    <p>Hola, "${user.username}".</p>
-                    <p>Ingrega al link a continuación para cambiar tu contraseña:</p>
-                    <a href="${url}">Reset Password</a>
-                    <p>Si no solicitaste este cambio, ignora este correo.</p>
-                    <p></p>
+                    <p>Hola, ${user.username}.</p>
+                    <p>Ingresá al link a continuación para cambiar tu contraseña: <a href=${url}>${url}</a>.</p>
+                    <p>Si no solicitaste este cambio, ignorá este correo.</p>
                     <p>El equipo de Wheels House.</p>
                 `,
             });
@@ -269,7 +270,7 @@ export class UserService {
 
         const user = await getUserFromRequestTokenSelector(selector);
 
-        const hashedPassword = await bcrypt.hash(resetPasswordData.newPassword, Number(process.env.HASH_SALT!));
+        const hashedPassword = await bcrypt.hash(resetPasswordData.newPassword, Number(this.configService.get<string>('HASH_SALT')!));
     
         const updatedPassword = await updatePasswordFromReset(user!.userId, hashedPassword);
 
