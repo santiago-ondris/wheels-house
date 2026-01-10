@@ -1,5 +1,5 @@
-import { LoginDTO, RegisterDTO } from "../dto/user.dto";
-import { getUserFromEmail, getUserFromUsername, getUserFromUsernameOrEmail } from "src/database/crud/user.crud";
+import { LoginDTO, RegisterDTO, ResetPasswordDTO, ForgotPasswordDTO, TokenData, UpdatePasswordDTO, UpdateUserProfileDTO } from "../dto/user.dto";
+import { getUserFromEmail, getUserFromRequestTokenSelector, getUserFromUsername, getUserFromUsernameOrEmail } from "src/database/crud/user.crud";
 import * as userUtils from "../utils/user.utils";
 
 export async function registerValidator(registerData: RegisterDTO) {
@@ -45,5 +45,59 @@ export async function loginValidator(loginData: LoginDTO){
 
     if(!validPassword) {
         throw userUtils.INVALID_CREDENTIALS;
+    }
+}
+
+export async function updateUserValidator(userData: TokenData, userChanges: UpdateUserProfileDTO) {
+    if(!userUtils.validUserPicture(userChanges.picture)) {
+        throw userUtils.USER_PICTURE_FORMAT_NOT_VALID;
+    }
+}
+
+export async function updatePasswordValidator(userData: TokenData, updatePasswordData: UpdatePasswordDTO) {
+    const user = await getUserFromUsername(userData.username);
+
+    const validOldPassword = await userUtils.verifyPassword(updatePasswordData.oldPassword, user.hashedPassword);
+
+    if(!validOldPassword) {
+        throw userUtils.INVALID_CREDENTIALS;
+    }
+
+    if (!userUtils.validatePassword(updatePasswordData.newPassword)) {
+        throw userUtils.INVALID_PASSWORD_EXCEPTION;
+    }
+}
+
+export async function forgotPasswordValidator(forgotPasswordData: ForgotPasswordDTO) {
+    const user = await getUserFromEmail(forgotPasswordData.email);
+
+    if(user == null) {
+        throw userUtils.INEXISTENT_USER;
+    }
+}
+
+export async function resetPasswordValidator(requestToken: string, resetPasswordData: ResetPasswordDTO) {
+    const splitToken = requestToken.split('.');
+
+    if(splitToken.length != 2) {
+        throw userUtils.INVALID_CREDENTIALS;
+    }
+
+    const selector = splitToken[0], validator = splitToken[1];
+    
+    const user = await getUserFromRequestTokenSelector(selector);
+
+    if(user == null) {
+        throw userUtils.INVALID_CREDENTIALS;
+    }
+
+    const validToken = await userUtils.verifyTokenValidator(validator, user.resetPasswordHashedValidator!);
+
+    if(!validToken) {
+        throw userUtils.INVALID_CREDENTIALS;
+    }
+
+    if(!userUtils.validatePassword(resetPasswordData.newPassword)) {
+        throw userUtils.INVALID_PASSWORD_EXCEPTION;
     }
 }

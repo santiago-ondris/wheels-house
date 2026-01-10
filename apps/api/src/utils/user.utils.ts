@@ -4,6 +4,8 @@ import bcrypt from "bcrypt";
 export const isLower = (c: string) => c === c.toLowerCase() && c !== c.toUpperCase();
 export const isUpper = (c: string) => c === c.toUpperCase() && c !== c.toLowerCase();
 
+export const PASSWORE_RESET_TIME_LIMIT = 1800000 // half an hour.
+
 export const INVALID_PASSWORD_EXCEPTION = new HttpException(
     {
         status: HttpStatus.BAD_REQUEST,
@@ -76,6 +78,30 @@ export const USER_PICTURE_FORMAT_NOT_VALID = new HttpException(
     HttpStatus.BAD_REQUEST
 );
 
+export const ERROR_UPDATING_USER = new HttpException(
+    {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: 'Error while updating the user.' 
+    },
+    HttpStatus.INTERNAL_SERVER_ERROR
+);
+
+export const ERROR_DELETING_USER = new HttpException(
+    {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: 'Error while deleting the user.' 
+    },
+    HttpStatus.INTERNAL_SERVER_ERROR
+);
+
+export const ERROR_SENDING_EMAIL = new HttpException(
+    {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: 'Error while sending the email.' 
+    },
+    HttpStatus.INTERNAL_SERVER_ERROR
+);
+
 export function isValidEmail(email: string): boolean {
     const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return pattern.test(email);
@@ -95,6 +121,10 @@ export function validatePassword(password: string): boolean {
 
 export async function verifyPassword(password: string, hashedPassword: string) {
     return await bcrypt.compare(password, hashedPassword);
+}
+
+export async function verifyTokenValidator(tokenValidator: string, hashedTokenValidator: string) {
+    return await bcrypt.compare(tokenValidator, hashedTokenValidator);
 }
 
 export function validUserPicture(url: string): boolean {
