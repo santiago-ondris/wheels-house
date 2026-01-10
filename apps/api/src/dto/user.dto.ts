@@ -120,7 +120,7 @@ export class UpdatePasswordDTO {
 export class ForgotPasswordDTO {
     @IsNotEmpty()
     @IsString()
-    email: string;
+    usernameOrEmail: string;
 }
 
 export class ResetPasswordDTO {

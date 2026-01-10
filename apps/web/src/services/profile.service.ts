@@ -82,10 +82,10 @@ export async function deleteUser(): Promise<void> {
     });
 }
 
-export async function requestPasswordRecovery(email: string): Promise<void> {
+export async function requestPasswordRecovery(usernameOrEmail: string): Promise<void> {
     return apiRequest<void>('/user/forgot-password', {
         method: 'POST',
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ usernameOrEmail }),
     });
 }
 

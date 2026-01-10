@@ -238,7 +238,7 @@ export class UserService {
     }
 
     async forgotPasswordService(forgotPasswordData: ForgotPasswordDTO) {
-        const user = await getUserFromUsernameOrEmail(forgotPasswordData.email);
+        const user = await getUserFromUsernameOrEmail(forgotPasswordData.usernameOrEmail);
 
         if (!user) {
             throw INEXISTENT_USER;
