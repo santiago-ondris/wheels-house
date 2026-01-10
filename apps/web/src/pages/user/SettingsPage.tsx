@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, Lock, Trash2, AlertTriangle, ChevronLeft, Save } from "lucide-react";
+import { User, Lock, AlertTriangle, ChevronLeft, Save } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { getPublicProfile, updateProfile, updatePassword, deleteUser } from "../../services/profile.service";
@@ -116,20 +116,20 @@ export default function SettingsPage() {
     if (isLoading) return <div className="min-h-screen flex items-center justify-center font-mono text-accent">CARGANDO_SISTEMA...</div>;
 
     return (
-        <div className="container mx-auto px-4 py-10 max-w-4xl">
+        <div className="container mx-auto px-4 py-6 md:py-10 max-w-6xl">
             {/* Header */}
-            <div className="flex items-center justify-between mb-12">
+            <div className="flex items-center justify-between mb-8 md:mb-12">
                 <button
                     onClick={() => navigate(`/collection/${user?.username}`)}
                     className="flex items-center gap-2 text-white/40 hover:text-white transition-colors group"
                 >
                     <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-                    <span className="font-mono text-xs tracking-widest uppercase">Volver al Perfil</span>
+                    <span className="font-mono text-[10px] md:text-xs tracking-widest uppercase">Volver al Perfil</span>
                 </button>
-                <h1 className="text-3xl font-black text-white tracking-tighter uppercase italic">CONFIGURACIÓN</h1>
+                <h1 className="text-sm md:text-base font-black text-white tracking-tighter uppercase italic">CONFIGURACIÓN</h1>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-12">
+            <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 md:gap-12">
                 {/* Sidebar Navigation */}
                 <nav className="flex flex-col gap-2">
                     <button
@@ -152,19 +152,10 @@ export default function SettingsPage() {
                         <Lock size={18} />
                         <span className="font-mono text-xs tracking-widest uppercase">Seguridad</span>
                     </button>
-                    <div className="mt-8 pt-8 border-t border-white/5">
-                        <button
-                            onClick={() => setIsDeleteModalOpen(true)}
-                            className="flex items-center gap-3 px-4 py-3 rounded-xl text-red-500/60 hover:text-red-500 hover:bg-red-500/5 transition-all w-full"
-                        >
-                            <Trash2 size={18} />
-                            <span className="font-mono text-xs tracking-widest uppercase">Borrar Cuenta</span>
-                        </button>
-                    </div>
                 </nav>
 
                 {/* Content Area */}
-                <main className="bg-white/[0.02] border border-white/10 rounded-3xl p-8 backdrop-blur-sm">
+                <main className="bg-white/[0.02] border border-white/10 rounded-3xl p-6 md:p-10 backdrop-blur-sm">
                     <AnimatePresence mode="wait">
                         {activeTab === "profile" ? (
                             <motion.div
@@ -179,95 +170,106 @@ export default function SettingsPage() {
                                     <p className="text-xs text-white/40 font-mono">Actualiza cómo te ven los demás coleccionistas</p>
                                 </div>
 
-                                {/* Avatar Upload */}
-                                <div className="flex flex-col items-center sm:flex-row gap-6 p-6 bg-white/5 border border-white/10 rounded-2xl">
-                                    <div className="relative group">
-                                        <div className="w-24 h-24 rounded-full border-2 border-accent/20 overflow-hidden bg-dark flex items-center justify-center">
-                                            {picture ? (
-                                                <img src={picture} alt="Avatar" className="w-full h-full object-cover" />
-                                            ) : (
-                                                <User className="text-white/20" size={40} />
-                                            )}
-                                        </div>
-                                        {isUploadingImage && (
-                                            <div className="absolute inset-0 bg-dark/60 rounded-full flex items-center justify-center">
-                                                <div className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+                                {/* Avatar & Bio Grid */}
+                                <div className="grid grid-cols-1 xl:grid-cols-[auto_1fr] gap-8">
+                                    {/* Avatar Upload */}
+                                    <div className="flex flex-col items-center gap-6 p-6 bg-white/5 border border-white/10 rounded-2xl h-fit">
+                                        <div className="relative group">
+                                            <div className="w-24 h-24 rounded-full border-2 border-accent/20 overflow-hidden bg-dark flex items-center justify-center">
+                                                {picture ? (
+                                                    <img src={picture} alt="Avatar" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <User className="text-white/20" size={40} />
+                                                )}
                                             </div>
-                                        )}
-                                    </div>
-                                    <div className="flex-1 space-y-3 text-center sm:text-left">
-                                        <div className="space-y-1">
-                                            <h3 className="text-sm font-bold text-white uppercase tracking-tight">Foto de Perfil</h3>
-                                            <p className="text-[10px] font-mono text-white/40 uppercase tracking-widest">JPG, PNG o WEBP. Máximo 10MB.</p>
-                                        </div>
-                                        <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
-                                            <label className="cursor-pointer px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg font-mono text-[10px] uppercase tracking-widest transition-all">
-                                                {isUploadingImage ? "SUBIENDO..." : "CAMBIAR FOTO"}
-                                                <input
-                                                    type="file"
-                                                    className="hidden"
-                                                    accept="image/*"
-                                                    onChange={handleImageUpload}
-                                                    disabled={isUploadingImage}
-                                                />
-                                            </label>
-                                            {picture && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setPicture("")}
-                                                    className="px-4 py-2 text-red-400/60 hover:text-red-400 font-mono text-[10px] uppercase tracking-widest transition-all"
-                                                >
-                                                    Eliminar
-                                                </button>
+                                            {isUploadingImage && (
+                                                <div className="absolute inset-0 bg-dark/60 rounded-full flex items-center justify-center">
+                                                    <div className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+                                                </div>
                                             )}
                                         </div>
+                                        <div className="space-y-3 text-center">
+                                            <div className="space-y-1">
+                                                <h3 className="text-sm font-bold text-white uppercase tracking-tight">Foto de Perfil</h3>
+                                                <p className="text-[10px] font-mono text-white/40 uppercase tracking-widest leading-tight">JPG, PNG o WEBP.<br />Máximo 10MB.</p>
+                                            </div>
+                                            <div className="flex flex-col gap-2">
+                                                <label className="cursor-pointer px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg font-mono text-[10px] uppercase tracking-widest transition-all">
+                                                    {isUploadingImage ? "SUBIENDO..." : "CAMBIAR FOTO"}
+                                                    <input
+                                                        type="file"
+                                                        className="hidden"
+                                                        accept="image/*"
+                                                        onChange={handleImageUpload}
+                                                        disabled={isUploadingImage}
+                                                    />
+                                                </label>
+                                                {picture && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setPicture("")}
+                                                        className="text-red-400/60 hover:text-red-400 font-mono text-[10px] uppercase tracking-widest transition-all"
+                                                    >
+                                                        Eliminar
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
+
+                                    <form onSubmit={handleUpdateProfile} className="space-y-6">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-mono text-white/40 uppercase tracking-widest ml-1">Nombre</label>
+                                                <input
+                                                    type="text"
+                                                    value={firstName}
+                                                    onChange={(e) => setFirstName(e.target.value)}
+                                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent/40 font-mono transition-colors"
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-mono text-white/40 uppercase tracking-widest ml-1">Apellido</label>
+                                                <input
+                                                    type="text"
+                                                    value={lastName}
+                                                    onChange={(e) => setLastName(e.target.value)}
+                                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent/40 font-mono transition-colors"
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <div className="flex justify-between items-end px-1">
+                                                <label className="text-[10px] font-mono text-white/40 uppercase tracking-widest">Biografía</label>
+                                                <span className={`text-[10px] font-mono ${biography.length >= 190 ? 'text-red-400' : 'text-white/20'}`}>
+                                                    {biography.length}/200
+                                                </span>
+                                            </div>
+                                            <textarea
+                                                value={biography}
+                                                onChange={(e) => setBiography(e.target.value.slice(0, 200))}
+                                                maxLength={200}
+                                                rows={4}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent/40 font-mono transition-colors resize-none lg:text-sm"
+                                                placeholder="Cuenta algo sobre tu pasión por los Hot Wheels..."
+                                            />
+                                        </div>
+
+                                        <div className="flex justify-end pt-4">
+                                            <button
+                                                type="submit"
+                                                disabled={isUpdatingProfile}
+                                                className="inline-flex items-center gap-3 px-10 py-4 bg-accent text-dark rounded-xl font-black text-xs uppercase tracking-widest hover:bg-accent/80 transition-all disabled:opacity-50"
+                                            >
+                                                <Save size={16} />
+                                                {isUpdatingProfile ? "GUARDANDO..." : "GUARDAR CAMBIOS"}
+                                            </button>
+                                        </div>
+                                    </form>
                                 </div>
-
-                                <form onSubmit={handleUpdateProfile} className="space-y-6">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-mono text-white/40 uppercase tracking-widest ml-1">Nombre</label>
-                                            <input
-                                                type="text"
-                                                value={firstName}
-                                                onChange={(e) => setFirstName(e.target.value)}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent/40 font-mono transition-colors"
-                                                required
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-mono text-white/40 uppercase tracking-widest ml-1">Apellido</label>
-                                            <input
-                                                type="text"
-                                                value={lastName}
-                                                onChange={(e) => setLastName(e.target.value)}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent/40 font-mono transition-colors"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-mono text-white/40 uppercase tracking-widest ml-1">Biografía</label>
-                                        <textarea
-                                            value={biography}
-                                            onChange={(e) => setBiography(e.target.value)}
-                                            rows={5}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent/40 font-mono transition-colors resize-none lg:text-sm"
-                                            placeholder="Cuenta algo sobre tu pasión por los Hot Wheels..."
-                                        />
-                                    </div>
-
-                                    <button
-                                        type="submit"
-                                        disabled={isUpdatingProfile}
-                                        className="inline-flex items-center gap-3 px-8 py-4 bg-accent text-dark rounded-xl font-black text-xs uppercase tracking-widest hover:bg-accent/80 transition-all disabled:opacity-50"
-                                    >
-                                        <Save size={16} />
-                                        {isUpdatingProfile ? "GUARDANDO..." : "GUARDAR CAMBIOS"}
-                                    </button>
-                                </form>
                             </motion.div>
                         ) : (
                             <motion.div
@@ -311,6 +313,21 @@ export default function SettingsPage() {
                                         ACTUALIZAR CREDENCIALES
                                     </button>
                                 </form>
+
+                                <div className="pt-10 mt-10 border-t border-white/5">
+                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-6 bg-red-500/5 border border-red-500/10 rounded-2xl">
+                                        <div className="space-y-1">
+                                            <h3 className="text-sm font-bold text-red-500 uppercase tracking-tight">Zona de Peligro</h3>
+                                            <p className="text-[10px] font-mono text-red-500/40 uppercase tracking-widest">Eliminar tu cuenta es una acción irreversible</p>
+                                        </div>
+                                        <button
+                                            onClick={() => setIsDeleteModalOpen(true)}
+                                            className="px-6 py-3 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-xl font-mono text-[10px] uppercase tracking-widest transition-all border border-red-500/20"
+                                        >
+                                            BORRAR_CUENTA
+                                        </button>
+                                    </div>
+                                </div>
                             </motion.div>
                         )}
                     </AnimatePresence>

@@ -76,7 +76,7 @@ export default function StatsPage() {
                         <div>
                             <h1 className="text-xl md:text-2xl font-mono font-bold text-white flex items-center gap-3 uppercase tracking-tighter">
                                 <BarChart3 className="w-6 h-6 text-accent" />
-                                Estadisticas_Colección
+                                Estadísticas_Colección
                             </h1>
                             <p className="text-white/20 text-[10px] font-bold uppercase tracking-[0.3em]">
                                 USUARIO: @{username} // Estado: Online
