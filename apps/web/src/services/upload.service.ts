@@ -1,18 +1,22 @@
 const API_URL = `http://${window.location.hostname}:3000`;
 
-export async function uploadImage(file: File): Promise<string> {
+export async function uploadImage(file: File, isPublic = false): Promise<string> {
     const formData = new FormData();
     formData.append('file', file);
 
     const token = localStorage.getItem('auth_token');
-    if (!token) {
+
+    // Only throw if NOT public and no token
+    if (!token && !isPublic) {
         throw new Error('No encontramos tu sesión. Por favor iniciá sesión nuevamente.');
     }
 
-    const response = await fetch(`${API_URL}/upload/image`, {
+    const endpoint = isPublic && !token ? `${API_URL}/upload/image/public` : `${API_URL}/upload/image`;
+
+    const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
-            'Authorization': `Bearer ${token}`,
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         },
         body: formData,
     });
@@ -28,7 +32,7 @@ export async function uploadImage(file: File): Promise<string> {
             const error = await response.json().catch(() => null);
             throw new Error(error?.message || 'Formato de imagen no válido. Usá JPG, PNG, GIF o WEBP.');
         }
-        
+
         const error = await response.json().catch(() => ({ message: 'Error al subir la imagen' }));
         throw new Error(error.message || 'Error al conectarse con el servidor');
     }

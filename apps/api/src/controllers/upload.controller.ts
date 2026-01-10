@@ -17,7 +17,7 @@ import * as path from 'path';
 
 @Controller('upload')
 export class UploadController {
-    constructor(private readonly uploadService: UploadService) {}
+    constructor(private readonly uploadService: UploadService) { }
 
     @UseGuards(JwtAuthGuard)
     @Post('image')
@@ -32,13 +32,13 @@ export class UploadController {
                 },
             }),
             limits: {
-                fileSize: 10 * 1024 * 1024, 
+                fileSize: 10 * 1024 * 1024,
             },
             fileFilter: (req, file, cb) => {
                 const allowedMimes = [
-                    'image/jpeg', 
-                    'image/png', 
-                    'image/gif', 
+                    'image/jpeg',
+                    'image/png',
+                    'image/gif',
                     'image/webp',
                     'image/heic',
                     'image/heif'
@@ -73,6 +73,61 @@ export class UploadController {
             throw error;
         }
     }
+
+    @Post('image/public')
+    @UseInterceptors(
+        FileInterceptor('file', {
+            storage: diskStorage({
+                destination: './uploads/temp',
+                filename: (req, file, cb) => {
+                    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+                    const ext = path.extname(file.originalname);
+                    cb(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+                },
+            }),
+            limits: {
+                fileSize: 10 * 1024 * 1024,
+            },
+            fileFilter: (req, file, cb) => {
+                const allowedMimes = [
+                    'image/jpeg',
+                    'image/png',
+                    'image/gif',
+                    'image/webp',
+                    'image/heic',
+                    'image/heif'
+                ];
+                if (allowedMimes.includes(file.mimetype)) {
+                    cb(null, true);
+                } else {
+                    cb(new BadRequestException('Solo se permiten imágenes (JPG, PNG, GIF, WEBP, HEIC)'), false);
+                }
+            },
+        })
+    )
+    async uploadImagePublic(@UploadedFile() file: Express.Multer.File) {
+        if (!file) {
+            throw new BadRequestException('No file uploaded');
+        }
+
+        try {
+            const data = await this.uploadService.uploadImage(file.path);
+
+            fs.unlinkSync(file.path);
+
+            return {
+                success: true,
+                url: data.url,
+                publicId: data.publicId,
+            };
+        } catch (error) {
+            if (file?.path && fs.existsSync(file.path)) {
+                fs.unlinkSync(file.path);
+            }
+            throw error;
+        }
+    }
+
     @UseGuards(JwtAuthGuard)
     @Delete('image/:publicId')
     async deleteImage(@Param('publicId') publicId: string) {

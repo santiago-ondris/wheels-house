@@ -310,7 +310,7 @@ export default function SettingsPage() {
                                         disabled={isUpdatingPassword}
                                         className="px-8 py-4 bg-white text-dark rounded-xl font-black text-xs uppercase tracking-widest hover:bg-white/80 transition-all disabled:opacity-50"
                                     >
-                                        ACTUALIZAR CREDENCIALES
+                                        ACTUALIZAR CONTRASEÑA
                                     </button>
                                 </form>
 

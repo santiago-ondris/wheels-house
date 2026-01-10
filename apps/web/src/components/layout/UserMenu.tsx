@@ -1,10 +1,12 @@
 import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { User, LogOut, ChevronDown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
 export default function UserMenu() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   if (!user) return null;
 
@@ -33,14 +35,14 @@ export default function UserMenu() {
           <div className="p-3 border-b border-white/10">
             <p className="text-white font-bold text-sm">{user.username}</p>
           </div>
-          
+
           <div className="p-1">
             <Menu.Item>
               {({ active }) => (
                 <button
-                  className={`${
-                    active ? "bg-white/10" : ""
-                  } flex items-center gap-2 w-full px-3 py-2 rounded-lg text-white text-sm transition-colors`}
+                  onClick={() => navigate("/settings")}
+                  className={`${active ? "bg-white/10" : ""
+                    } flex items-center gap-2 w-full px-3 py-2 rounded-lg text-white text-sm transition-colors`}
                 >
                   <User className="w-4 h-4" />
                   Mi Perfil
@@ -52,9 +54,8 @@ export default function UserMenu() {
               {({ active }) => (
                 <button
                   onClick={logout}
-                  className={`${
-                    active ? "bg-danger/20" : ""
-                  } flex items-center gap-2 w-full px-3 py-2 rounded-lg text-danger text-sm transition-colors`}
+                  className={`${active ? "bg-danger/20" : ""
+                    } flex items-center gap-2 w-full px-3 py-2 rounded-lg text-danger text-sm transition-colors`}
                 >
                   <LogOut className="w-4 h-4" />
                   Cerrar sesión
