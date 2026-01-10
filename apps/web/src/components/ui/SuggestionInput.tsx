@@ -39,7 +39,7 @@ export default function SuggestionInput({
                     )}
                     <Combobox.Input
                         className={`w-full bg-input-bg border ${error ? "border-danger" : "border-white/5"
-                            } ${icon ? "pl-10" : "pl-4"} pr-10 py-2.5 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-sm`}
+                            } ${icon ? "pl-10" : "pl-4"} pr-10 py-2.5 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-base`}
                         onChange={(e) => {
                             setQuery(e.target.value);
                             onChange(e.target.value);

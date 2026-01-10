@@ -13,6 +13,9 @@ import { GroupController } from './controllers/group.controller';
 import { GroupService } from './services/group.service';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { StatsController } from './controllers/stats.controller';
+import { StatsService } from './services/stats.service';
+
 
 @Module({
   imports: [
@@ -42,7 +45,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
       signOptions: { expiresIn: '7d' },
     }),
   ],
-  controllers: [UserController, CarController, UploadController, GroupController],
-  providers: [JwtStrategy, UserService, CarService, UploadService, GroupService],
+  controllers: [UserController, CarController, UploadController, GroupController, StatsController],
+  providers: [JwtStrategy, UserService, CarService, UploadService, GroupService, StatsService],
 })
-export class AppModule {}
+export class AppModule { }
