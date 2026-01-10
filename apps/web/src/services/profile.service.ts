@@ -5,6 +5,7 @@ export interface PublicProfile {
     username: string;
     firstName: string;
     lastName: string;
+    biography?: string;
     picture?: string;
     createdDate?: string;
     totalCars: number;
@@ -47,4 +48,50 @@ export async function searchUsers(query: string): Promise<BasicUser[]> {
 
 export async function getUserStats(username: string): Promise<UserStats> {
     return apiRequest<UserStats>(`/stats/${username}`);
+}
+
+export async function updateProfile(data: Partial<PublicProfile>): Promise<PublicProfile> {
+    const token = localStorage.getItem("auth_token");
+    return apiRequest<PublicProfile>('/user/update-info', {
+        method: 'PUT',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data),
+    });
+}
+
+export async function updatePassword(oldPassword: string, newPassword: string): Promise<void> {
+    const token = localStorage.getItem("auth_token");
+    return apiRequest<void>('/user/update-password', {
+        method: 'PUT',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ oldPassword, newPassword }),
+    });
+}
+
+export async function deleteUser(): Promise<void> {
+    const token = localStorage.getItem("auth_token");
+    return apiRequest<void>('/user', {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
+    });
+}
+
+export async function requestPasswordRecovery(email: string): Promise<void> {
+    return apiRequest<void>('/user/forgot-password', {
+        method: 'POST',
+        body: JSON.stringify({ email }),
+    });
+}
+
+export async function resetPassword(token: string, newPassword: string): Promise<void> {
+    return apiRequest<void>(`/user/reset-password/${token}`, {
+        method: 'POST',
+        body: JSON.stringify({ newPassword }),
+    });
 }

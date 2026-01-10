@@ -2,14 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDTO, UserToDB, LoginDTO, LoginResponse, TokenData, UpdateUserProfileDTO, UpdatePasswordDTO, ResetPasswordDTO, ForgotPasswordDTO } from '../dto/user.dto';
 import { PublicProfileDTO, PublicCarDTO } from '../dto/public-profile.dto';
-import { createUser, getUserFromUsernameOrEmail, getPublicProfileByUsername, searchUsers, updateUserFromUserId, getUserFromUsername, 
-    updatePasswordFromUserId, deleteUserFromUsername, 
+import {
+    createUser, getUserFromUsernameOrEmail, getPublicProfileByUsername, searchUsers, updateUserFromUserId, getUserFromUsername,
+    updatePasswordFromUserId, deleteUserFromUsername,
     getUserFromEmail,
     updateResetPasswordToken,
     getUserFromRequestTokenSelector,
-    updatePasswordFromReset} from 'src/database/crud/user.crud';
+    updatePasswordFromReset
+} from 'src/database/crud/user.crud';
 import { deleteAllCarPictures, deleteCarsFromUserId, getCarsFromUserId, getPicturesFromCar } from 'src/database/crud/car.crud';
-import { deleteGroupedCarsFromCarId, deleteGroupsFromUserId, getGroupsFromUserId } from 'src/database/crud/group.crud';
+import { deleteGroupedCarsFromCarId, deleteGroupedCarsFromGroupId, deleteGroupsFromUserId, getGroupsFromUserId } from 'src/database/crud/group.crud';
 import { ERROR_CREATING_USER, ERROR_DELETING_USER, ERROR_SENDING_EMAIL, ERROR_UPDATING_USER, INEXISTENT_USER } from 'src/utils/user.utils';
 import bcrypt from "bcrypt";
 import { randomBytes } from 'crypto';
@@ -21,7 +23,7 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class UserService {
     constructor(
-        private readonly jwtService: JwtService, 
+        private readonly jwtService: JwtService,
         private readonly uploadService: UploadService,
         private readonly mailerService: MailerService,
         private readonly configService: ConfigService
@@ -140,13 +142,13 @@ export class UserService {
     async updateUserService(userData: TokenData, userChanges: UpdateUserProfileDTO) {
         const user = await getUserFromUsernameOrEmail(userData.username);
 
-        if(user.picture != null && user.picture != '' && user.picture != userChanges.picture) {
+        if (user.picture != null && user.picture != '' && user.picture != userChanges.picture) {
             await this.uploadService.deleteImage(getPublicIdFromURL(user.picture));
         }
 
         const updated = await updateUserFromUserId(user.userId, userChanges);
-        
-        if(!updated) {
+
+        if (!updated) {
             throw ERROR_UPDATING_USER;
         }
 
@@ -160,7 +162,7 @@ export class UserService {
 
         const passwordUpdated = await updatePasswordFromUserId(user.userId, hashedPassword);
 
-        if(!passwordUpdated) {
+        if (!passwordUpdated) {
             throw ERROR_UPDATING_USER;
         }
 
@@ -168,51 +170,67 @@ export class UserService {
     }
 
     async deleteUserService(userData: TokenData) {
+        const user = await getUserFromUsername(userData.username);
+        if (!user) {
+            throw INEXISTENT_USER;
+        }
+
+        const cars = await getCarsFromUserId(user.userId);
+        const groups = await getGroupsFromUserId(user.userId);
+
+        const carPictures: string[] = [];
+        for (const car of cars) {
+            const pics = await getPicturesFromCar(car.carId);
+            pics.forEach(p => carPictures.push(p.url));
+        }
+
+        for (const car of cars) {
+            await deleteGroupedCarsFromCarId(car.carId);
+            await deleteAllCarPictures(car.carId);
+        }
+
+        for (const group of groups) {
+            await deleteGroupedCarsFromGroupId(group.groupId);
+        }
+
+        const deletedCars = await deleteCarsFromUserId(user.userId);
+        if (deletedCars == null) {
+            throw ERROR_DELETING_USER;
+        }
+
+        const deletedGroups = await deleteGroupsFromUserId(user.userId);
+        if (deletedGroups == null) {
+            throw ERROR_DELETING_USER;
+        }
+
         const deletedUser = await deleteUserFromUsername(userData.username);
-
-        if(deletedUser == null) {
+        if (deletedUser == null) {
             throw ERROR_DELETING_USER;
         }
-
-        if(deletedUser.picture != null && deletedUser.picture != '') {
-            await this.uploadService.deleteImage(getPublicIdFromURL(deletedUser.picture));
-        }
-
-        // Delete their cars.
-        const deletedCars = await deleteCarsFromUserId(deletedUser.userId);
-
-        if(deletedCars == null) {
-            throw ERROR_DELETING_USER;
-        }
-
-        for(const car of deletedCars) {
-            const deletedPictures = await deleteAllCarPictures(car.carId);
-
-            if(deletedPictures == null) {
-                throw ERROR_DELETING_USER;
-            }
-
-            for(const picture of deletedPictures) {
-                await this.uploadService.deleteImage(getPublicIdFromURL(picture.url));
-            }
-
-            const deletedGroupedCars = await deleteGroupedCarsFromCarId(car.carId);
-            
-            if(!deletedGroupedCars) {
-                throw ERROR_DELETING_USER;
+        // User picture
+        if (deletedUser.picture != null && deletedUser.picture != '') {
+            try {
+                await this.uploadService.deleteImage(getPublicIdFromURL(deletedUser.picture));
+            } catch (e) {
+                console.error("Cloudinary: Error deleting user picture", e);
             }
         }
 
-        // Delete their groups.
-        const deletedGroups = await deleteGroupsFromUserId(deletedUser.userId);
-
-        if(deletedGroups == null) {
-            throw ERROR_DELETING_USER;
+        for (const url of carPictures) {
+            try {
+                await this.uploadService.deleteImage(getPublicIdFromURL(url));
+            } catch (e) {
+                console.error("Cloudinary: Error deleting car picture", e);
+            }
         }
 
-        for(const group of deletedGroups) {
-            if(group.picture != null && group.picture != '') {
-                await this.uploadService.deleteImage(getPublicIdFromURL(group.picture));
+        for (const group of groups) {
+            if (group.picture != null && group.picture != '') {
+                try {
+                    await this.uploadService.deleteImage(getPublicIdFromURL(group.picture));
+                } catch (e) {
+                    console.error("Cloudinary: Error deleting group picture", e);
+                }
             }
         }
 
@@ -220,12 +238,16 @@ export class UserService {
     }
 
     async forgotPasswordService(forgotPasswordData: ForgotPasswordDTO) {
-        const user = await getUserFromEmail(forgotPasswordData.email);
-    
+        const user = await getUserFromUsernameOrEmail(forgotPasswordData.email);
+
+        if (!user) {
+            throw INEXISTENT_USER;
+        }
+
         // selector + validator.
         const resetToken = randomBytes(16).toString('hex');
 
-        const selector = resetToken.slice(0,16);
+        const selector = resetToken.slice(0, 16);
 
         const validator = resetToken.slice(16);
 
@@ -233,22 +255,20 @@ export class UserService {
 
         const updatedResetToken = await updateResetPasswordToken(user.userId, selector, hashedValidator);
 
-        if(!updatedResetToken) {
+        if (!updatedResetToken) {
             throw ERROR_UPDATING_USER;
         }
 
-        
+
         // Send email with url with token=selector.validator
         const domain = this.configService.get<string>('APP_DOMAIN')!;
-        console.log(domain);
-        
-        const url = `${domain}/reset-password?token=${selector+'.'+validator}`;
+
+        const url = `${domain}/reset-password?token=${selector + '.' + validator}`;
 
         try {
             await this.mailerService.sendMail({
-                to: forgotPasswordData.email,
+                to: user.email,
                 subject: 'Wheels House - Recuperación de contraseña',
-                // You can use 'text' for plain text or 'html' for a styled email
                 html: `
                     <p>Hola, ${user.username}.</p>
                     <p>Ingresá al link a continuación para cambiar tu contraseña: <a href=${url}>${url}</a>.</p>
@@ -256,7 +276,8 @@ export class UserService {
                     <p>El equipo de Wheels House.</p>
                 `,
             });
-        } catch {
+        } catch (error) {
+            console.error("Error sending recovery email:", error);
             throw ERROR_SENDING_EMAIL;
         }
 
@@ -265,16 +286,16 @@ export class UserService {
 
     async resetPasswordService(requestToken: string, resetPasswordData: ResetPasswordDTO) {
         const splitToken = requestToken.split('.');
-        
+
         const selector = splitToken[0];
 
         const user = await getUserFromRequestTokenSelector(selector);
 
         const hashedPassword = await bcrypt.hash(resetPasswordData.newPassword, Number(this.configService.get<string>('HASH_SALT')!));
-    
+
         const updatedPassword = await updatePasswordFromReset(user!.userId, hashedPassword);
 
-        if(!updatedPassword) {
+        if (!updatedPassword) {
             throw ERROR_UPDATING_USER;
         }
 
