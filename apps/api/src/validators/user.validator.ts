@@ -1,6 +1,8 @@
-import { LoginDTO, RegisterDTO, TokenData, UpdatePasswordDTO, UpdateUserProfileDTO } from "../dto/user.dto";
-import { getUserFromEmail, getUserFromUsername, getUserFromUsernameOrEmail } from "src/database/crud/user.crud";
+import { LoginDTO, RegisterDTO, ResetPasswordDTO, ForgotPasswordDTO, TokenData, UpdatePasswordDTO, UpdateUserProfileDTO } from "../dto/user.dto";
+import { getUserFromEmail, getUserFromRequestTokenSelector, getUserFromUsername, getUserFromUsernameOrEmail } from "src/database/crud/user.crud";
 import * as userUtils from "../utils/user.utils";
+import bcrypt from "bcrypt";
+import { endWith } from "rxjs";
 
 export async function registerValidator(registerData: RegisterDTO) {
     if (!userUtils.validatePassword(registerData.password)) {
@@ -64,6 +66,40 @@ export async function updatePasswordValidator(userData: TokenData, updatePasswor
     }
 
     if (!userUtils.validatePassword(updatePasswordData.newPassword)) {
+        throw userUtils.INVALID_PASSWORD_EXCEPTION;
+    }
+}
+
+export async function forgotPasswordValidator(forgotPasswordData: ForgotPasswordDTO) {
+    const user = await getUserFromEmail(forgotPasswordData.email);
+
+    if(user == null) {
+        throw userUtils.INEXISTENT_USER;
+    }
+}
+
+export async function resetPasswordValidator(requestToken: string, resetPasswordData: ResetPasswordDTO) {
+    const splitToken = requestToken.split('.');
+
+    if(splitToken.length != 2) {
+        throw userUtils.INVALID_CREDENTIALS;
+    }
+
+    const selector = splitToken[0], validator = splitToken[1];
+    
+    const user = await getUserFromRequestTokenSelector(selector);
+
+    if(user == null) {
+        throw userUtils.INVALID_CREDENTIALS;
+    }
+
+    const validToken = await userUtils.verifyTokenValidator(validator, user.resetPasswordHashedValidator!);
+
+    if(!validToken) {
+        throw userUtils.INVALID_CREDENTIALS;
+    }
+
+    if(!userUtils.validatePassword(resetPasswordData.newPassword)) {
         throw userUtils.INVALID_PASSWORD_EXCEPTION;
     }
 }

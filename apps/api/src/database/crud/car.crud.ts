@@ -8,7 +8,7 @@ import { count, eq } from 'drizzle-orm';
 export async function createCar(newCar: CarToDB) {
     try {
         const createdCar = await db.insert(car).values(newCar).returning();
-        return createdCar[0];
+        return createdCar[0] ?? null;
     } catch {
         return null;
     }
@@ -17,7 +17,7 @@ export async function createCar(newCar: CarToDB) {
 export async function createCarPicture(newCarPicture: CarPictureToDB) {
     try {
         const createdPicture = await db.insert(carPicture).values(newCarPicture).returning();
-        return createdPicture[0];
+        return createdPicture[0] ?? null;
     } catch {
         return null;
     }
@@ -98,7 +98,7 @@ export async function getCarByOffset(offset: number) {
         .limit(1)
         .offset(offset);
 
-    return result[0];
+    return result[0] ?? null;
 }
 
 export async function getPicturesFromCar(carId: number) {
@@ -139,7 +139,7 @@ export async function deleteCar(carId: number) {
 export async function deleteCarPicture(carPictureId: number) {
     try {
         const deletedPicture = await db.delete(carPicture).where(eq(carPicture.carPictureId, carPictureId)).returning();
-        return deletedPicture[0];
+        return deletedPicture[0] ?? null;
     } catch {
         return null;
     }

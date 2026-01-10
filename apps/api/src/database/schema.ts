@@ -7,13 +7,15 @@ export const user = pgTable("user", {
     lastName: text("lastName").notNull(),
     email: text("email").notNull().unique(),
     hashedPassword: text("hashedPassword").notNull(),
-    createdDate: timestamp("createdDate").defaultNow(),
+    createdDate: timestamp("createdDate", {withTimezone: true}).defaultNow(),
     picture: text("picture"),
-    biography: text("biography")
+    biography: text("biography"),
+    resetPasswordRequestSelector: text("resetPasswordRequestSelector"),
+    resetPasswordHashedValidator: text("resetPasswordHashedValidator"),
+    resetPasswordTokenExpires: timestamp("resetPasswordTokenExpires", {withTimezone: true})
     // for the future:
     // verificationCode: integer("verificationCode").notNull(),
     // verified: boolean("verified"),
-    // restorePasswordCode: integer("restorePasswordCode"),
 });
 
 // export const collection = pgTable("collection",{

@@ -1,19 +1,29 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { RegisterDTO, UserToDB, LoginDTO, LoginResponse, TokenData, UpdateUserProfileDTO, UpdatePasswordDTO } from '../dto/user.dto';
+import { RegisterDTO, UserToDB, LoginDTO, LoginResponse, TokenData, UpdateUserProfileDTO, UpdatePasswordDTO, ResetPasswordDTO, ForgotPasswordDTO } from '../dto/user.dto';
 import { PublicProfileDTO, PublicCarDTO } from '../dto/public-profile.dto';
 import { createUser, getUserFromUsernameOrEmail, getPublicProfileByUsername, searchUsers, updateUserFromUserId, getUserFromUsername, 
-    updatePasswordFromUserId, deleteUserFromUsername } from 'src/database/crud/user.crud';
+    updatePasswordFromUserId, deleteUserFromUsername, 
+    getUserFromEmail,
+    updateResetPasswordToken,
+    getUserFromRequestTokenSelector,
+    updatePasswordFromReset} from 'src/database/crud/user.crud';
 import { deleteAllCarPictures, deleteCarsFromUserId, getCarsFromUserId, getPicturesFromCar } from 'src/database/crud/car.crud';
 import { deleteGroupedCarsFromCarId, deleteGroupsFromUserId, getGroupsFromUserId } from 'src/database/crud/group.crud';
-import { ERROR_CREATING_USER, ERROR_DELETING_USER, ERROR_UPDATING_USER, INEXISTENT_USER } from 'src/utils/user.utils';
+import { ERROR_CREATING_USER, ERROR_DELETING_USER, ERROR_SENDING_EMAIL, ERROR_UPDATING_USER, INEXISTENT_USER } from 'src/utils/user.utils';
 import bcrypt from "bcrypt";
+import { randomBytes } from 'crypto';
 import { UploadService } from './upload.service';
 import { getPublicIdFromURL } from 'src/utils/upload.utils';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class UserService {
-    constructor(private readonly jwtService: JwtService, private readonly uploadService: UploadService) { }
+    constructor(
+        private readonly jwtService: JwtService, 
+        private readonly uploadService: UploadService,
+        private readonly mailerService: MailerService
+    ) { }
 
     async registerService(registerData: RegisterDTO) {
         const hashedPassword = await bcrypt.hash(registerData.password, 10);
@@ -202,6 +212,69 @@ export class UserService {
             if(group.picture != null && group.picture != '') {
                 await this.uploadService.deleteImage(getPublicIdFromURL(group.picture));
             }
+        }
+
+        return true;
+    }
+
+    async forgotPasswordService(forgotPasswordData: ForgotPasswordDTO) {
+        const user = await getUserFromEmail(forgotPasswordData.email);
+    
+        // selector + validator.
+        const resetToken = randomBytes(32).toString('hex');
+
+        const selector = resetToken.slice(0,24);
+
+        const validator = resetToken.slice(24);
+
+        console.log(selector+'.'+validator)
+
+        const hashedValidator = await bcrypt.hash(validator, Number(process.env.HASH_SALT!));
+
+        const updatedResetToken = await updateResetPasswordToken(user.userId, selector, hashedValidator);
+
+        if(!updatedResetToken) {
+            throw ERROR_UPDATING_USER;
+        }
+
+        // Send email with url with token=selector.validator
+        
+        const url = `https://your-app.com/reset-password?token=${selector+'.'+validator}`;
+
+        try {
+            await this.mailerService.sendMail({
+                to: forgotPasswordData.email,
+                subject: 'Wheels House - Recuperación de contraseña',
+                // You can use 'text' for plain text or 'html' for a styled email
+                html: `
+                    <p>Hola, "${user.username}".</p>
+                    <p>Ingrega al link a continuación para cambiar tu contraseña:</p>
+                    <a href="${url}">Reset Password</a>
+                    <p>Si no solicitaste este cambio, ignora este correo.</p>
+                    <p></p>
+                    <p>El equipo de Wheels House.</p>
+                `,
+            });
+        } catch {
+            throw ERROR_SENDING_EMAIL;
+        }
+
+        return true;
+    }
+
+    async resetPasswordService(requestToken: string, resetPasswordData: ResetPasswordDTO) {
+        const splitToken = requestToken.split('.');
+        
+        const selector = splitToken[0];
+
+        const user = await getUserFromRequestTokenSelector(selector);
+
+        const hashedPassword = await bcrypt.hash(resetPasswordData.newPassword, Number(process.env.HASH_SALT!));
+    
+        const updatedPassword = await updatePasswordFromReset(user!.userId, hashedPassword);
+
+        if(!updatedPassword) {
+            throw ERROR_UPDATING_USER;
         }
 
         return true;

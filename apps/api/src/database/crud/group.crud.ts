@@ -9,7 +9,7 @@ import { GroupToDB, UpdateGroupDTO } from 'src/dto/group.dto';
 export async function createGroup(newGroup: GroupToDB) {
     try {
         const createdGroup = await db.insert(group).values(newGroup).returning();
-        return createdGroup[0];
+        return createdGroup[0] ?? null;
     } catch {
         return null;
     }
@@ -124,7 +124,7 @@ export async function updateGroup(groupChanges: UpdateGroupDTO, groupId: number)
 export async function deleteGroupFromId(groupId: number) {
     try {
         const deletedGroup = await db.delete(group).where(eq(group.groupId, groupId)).returning();
-        return deletedGroup[0];
+        return deletedGroup[0] ?? null;
     } catch {
         return null;
     }

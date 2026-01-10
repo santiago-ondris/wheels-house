@@ -1,8 +1,9 @@
 import { Controller, Get, Post, Body, Put, Delete, Param, Query, UseGuards, Request } from '@nestjs/common';
 import { UserService } from '../services/user.service';
-import { RegisterDTO, LoginDTO, UpdateUserProfileDTO, UpdatePasswordDTO } from '../dto/user.dto';
-import { loginValidator, registerValidator, updatePasswordValidator, updateUserValidator } from '../validators/user.validator'
+import { RegisterDTO, LoginDTO, UpdateUserProfileDTO, UpdatePasswordDTO, ResetPasswordDTO, ForgotPasswordDTO } from '../dto/user.dto';
+import { loginValidator, registerValidator, forgotPasswordValidator, resetPasswordValidator, updatePasswordValidator, updateUserValidator } from '../validators/user.validator'
 import { JwtAuthGuard } from 'src/validators/auth.validator';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller()
 export class UserController {
@@ -46,6 +47,24 @@ export class UserController {
         await updatePasswordValidator(req.user, updatePasswordData);
 
         return await this.userService.updatePasswordService(req.user, updatePasswordData);
+    }
+
+    @UseGuards(ThrottlerGuard)
+    @Post('user/forgot-password')
+    async forgotPassword(@Body() forgotPasswordeData: ForgotPasswordDTO) {
+        console.log(process.env.EMAIL_PASSWORD!);
+        console.log(process.env.EMAIL_ADDRESS!);
+        console.log(process.env.EMAIL_PROVIDER!);
+        await forgotPasswordValidator(forgotPasswordeData);
+
+        return await this.userService.forgotPasswordService(forgotPasswordeData);
+    }
+
+    @Post('user/reset-password/:requestToken')
+    async resetPassword(@Param('requestToken') requestToken, @Body() resetPasswordData: ResetPasswordDTO) {
+        await resetPasswordValidator(requestToken, resetPasswordData);
+
+        return await this.userService.resetPasswordService(requestToken, resetPasswordData);
     }
 
     @UseGuards(JwtAuthGuard)

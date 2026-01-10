@@ -11,10 +11,28 @@ import { UploadService } from './services/upload.service';
 import { JwtStrategy } from './validators/auth.validator';
 import { GroupController } from './controllers/group.controller';
 import { GroupService } from './services/group.service';
-
+import { ThrottlerModule } from '@nestjs/throttler';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
+    MailerModule.forRoot({
+      transport: {
+        host: process.env.EMAIL_PROVIDER!, // Replace with your provider's SMTP host
+        port: 587,
+        auth: {
+          user: process.env.EMAIL_ADDRESS!,
+          pass: process.env.EMAIL_PASSWORD!,
+        },
+      },
+      defaults: {
+        from: '"No Reply" <noreply@wheelshouse.com>',
+      },
+    }),
+    ThrottlerModule.forRoot([{
+      ttl: 60000, // Time to live in milliseconds (1 minute)
+      limit: 3,   // Max 3 requests per minute
+    }]),
     PassportModule,
     ConfigModule.forRoot({
       isGlobal: true, // This makes the config available everywhere without re-importing

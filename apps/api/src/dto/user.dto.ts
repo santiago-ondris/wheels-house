@@ -116,3 +116,15 @@ export class UpdatePasswordDTO {
     @IsString()
     newPassword: string;
 }
+
+export class ForgotPasswordDTO {
+    @IsNotEmpty()
+    @IsString()
+    email: string;
+}
+
+export class ResetPasswordDTO {
+    @IsNotEmpty()
+    @IsString()
+    newPassword: string;
+}

@@ -1,13 +1,15 @@
 import { db } from '../index'
 import { UpdateUserProfileDTO, UserToDB } from 'src/dto/user.dto'
 import { user } from 'src/database/schema'
-import { eq, ilike } from 'drizzle-orm';
+import { eq, gt, ilike, and } from 'drizzle-orm';
+import { PASSWORE_RESET_TIME_LIMIT } from 'src/utils/user.utils';
 
 // Create
 
 export async function createUser(newUser: UserToDB) {
     try {
-        return await db.insert(user).values(newUser);
+        const createdUser = await db.insert(user).values(newUser).returning();
+        return createdUser[0];
     } catch {
         return null;
     }
@@ -71,6 +73,20 @@ export async function searchUsers(query: string) {
         .limit(20);
 }
 
+export async function getUserFromRequestTokenSelector(selector: string) {
+    try {
+        const userObject = await db.select().from(user).where(
+            and(
+                eq(user.resetPasswordRequestSelector, selector),
+                gt(user.resetPasswordTokenExpires, new Date(Date.now()))
+            )
+        );
+        return userObject[0] ?? null;
+    } catch {
+        return null;
+    }
+}
+
 // Update
 
 export async function updateUserFromUserId(userId: number, userChanges: UpdateUserProfileDTO) {
@@ -91,12 +107,39 @@ export async function updatePasswordFromUserId(userId: number, newHashedPassword
     }
 }
 
+export async function updateResetPasswordToken(userId: number, selector: string, hashedValidator: string) {
+    try {
+        await db.update(user).set({
+            resetPasswordRequestSelector: selector,
+            resetPasswordHashedValidator: hashedValidator, 
+            resetPasswordTokenExpires: new Date(Date.now() + PASSWORE_RESET_TIME_LIMIT)
+        }).where(eq(user.userId, userId));
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+export async function updatePasswordFromReset(userId: number, newHashedPassword: string) {
+    try {
+        await db.update(user).set({
+            hashedPassword: newHashedPassword,
+            resetPasswordRequestSelector: '',
+            resetPasswordHashedValidator: '', 
+            resetPasswordTokenExpires: new Date(Date.now())
+        }).where(eq(user.userId, userId));
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 // Delete
 
 export async function deleteUserFromUsername(username: string) {
     try {
         const deletedUser = await db.delete(user).where(eq(user.username, username)).returning();
-        return deletedUser[0];
+        return deletedUser[0] ?? null;
     } catch {
         return null;
     }
