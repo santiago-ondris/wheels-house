@@ -82,7 +82,7 @@ export default function CreateGroupPage() {
             };
             await createGroup(data);
             toast.success("¡Grupo creado exitosamente!");
-            navigate(`/collection/${user?.username}`);
+            navigate(`/collection/${user?.username}/groups`, { replace: true });
         } catch (error: any) {
             if (error?.error?.includes("more than 4")) {
                 toast.error("No podés tener más de 4 grupos destacados");
@@ -98,7 +98,7 @@ export default function CreateGroupPage() {
     };
 
     const handleCancel = () => {
-        navigate(`/collection/${user?.username}`);
+        navigate(-1);
     };
 
     const toggleCar = (carId: number) => {
