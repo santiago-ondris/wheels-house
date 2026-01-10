@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../../contexts/AuthContext";
 import { getPublicProfile, PublicProfile } from "../../services/profile.service";
@@ -11,6 +11,7 @@ import UserNotFoundPage from "../user/UserNotFoundPage";
 export default function ProfilePage() {
     const { username } = useParams<{ username: string }>();
     const { user } = useAuth();
+    const navigate = useNavigate();
 
     const [profile, setProfile] = useState<PublicProfile | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -70,17 +71,19 @@ export default function ProfilePage() {
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="container mx-auto px-4"
+            className="container mx-auto px-4 pb-20"
         >
             <ProfileHero
                 username={profile.username}
                 firstName={profile.firstName}
                 lastName={profile.lastName}
+                biography={profile.biography}
                 picture={profile.picture}
                 createdDate={profile.createdDate}
                 totalCars={profile.totalCars}
                 totalGroups={profile.totalGroups}
                 isOwner={isOwner}
+                onEditClick={() => navigate("/settings")}
             />
 
             <GroupsSection

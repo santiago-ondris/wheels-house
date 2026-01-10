@@ -76,10 +76,10 @@ export default function StatsPage() {
                         <div>
                             <h1 className="text-xl md:text-2xl font-mono font-bold text-white flex items-center gap-3 uppercase tracking-tighter">
                                 <BarChart3 className="w-6 h-6 text-accent" />
-                                Estadisticas_Colección
+                                Estadísticas_Colección
                             </h1>
                             <p className="text-white/20 text-[10px] font-bold uppercase tracking-[0.3em]">
-                                ID_USUARIO: @{username} // Estado: Online
+                                USUARIO: @{username} // Estado: Online
                             </p>
                         </div>
                     </div>
@@ -105,14 +105,14 @@ export default function StatsPage() {
                     />
                     <StatsCard
                         label="Nac. Favorita"
-                        subLabel="PAIS FAVORITO"
+                        subLabel="PAÍS FAVORITO"
                         value={stats.favoriteNationality?.substring(0, 3).toUpperCase() || "---"}
                         icon={Globe}
                         index={2}
                     />
                     <StatsCard
                         label="Total Fotos"
-                        subLabel="GALERIA"
+                        subLabel="GALERÍA"
                         value={stats.totalPhotos.toString().padStart(3, '0')}
                         icon={Layers}
                         index={3}
@@ -123,8 +123,8 @@ export default function StatsPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
                     {/* Distributions */}
                     <DistributionSection
-                        title="Top_5_Marcas"
-                        subTitle="PRIMER_ANALITICA"
+                        title="Top_Marcas"
+                        subTitle="PRIMERA_ANALÍTICA"
                         items={stats.brandDistribution}
                         total={stats.totalCars}
                         colorClass="bg-accent"
@@ -132,7 +132,7 @@ export default function StatsPage() {
 
                     <DistributionSection
                         title="Top_Fabricantes"
-                        subTitle="SEGUNDA_ANALITICA"
+                        subTitle="SEGUNDA_ANALÍTICA"
                         items={stats.manufacturerDistribution}
                         total={stats.totalCars}
                         colorClass="bg-blue-500"
@@ -140,15 +140,15 @@ export default function StatsPage() {
 
                     <DistributionSection
                         title="Top_Escala"
-                        subTitle="TERCER_ANALITICA"
+                        subTitle="TERCERA_ANALÍTICA"
                         items={stats.scaleDistribution}
                         total={stats.totalCars}
                         colorClass="bg-emerald-500"
                     />
 
                     <DistributionSection
-                        title="Top_Condicion"
-                        subTitle="CUARTA_ANALITICA"
+                        title="Top_Condición"
+                        subTitle="CUARTA_ANALÍTICA"
                         items={stats.conditionDistribution}
                         total={stats.totalCars}
                         colorClass="bg-amber-500"
@@ -256,7 +256,7 @@ export default function StatsPage() {
                     <div>
                         <h4 className="text-white font-mono font-bold text-lg uppercase tracking-tight">Notificación del Sistema: Características Futuras</h4>
                         <p className="text-white/30 font-mono text-xs mt-2 uppercase tracking-wide">
-                            CUALQUIER ESTADISTICA DESEADA QUE NO ESTE, PONERSE EN CONTACTO PARA SOLICITARLA.
+                            CUALQUIER ESTADÍSTICA DESEADA QUE NO ESTÉ, PONERSE EN CONTACTO PARA SOLICITARLA.
                         </p>
                         <p className="text-white/40 text-[10px] mt-4 leading-relaxed italic">
                             "Colecciona más rápido, analiza más profundo. El sistema está aún evolucionando."

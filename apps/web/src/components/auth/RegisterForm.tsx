@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { User, Mail, UserCircle } from "lucide-react";
 import PasswordInput from "./PasswordInput";
+import ImageCropperModal from "../ui/ImageCropperModal";
 import { RegisterFormData, registerSchema } from "../../lib/validations/auth";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -16,7 +17,13 @@ export default function RegisterForm() {
     lastName: "",
     password: "",
     confirmPassword: "",
+    biography: "",
+    picture: "",
   });
+
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [tempImage, setTempImage] = useState<string | null>(null);
+  const [isCropping, setIsCropping] = useState(false);
 
   const [errors, setErrors] = useState<Partial<Record<keyof RegisterFormData, string>>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -49,6 +56,8 @@ export default function RegisterForm() {
         firstName: result.data.firstName,
         lastName: result.data.lastName,
         password: result.data.password,
+        biography: result.data.biography,
+        picture: result.data.picture,
       });
 
       await login(result.data.username, result.data.password);
@@ -71,6 +80,43 @@ export default function RegisterForm() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setTempImage(reader.result as string);
+      setIsCropping(true);
+    };
+    reader.readAsDataURL(file);
+
+    // Reset input value so same file can be selected again
+    e.target.value = '';
+  };
+
+  const handleCropSave = async (croppedBlob: Blob) => {
+    setIsCropping(false);
+    setIsUploadingImage(true);
+    try {
+      const { uploadImage } = await import("../../services/upload.service");
+      const file = new File([croppedBlob], "avatar.jpg", { type: "image/jpeg" });
+      const imageUrl = await uploadImage(file, true);
+      setFormData(prev => ({ ...prev, picture: imageUrl }));
+      toast.success("¡Avatar listo!");
+    } catch (error: any) {
+      toast.error(error.message || "Error al subir la imagen");
+    } finally {
+      setIsUploadingImage(false);
+      setTempImage(null);
+    }
+  };
+
+  const handleCropCancel = () => {
+    setIsCropping(false);
+    setTempImage(null);
   };
 
   return (
@@ -127,7 +173,7 @@ export default function RegisterForm() {
             <input
               id="firstName"
               type="text"
-              placeholder="Juan"
+              placeholder="Jesus"
               value={formData.firstName}
               onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
               className="w-full bg-input-bg pl-11 pr-4 py-3 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-accent"
@@ -145,7 +191,7 @@ export default function RegisterForm() {
             <input
               id="lastName"
               type="text"
-              placeholder="Pérez"
+              placeholder="Bertola"
               value={formData.lastName}
               onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
               className="w-full bg-input-bg pl-11 pr-4 py-3 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-accent"
@@ -181,6 +227,74 @@ export default function RegisterForm() {
         />
       </div>
 
+      <div className="pt-4 border-t border-white/5 space-y-6">
+        <div>
+          <div className="flex justify-between items-end mb-2">
+            <label className="block text-accent uppercase tracking-widest text-xs">
+              Avatar (Opcional)
+            </label>
+            <span className="text-[10px] font-mono text-white/20 italic">Podes subirla después!</span>
+          </div>
+          <div className="flex items-center gap-4 p-4 bg-input-bg rounded-xl border border-white/5">
+            <div className="relative group shrink-0">
+              <div className="w-16 h-16 rounded-full border-2 border-accent/20 overflow-hidden bg-background flex items-center justify-center">
+                {formData.picture ? (
+                  <img src={formData.picture} alt="Preview" className="w-full h-full object-cover" />
+                ) : (
+                  <UserCircle className="text-white/20 w-8 h-8" />
+                )}
+              </div>
+              {isUploadingImage && (
+                <div className="absolute inset-0 bg-dark/60 rounded-full flex items-center justify-center">
+                  <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+                </div>
+              )}
+            </div>
+            <div className="flex-1">
+              <label className="cursor-pointer inline-flex items-center px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg font-mono text-[10px] uppercase tracking-widest transition-all border border-white/10">
+                {isUploadingImage ? "SUBIENDO..." : "SUBIR FOTO"}
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  disabled={isUploadingImage}
+                />
+              </label>
+              {formData.picture && (
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, picture: "" })}
+                  className="ml-4 text-red-400/60 hover:text-red-400 font-mono text-[10px] uppercase tracking-widest"
+                >
+                  Eliminar
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div className="flex justify-between items-end mb-2">
+            <label htmlFor="biography" className="block text-accent uppercase tracking-widest text-xs">
+              Biografía (Opcional)
+            </label>
+            <span className={`text-[10px] font-mono ${(formData.biography?.length ?? 0) >= 190 ? 'text-red-400' : 'text-white/20'}`}>
+              {(formData.biography?.length ?? 0)}/200
+            </span>
+          </div>
+          <textarea
+            id="biography"
+            placeholder="Bienvenidos sean todos..."
+            value={formData.biography}
+            onChange={(e) => setFormData({ ...formData, biography: e.target.value.slice(0, 200) })}
+            maxLength={200}
+            rows={3}
+            className="w-full bg-input-bg px-4 py-3 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-accent resize-none text-sm"
+          />
+        </div>
+      </div>
+
       <button
         type="submit"
         disabled={isLoading}
@@ -188,6 +302,16 @@ export default function RegisterForm() {
       >
         {isLoading ? "Creando cuenta..." : "Crear cuenta"}
       </button>
+
+      {isCropping && tempImage && (
+        <ImageCropperModal
+          image={tempImage}
+          onSave={handleCropSave}
+          onCancel={handleCropCancel}
+          aspect={1 / 1}
+          cropShape="round"
+        />
+      )}
     </motion.form>
   );
 }

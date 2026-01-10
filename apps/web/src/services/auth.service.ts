@@ -6,6 +6,8 @@ interface RegisterData {
     firstName: string;
     lastName: string;
     password: string;
+    biography?: string;
+    picture?: string;
 }
 
 interface LoginData {
@@ -24,7 +26,7 @@ export async function register(data: RegisterData): Promise<boolean> {
     });
 }
 
-export async function login(data: LoginData): Promise <LoginResponse> {
+export async function login(data: LoginData): Promise<LoginResponse> {
     return apiRequest<LoginResponse>('/login', {
         method: 'POST',
         body: JSON.stringify(data),

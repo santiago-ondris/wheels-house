@@ -69,7 +69,7 @@ export async function updatePasswordValidator(userData: TokenData, updatePasswor
 }
 
 export async function forgotPasswordValidator(forgotPasswordData: ForgotPasswordDTO) {
-    const user = await getUserFromEmail(forgotPasswordData.email);
+    const user = await getUserFromUsernameOrEmail(forgotPasswordData.usernameOrEmail);
 
     if(user == null) {
         throw userUtils.INEXISTENT_USER;

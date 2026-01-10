@@ -19,6 +19,8 @@ import FoundersPage from "../pages/hall-of-fame/FoundersPage";
 import ContributorsPage from "../pages/hall-of-fame/ContributorsPage";
 import AmbassadorsPage from "../pages/hall-of-fame/AmbassadorsPage";
 import LegendsPage from "../pages/hall-of-fame/LegendsPage";
+import ResetPasswordPage from "../pages/login/ResetPasswordPage";
+import SettingsPage from "../pages/user/SettingsPage";
 
 export default function AppRoutes() {
   return (
@@ -26,8 +28,15 @@ export default function AppRoutes() {
       <Route element={<MainLayout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/auth-required" element={<AuthRequiredPage />} />
         <Route path="/car/:carId" element={<CarDetailPage />} />
+
+        <Route path="/settings" element={
+          <ProtectedRoute>
+            <SettingsPage />
+          </ProtectedRoute>
+        } />
 
         <Route path="/collection/add" element={
           <ProtectedRoute>
