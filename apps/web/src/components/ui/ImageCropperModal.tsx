@@ -8,9 +8,17 @@ interface ImageCropperModalProps {
     image: string;
     onSave: (croppedImage: Blob) => void;
     onCancel: () => void;
+    aspect?: number;
+    cropShape?: 'rect' | 'round';
 }
 
-export default function ImageCropperModal({ image, onSave, onCancel }: ImageCropperModalProps) {
+export default function ImageCropperModal({
+    image,
+    onSave,
+    onCancel,
+    aspect = 4 / 3,
+    cropShape = 'rect'
+}: ImageCropperModalProps) {
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
@@ -55,7 +63,8 @@ export default function ImageCropperModal({ image, onSave, onCancel }: ImageCrop
                         image={image}
                         crop={crop}
                         zoom={zoom}
-                        aspect={4 / 3}
+                        aspect={aspect}
+                        cropShape={cropShape}
                         onCropChange={setCrop}
                         onCropComplete={onCropComplete}
                         onZoomChange={setZoom}

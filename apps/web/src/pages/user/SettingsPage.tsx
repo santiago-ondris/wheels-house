@@ -6,6 +6,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { getPublicProfile, updateProfile, updatePassword, deleteUser } from "../../services/profile.service";
 import PasswordInput from "../../components/auth/PasswordInput";
 import Modal from "../../components/ui/Modal";
+import ImageCropperModal from "../../components/ui/ImageCropperModal";
 import toast from "react-hot-toast";
 
 type SettingsTab = "profile" | "security";
@@ -24,6 +25,8 @@ export default function SettingsPage() {
     const [picture, setPicture] = useState("");
     const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
     const [isUploadingImage, setIsUploadingImage] = useState(false);
+    const [tempImage, setTempImage] = useState<string | null>(null);
+    const [isCropping, setIsCropping] = useState(false);
 
     // Password States
     const [oldPassword, setOldPassword] = useState("");
@@ -58,17 +61,37 @@ export default function SettingsPage() {
         const file = e.target.files?.[0];
         if (!file) return;
 
+        const reader = new FileReader();
+        reader.onload = () => {
+            setTempImage(reader.result as string);
+            setIsCropping(true);
+        };
+        reader.readAsDataURL(file);
+
+        // Reset input value
+        e.target.value = '';
+    };
+
+    const handleCropSave = async (croppedBlob: Blob) => {
+        setIsCropping(false);
         setIsUploadingImage(true);
         try {
             const { uploadImage } = await import("../../services/upload.service");
+            const file = new File([croppedBlob], "avatar.jpg", { type: "image/jpeg" });
             const imageUrl = await uploadImage(file);
             setPicture(imageUrl);
-            toast.success("Imagen subida");
+            toast.success("Avatar actualizado");
         } catch (error: any) {
             toast.error(error.message || "Error al subir imagen");
         } finally {
             setIsUploadingImage(false);
+            setTempImage(null);
         }
+    };
+
+    const handleCropCancel = () => {
+        setIsCropping(false);
+        setTempImage(null);
     };
 
     const handleUpdateProfile = async (e: React.FormEvent) => {
@@ -378,6 +401,16 @@ export default function SettingsPage() {
                     </div>
                 </div>
             </Modal>
+
+            {isCropping && tempImage && (
+                <ImageCropperModal
+                    image={tempImage}
+                    onSave={handleCropSave}
+                    onCancel={handleCropCancel}
+                    aspect={1 / 1}
+                    cropShape="round"
+                />
+            )}
         </div>
     );
 }

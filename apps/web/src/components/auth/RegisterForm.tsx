@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { User, Mail, UserCircle } from "lucide-react";
 import PasswordInput from "./PasswordInput";
+import ImageCropperModal from "../ui/ImageCropperModal";
 import { RegisterFormData, registerSchema } from "../../lib/validations/auth";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -21,6 +22,8 @@ export default function RegisterForm() {
   });
 
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [tempImage, setTempImage] = useState<string | null>(null);
+  const [isCropping, setIsCropping] = useState(false);
 
   const [errors, setErrors] = useState<Partial<Record<keyof RegisterFormData, string>>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -83,9 +86,23 @@ export default function RegisterForm() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const reader = new FileReader();
+    reader.onload = () => {
+      setTempImage(reader.result as string);
+      setIsCropping(true);
+    };
+    reader.readAsDataURL(file);
+
+    // Reset input value so same file can be selected again
+    e.target.value = '';
+  };
+
+  const handleCropSave = async (croppedBlob: Blob) => {
+    setIsCropping(false);
     setIsUploadingImage(true);
     try {
       const { uploadImage } = await import("../../services/upload.service");
+      const file = new File([croppedBlob], "avatar.jpg", { type: "image/jpeg" });
       const imageUrl = await uploadImage(file, true);
       setFormData(prev => ({ ...prev, picture: imageUrl }));
       toast.success("¡Avatar listo!");
@@ -93,7 +110,13 @@ export default function RegisterForm() {
       toast.error(error.message || "Error al subir la imagen");
     } finally {
       setIsUploadingImage(false);
+      setTempImage(null);
     }
+  };
+
+  const handleCropCancel = () => {
+    setIsCropping(false);
+    setTempImage(null);
   };
 
   return (
@@ -279,6 +302,16 @@ export default function RegisterForm() {
       >
         {isLoading ? "Creando cuenta..." : "Crear cuenta"}
       </button>
+
+      {isCropping && tempImage && (
+        <ImageCropperModal
+          image={tempImage}
+          onSave={handleCropSave}
+          onCancel={handleCropCancel}
+          aspect={1 / 1}
+          cropShape="round"
+        />
+      )}
     </motion.form>
   );
 }
