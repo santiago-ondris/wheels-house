@@ -1,9 +1,10 @@
 import { Controller, Get, Post, Put, Body, UseGuards, Request, Param, Delete, Query } from '@nestjs/common';
+import { car } from 'src/database/schema';
 import { CarUpdateDTO, CreateCarDTO } from 'src/dto/car.dto';
 import { CollectionQueryDTO, BulkAddToGroupDTO } from 'src/dto/collection-query.dto';
 import { CarService } from 'src/services/car.service';
 import { JwtAuthGuard } from 'src/validators/auth.validator';
-import { createCarValidator, deleteCarValidator, getCarValidator, listCarsValidator, updateCarGroupsValidator, updateCarValidator } from 'src/validators/car.validator';
+import { createCarValidator, deleteCarValidator, getCarValidator, getWishlistValidator, listCarsValidator, updateCarGroupsValidator, updateCarValidator, wishedCarToCollectionValidator } from 'src/validators/car.validator';
 
 @Controller('car')
 export class CarController {
@@ -12,6 +13,7 @@ export class CarController {
     @UseGuards(JwtAuthGuard)
     @Post('/create')
     async createCar(@Request() req, @Body() carData: CreateCarDTO) {
+        console.log("HOLA");
         await createCarValidator(carData, req.user);
 
         return await this.carService.createCarService(carData, req.user);
@@ -117,5 +119,20 @@ export class CarController {
             body.carIds,
             body.filterQuery
         );
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Put('wishedCarToCollection/:carId')
+    async wishedCarToCollection(@Request() req, @Param('carId') carId: number, @Body() carChanges: CarUpdateDTO) {
+        await wishedCarToCollectionValidator(req.user, carId, carChanges);
+
+        return await this.carService.wishedCarToCollectionService(carId, carChanges);
+    }
+
+    @Get('wishlist/:username')
+    async getWishlist(@Param('username') username: string) {
+        await getWishlistValidator(username);
+
+        return await this.carService.getWishlistService(username);
     }
 }

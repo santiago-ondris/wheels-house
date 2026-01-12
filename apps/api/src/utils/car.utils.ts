@@ -72,6 +72,14 @@ export const CAR_PICTURE_FORMAT_NOT_VALID = new HttpException(
     HttpStatus.BAD_REQUEST
 );
 
+export const CAR_ALREADY_OWNED = new HttpException(
+    {
+        status: HttpStatus.CONFLICT,
+        error: 'This car is already in your collection.' 
+    },
+    HttpStatus.CONFLICT
+);
+
 export function validCarPicture(url: string): boolean {
     const cloudinaryRegex = /^https:\/\/res\.cloudinary\.com\/dyx7kjnjq\/image\/upload\/v\d+\/wheels-house\/cars\/[a-zA-Z0-9_-]+\.(jpg|jpeg|png|webp)$/;
     

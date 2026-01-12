@@ -6,7 +6,8 @@ import { ERROR_CREATING_CAR, ERROR_DELETING_CAR, ERROR_UPDATING_CAR } from 'src/
 import {
     createCar, deleteCar, getCarByIdWithOwner, getCarsFromUserId, updateCar, createCarPicture, getPicturesFromCar,
     deleteAllCarPictures, deleteCarPicture, updateCarPicture, getTotalCarsCount, getCarByOffset, getUniqueCarValues,
-    getCarsFromUserIdPaginated, getFilterOptionsForUser, getCarIdsFromUserIdWithFilter
+    getCarsFromUserIdPaginated, getFilterOptionsForUser, getCarIdsFromUserIdWithFilter,
+    getWishedCarsFromUserId
 } from 'src/database/crud/car.crud';
 import { CollectionQueryDTO, PaginatedCarsResponse } from 'src/dto/collection-query.dto';
 import { createGroupedCars, deleteGroupedCarsFromCarId, getGroupsFromCarId } from 'src/database/crud/group.crud';
@@ -22,8 +23,8 @@ export class CarService {
 
         const newCar: CarToDB = new CarToDB(
             user.userId, carData.name, carData.color, carData.brand,
-            carData.scale, carData.manufacturer, carData.condition, carData.description,
-            carData.designer, carData.series, carData.country
+            carData.scale, carData.manufacturer, carData.condition, carData.wished, 
+            carData.description, carData.designer, carData.series, carData.country
         );
 
         const createdCar = await createCar(newCar);
@@ -63,8 +64,8 @@ export class CarService {
 
             listedCars.push(new CarInfo(
                 car.carId, car.name, car.color, car.brand,
-                car.scale, car.manufacturer, car.condition, car.description,
-                car.designer, car.series, carPictures, car.country
+                car.scale, car.manufacturer, car.condition, car.wished, 
+                car.description, car.designer, car.series, carPictures, car.country
             ));
         }
 
@@ -80,8 +81,8 @@ export class CarService {
 
         const car: CarInfoWithOwner = new CarInfoWithOwner(
             carFromDB.carId, carFromDB.name, carFromDB.color, carFromDB.brand,
-            carFromDB.scale, carFromDB.manufacturer, carFromDB.condition, carFromDB.ownerUsername,
-            carFromDB.description, carFromDB.designer, carFromDB.series,
+            carFromDB.scale, carFromDB.manufacturer, carFromDB.condition, carFromDB.wished, 
+            carFromDB.ownerUsername, carFromDB.description, carFromDB.designer, carFromDB.series,
             carPicturesURLs, carFromDB.country
         );
 
@@ -201,8 +202,8 @@ export class CarService {
 
         return new CarInfoWithOwner(
             carFromDB.carId, carFromDB.name, carFromDB.color, carFromDB.brand,
-            carFromDB.scale, carFromDB.manufacturer, carFromDB.condition, carFromDB.ownerUsername,
-            carFromDB.description, carFromDB.designer, carFromDB.series,
+            carFromDB.scale, carFromDB.manufacturer, carFromDB.condition, carFromDB.wished, 
+            carFromDB.ownerUsername, carFromDB.description, carFromDB.designer, carFromDB.series,
             carPicturesURLs, carFromDB.country
         );
     }
@@ -238,8 +239,8 @@ export class CarService {
 
             listedCars.push(new CarInfo(
                 carData.carId, carData.name, carData.color, carData.brand,
-                carData.scale, carData.manufacturer, carData.condition, carData.description,
-                carData.designer, carData.series, carPictures, carData.country
+                carData.scale, carData.manufacturer, carData.condition, carData.wished, 
+                carData.description, carData.designer, carData.series, carPictures, carData.country
             ));
         }
 
@@ -285,5 +286,80 @@ export class CarService {
             alreadyInGroup,
             totalRequested: targetCarIds.length
         };
+    }
+
+    async wishedCarToCollectionService(carId: number, carChanges: CarUpdateDTO) {
+        const carUpdated = await updateCar(carChanges, carId);
+
+        if (!carUpdated) {
+            throw ERROR_UPDATING_CAR;
+        }
+
+        const carPicturesFromDB = await getPicturesFromCar(carId);
+
+        for (let idx = 0; idx < Math.min(carChanges.pictures!.length, carPicturesFromDB.length); ++idx) {
+            if (carChanges.pictures![idx] == carPicturesFromDB[idx].url) continue;
+
+            const pictureUpdated = await updateCarPicture(new CarPictureToDB(
+                carChanges.pictures![idx],
+                carId,
+                idx
+            ), carPicturesFromDB[idx].carPictureId);
+
+            if (!pictureUpdated) {
+                throw ERROR_UPDATING_CAR;
+            }
+
+            // URL not used anymore.
+            await this.uploadService.deleteImage(getPublicIdFromURL(carPicturesFromDB[idx].url));
+        }
+
+        if (carChanges.pictures!.length > carPicturesFromDB.length) {
+            for (let idx = carPicturesFromDB.length; idx < carChanges.pictures!.length; ++idx) {
+                const newCarPicture = new CarPictureToDB(
+                    carChanges.pictures![idx],
+                    carId,
+                    idx
+                );
+
+                const createdPicture = await createCarPicture(newCarPicture);
+
+                if (!createdPicture) {
+                    throw ERROR_UPDATING_CAR;
+                }
+            }
+        } else if (carChanges.pictures!.length < carPicturesFromDB.length) {
+            for (let idx = carChanges.pictures!.length; idx < carPicturesFromDB.length; ++idx) {
+                const pictureDeleted = await deleteCarPicture(carPicturesFromDB[idx].carPictureId);
+
+                if (pictureDeleted == null) {
+                    throw ERROR_UPDATING_CAR;
+                }
+
+                await this.uploadService.deleteImage(getPublicIdFromURL(pictureDeleted.url));
+            }
+        }
+    }
+
+    async getWishlistService(username: string) {
+        const user = await getUserFromUsername(username);
+
+        const wishedCarsFromDB = await getWishedCarsFromUserId(user.userId);
+
+        let wishlist: CarInfo[] = [];
+
+        for (const car of wishedCarsFromDB) {
+            const carPicturesFromDB = await getPicturesFromCar(car.carId);
+
+            const carPictures = carPicturesFromDB.map(picture => picture.url);
+
+            wishlist.push(new CarInfo(
+                car.carId, car.name, car.color, car.brand,
+                car.scale, car.manufacturer, car.condition, car.wished, 
+                car.description, car.designer, car.series, carPictures, car.country
+            ));
+        }
+
+        return wishlist;
     }
 }

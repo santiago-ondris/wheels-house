@@ -45,6 +45,7 @@ export async function getCarByIdWithOwner(carId: number) {
             series: car.series,
             country: car.country,
             condition: car.condition,
+            wished: car.wished,
             ownerUsername: user.username,
         })
         .from(car)
@@ -55,13 +56,17 @@ export async function getCarByIdWithOwner(carId: number) {
 }
 
 export async function getCarsFromUserId(userId: number) {
-    return await db.select().from(car).where(eq(car.userId, userId));
+    return await db.select().from(car).where(and(eq(car.userId, userId),eq(car.wished, false)));
+}
+
+export async function getWishedCarsFromUserId(userId: number) {
+    return await db.select().from(car).where(and(eq(car.userId, userId),eq(car.wished, true)));
 }
 
 //functions for featured car
 
 export async function getTotalCarsCount() {
-    const result = await db.select({ value: count() }).from(car);
+    const result = await db.select({ value: count() }).from(car).where(eq(car.wished, false));
     return result[0].value;
 }
 
@@ -73,7 +78,7 @@ export async function getUniqueCarValues(userId: number) {
             designer: car.designer,
         })
         .from(car)
-        .where(eq(car.userId, userId));
+        .where(and(eq(car.userId, userId),eq(car.wished, false)));
 
     return result;
 }
@@ -92,10 +97,12 @@ export async function getCarByOffset(offset: number) {
             series: car.series,
             country: car.country,
             condition: car.condition,
+            wished: car.wished,
             ownerUsername: user.username,
         })
         .from(car)
         .innerJoin(user, eq(car.userId, user.userId))
+        .where(eq(car.wished, false))
         .limit(1)
         .offset(offset);
 
@@ -180,7 +187,7 @@ export async function getCarsFromUserIdPaginated(userId: number, query: Collecti
         search
     } = query;
 
-    const conditions_list: SQL[] = [eq(car.userId, userId)];
+    const conditions_list: SQL[] = [eq(car.userId, userId), eq(car.wished, false)];
 
     // Filter by group if provided
     if (query.groupId) {
@@ -259,6 +266,7 @@ export async function getCarsFromUserIdPaginated(userId: number, query: Collecti
             series: car.series,
             country: car.country,
             condition: car.condition,
+            wished: car.wished,
         })
         .from(car)
         .where(whereClause)
@@ -280,7 +288,7 @@ export async function getCarsFromUserIdPaginated(userId: number, query: Collecti
 export async function getCarIdsFromUserIdWithFilter(userId: number, query: CollectionQueryDTO) {
     const { brands, colors, manufacturers, scales, conditions, countries, search } = query;
 
-    const conditions_list: SQL[] = [eq(car.userId, userId)];
+    const conditions_list: SQL[] = [eq(car.userId, userId), eq(car.wished, false)];
 
     if (brands && brands.length > 0) {
         conditions_list.push(or(...brands.map(b => eq(car.brand, b)))!);
@@ -328,7 +336,7 @@ export async function getFilterOptionsForUser(userId: number) {
         scale: car.scale,
         condition: car.condition,
         country: car.country,
-    }).from(car).where(eq(car.userId, userId));
+    }).from(car).where(and(eq(car.userId, userId), eq(car.wished, false)));
 
     const countBy = <T extends string | null>(items: T[]): { name: string; count: number }[] => {
         const map = new Map<string, number>();
