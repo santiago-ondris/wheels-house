@@ -22,6 +22,8 @@ import AmbassadorsPage from "../pages/hall-of-fame/AmbassadorsPage";
 import LegendsPage from "../pages/hall-of-fame/LegendsPage";
 import ResetPasswordPage from "../pages/login/ResetPasswordPage";
 import SettingsPage from "../pages/user/SettingsPage";
+import ContactPage from "../pages/ContactPage";
+import RoadmapPage from "../pages/RoadmapPage";
 
 export default function AppRoutes() {
   return (
@@ -75,6 +77,8 @@ export default function AppRoutes() {
         <Route path="/hall-of-fame/contributors" element={<ContributorsPage />} />
         <Route path="/hall-of-fame/ambassadors" element={<AmbassadorsPage />} />
         <Route path="/hall-of-fame/legends" element={<LegendsPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/roadmap" element={<RoadmapPage />} />
 
         <Route path="*" element={<NotFoundPage />} />
       </Route>

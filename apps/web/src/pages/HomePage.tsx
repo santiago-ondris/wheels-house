@@ -10,7 +10,7 @@ const features = [
   {
     icon: Car,
     title: "Mi Colección",
-    description: "Todos tus Hot Wheels en un solo lugar, organizados y con imágenes.",
+    description: "Todos tus vehículos en un solo lugar, organizados y con imágenes.",
     route: "collection",
   },
   {
