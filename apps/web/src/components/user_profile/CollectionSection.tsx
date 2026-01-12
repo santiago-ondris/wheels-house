@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Car, SlidersHorizontal, Search, X } from "lucide-react";
+import { Plus, Car, SlidersHorizontal, Search, X, Save } from "lucide-react";
 import toast from "react-hot-toast";
 
 import { useCollectionParams } from "../../hooks/useCollectionParams";
@@ -21,6 +21,10 @@ import SelectionToolbar from "../collection/SelectionToolbar";
 interface CollectionSectionProps {
     username: string;
     isOwner: boolean;
+    groupId?: number;
+    mode?: 'view' | 'select' | 'manage_group';
+    initialSelection?: number[];
+    onSaveSelection?: (selectedIds: number[]) => Promise<void>;
 }
 
 interface Group {
@@ -28,30 +32,51 @@ interface Group {
     name: string;
 }
 
-export default function CollectionSection({ username, isOwner }: CollectionSectionProps) {
+export default function CollectionSection({
+    username,
+    isOwner,
+    groupId,
+    mode = 'view',
+    initialSelection = [],
+    onSaveSelection
+}: CollectionSectionProps) {
     const navigate = useNavigate();
     const { params, setPage, setLimit, setSort, setSearch, toggleFilter, clearFilters, hasActiveFilters } = useCollectionParams();
+
+    useEffect(() => {
+        setPage(1);
+    }, [groupId]);
 
     const [isLoading, setIsLoading] = useState(true);
     const [data, setData] = useState<PaginatedCarsResponse | null>(null);
     const [view, setView] = useState<"grid" | "list">("grid");
     const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
-    const [isSelectMode, setIsSelectMode] = useState(false);
+    const [isSelectMode, setIsSelectMode] = useState(mode === 'manage_group');
     const [showGroupModal, setShowGroupModal] = useState(false);
     const [groups, setGroups] = useState<Group[]>([]);
     const [searchInput, setSearchInput] = useState(params.search);
+    const [isSaving, setIsSaving] = useState(false);
     const carsGridRef = useRef<HTMLDivElement>(null);
 
-    // Get page IDs for selection
     const pageIds = data?.items.map(car => car.carId!) || [];
     const selection = useSelectionState(pageIds, data?.pagination.totalItems || 0);
 
-    // Fetch cars when params change
+    useEffect(() => {
+        if (mode === 'manage_group' && initialSelection.length > 0) {
+            selection.setInitialSelection(initialSelection);
+        }
+    }, [mode, initialSelection]);
+
     useEffect(() => {
         const fetchCars = async () => {
             setIsLoading(true);
             try {
-                const response = await listCarsPaginated(username, params);
+                const fetchParams: CollectionQueryParams = { ...params };
+                if (groupId && mode === 'view') {
+                    fetchParams.groupId = groupId;
+                }
+
+                const response = await listCarsPaginated(username, fetchParams);
                 setData(response);
             } catch (error) {
                 console.error("Error fetching cars:", error);
@@ -62,16 +87,14 @@ export default function CollectionSection({ username, isOwner }: CollectionSecti
         };
 
         fetchCars();
-    }, [username, params]);
+    }, [username, params, groupId, mode]);
 
-    // Fetch user groups for bulk add modal
     useEffect(() => {
-        if (isOwner) {
+        if (isOwner && mode === 'view') {
             listGroups(username).then(g => setGroups(g.map(gr => ({ groupId: gr.groupId, name: gr.name })))).catch(console.error);
         }
-    }, [username, isOwner]);
+    }, [username, isOwner, mode]);
 
-    // Debounced search
     useEffect(() => {
         const timer = setTimeout(() => {
             if (searchInput !== params.search) {
@@ -81,25 +104,22 @@ export default function CollectionSection({ username, isOwner }: CollectionSecti
         return () => clearTimeout(timer);
     }, [searchInput, params.search, setSearch]);
 
-    // Clear selection when leaving select mode
     useEffect(() => {
-        if (!isSelectMode) {
+        if (!isSelectMode && mode === 'view') {
             selection.clear();
         }
-    }, [isSelectMode]);
+    }, [isSelectMode, mode]);
 
-    const handleAddToGroup = useCallback(async (groupId: number) => {
+    const handleAddToGroup = useCallback(async (targetGroupId: number) => {
         try {
             const selectionData = selection.getSelectionForBulkAction();
 
             let request: { groupId: number; carIds?: number[]; filterQuery?: CollectionQueryParams };
 
             if (selectionData.mode === 'all') {
-                // Use filter-based selection (Option A)
-                request = { groupId, filterQuery: params };
+                request = { groupId: targetGroupId, filterQuery: params };
             } else {
-                // Use specific IDs
-                request = { groupId, carIds: selectionData.carIds };
+                request = { groupId: targetGroupId, carIds: selectionData.carIds };
             }
 
             const result = await bulkAddToGroup(request);
@@ -127,6 +147,27 @@ export default function CollectionSection({ username, isOwner }: CollectionSecti
             toast.error("Error al añadir al grupo");
         }
     }, [selection, params]);
+
+    const handleSaveGroupSelection = async () => {
+        if (!onSaveSelection) return;
+
+        setIsSaving(true);
+        try {
+            const selectionData = selection.getSelectionForBulkAction();
+            if (selectionData.mode === 'all') {
+                toast.error("La selección masiva 'Todos' no está soportada en este modo aún.");
+                return;
+            }
+
+            await onSaveSelection(selectionData.carIds);
+
+        } catch (error) {
+            console.error(error);
+            toast.error("Error al guardar selección");
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     const mappedCars = (data?.items || []).map((car) => ({
         id: String(car.carId),
@@ -158,11 +199,10 @@ export default function CollectionSection({ username, isOwner }: CollectionSecti
             transition={{ duration: 0.5, delay: 0.2 }}
             className="mt-8"
         >
-            {/* Header */}
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg md:text-xl font-bold text-white flex items-center gap-2">
                     <Car className="w-5 h-5 text-accent" />
-                    Toda mi Colección
+                    {mode === 'manage_group' ? 'Seleccionar Autos' : (groupId ? 'Autos en el grupo' : 'Toda mi Colección')}
                     {data && (
                         <span className="text-accent/70 text-sm font-normal ml-2">
                             ({data.pagination.totalItems})
@@ -170,7 +210,20 @@ export default function CollectionSection({ username, isOwner }: CollectionSecti
                     )}
                 </h2>
                 <div className="flex items-center gap-2">
-                    {isOwner && !isSelectMode && (
+                    {mode === 'manage_group' && (
+                        <button
+                            onClick={handleSaveGroupSelection}
+                            disabled={isSaving}
+                            className="px-4 py-2 bg-accent hover:bg-accent/80 text-white rounded-lg transition-all hover:scale-105 active:scale-95 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {isSaving ? <span className="animate-spin">⌛</span> : <Save className="w-4 h-4" />}
+                            <span className="hidden sm:inline text-xs uppercase tracking-widest font-bold">
+                                Guardar Cambios
+                            </span>
+                        </button>
+                    )}
+
+                    {isOwner && mode === 'view' && !isSelectMode && (
                         <button
                             onClick={() => setIsSelectMode(true)}
                             className="p-2 text-white/40 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
@@ -181,7 +234,7 @@ export default function CollectionSection({ username, isOwner }: CollectionSecti
                             </svg>
                         </button>
                     )}
-                    {isSelectMode && (
+                    {mode === 'view' && isSelectMode && (
                         <button
                             onClick={() => setIsSelectMode(false)}
                             className="px-3 py-1.5 text-xs font-mono text-white/60 hover:text-white border border-white/10 rounded-lg transition-colors"
@@ -189,7 +242,7 @@ export default function CollectionSection({ username, isOwner }: CollectionSecti
                             Cancelar selección
                         </button>
                     )}
-                    {isOwner && !isSelectMode && (data?.items?.length ?? 0) > 0 && (
+                    {isOwner && mode === 'view' && !isSelectMode && (data?.items?.length ?? 0) > 0 && !groupId && (
                         <button
                             onClick={() => navigate("/collection/add")}
                             className="p-2 bg-accent hover:bg-accent/80 text-white rounded-lg transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
@@ -203,9 +256,7 @@ export default function CollectionSection({ username, isOwner }: CollectionSecti
                 </div>
             </div>
 
-            {/* Main Content */}
             <div className="flex gap-6">
-                {/* Desktop Sidebar Filters */}
                 <div className="hidden lg:block w-64 shrink-0">
                     <div className="sticky top-20 bg-white/[0.02] border border-white/5 rounded-xl p-4">
                         <CollectionFilters
@@ -223,11 +274,8 @@ export default function CollectionSection({ username, isOwner }: CollectionSecti
                     </div>
                 </div>
 
-                {/* Main Content Area */}
                 <div className="flex-1 min-w-0">
-                    {/* Controls Bar */}
                     <div ref={carsGridRef} className="flex flex-col sm:flex-row gap-3 mb-6">
-                        {/* Search */}
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
                             <input
@@ -247,9 +295,7 @@ export default function CollectionSection({ username, isOwner }: CollectionSecti
                             )}
                         </div>
 
-                        {/* Right Controls */}
                         <div className="flex gap-2">
-                            {/* Mobile Filter Button */}
                             <button
                                 onClick={() => setIsFilterDrawerOpen(true)}
                                 className="lg:hidden flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors"
@@ -274,7 +320,6 @@ export default function CollectionSection({ username, isOwner }: CollectionSecti
                         </div>
                     </div>
 
-                    {/* Loading State */}
                     {isLoading && (
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -283,16 +328,17 @@ export default function CollectionSection({ username, isOwner }: CollectionSecti
                         </div>
                     )}
 
-                    {/* Empty State */}
                     {!isLoading && (data?.items?.length ?? 0) === 0 && (
                         <div className="text-center py-12 bg-white/5 rounded-xl border border-white/10">
                             <Car className="w-16 h-16 mx-auto mb-4 text-white/20" />
                             <p className="text-white/60 text-lg mb-2">
                                 {hasActiveFilters
                                     ? "No se encontraron resultados"
-                                    : isOwner
-                                        ? "Tu colección está vacía"
-                                        : "Esta colección está vacía"
+                                    : (
+                                        groupId
+                                            ? "Este grupo no tiene autos"
+                                            : (isOwner ? "Tu colección está vacía" : "Esta colección está vacía")
+                                    )
                                 }
                             </p>
                             {hasActiveFilters ? (
@@ -302,7 +348,7 @@ export default function CollectionSection({ username, isOwner }: CollectionSecti
                                 >
                                     Limpiar filtros
                                 </button>
-                            ) : isOwner && (
+                            ) : isOwner && !groupId && (
                                 <button
                                     onClick={() => navigate("/collection/add")}
                                     className="mt-4 px-6 py-3 bg-accent hover:bg-accent/80 text-white rounded-lg transition-all flex items-center gap-2 mx-auto"
@@ -314,7 +360,6 @@ export default function CollectionSection({ username, isOwner }: CollectionSecti
                         </div>
                     )}
 
-                    {/* Cars Grid/List */}
                     {!isLoading && (data?.items?.length ?? 0) > 0 && (
                         <>
                             <AnimatePresence mode="wait">
@@ -326,16 +371,18 @@ export default function CollectionSection({ username, isOwner }: CollectionSecti
                                         exit={{ opacity: 0 }}
                                         className="grid grid-cols-2 md:grid-cols-3 gap-4"
                                     >
-                                        {mappedCars.map((car) => (
-                                            <HotWheelCardGrid
-                                                key={car.id}
-                                                car={car}
-                                                onClick={() => navigate(`/car/${car.id}`)}
-                                                selectable={isSelectMode}
-                                                isSelected={selection.isSelected(Number(car.id))}
-                                                onSelect={() => selection.toggle(Number(car.id))}
-                                            />
-                                        ))}
+                                        {mappedCars.map((car) => {
+                                            return (
+                                                <HotWheelCardGrid
+                                                    key={car.id}
+                                                    car={car}
+                                                    onClick={() => mode === 'manage_group' ? selection.toggle(Number(car.id)) : navigate(`/car/${car.id}`)}
+                                                    selectable={isSelectMode}
+                                                    isSelected={selection.isSelected(Number(car.id))}
+                                                    onSelect={() => selection.toggle(Number(car.id))}
+                                                />
+                                            )
+                                        })}
                                     </motion.div>
                                 ) : (
                                     <motion.div
@@ -349,7 +396,7 @@ export default function CollectionSection({ username, isOwner }: CollectionSecti
                                             <HotWheelCardList
                                                 key={car.id}
                                                 car={car}
-                                                onClick={() => navigate(`/car/${car.id}`)}
+                                                onClick={() => mode === 'manage_group' ? selection.toggle(Number(car.id)) : navigate(`/car/${car.id}`)}
                                                 selectable={isSelectMode}
                                                 isSelected={selection.isSelected(Number(car.id))}
                                                 onSelect={() => selection.toggle(Number(car.id))}
@@ -359,7 +406,6 @@ export default function CollectionSection({ username, isOwner }: CollectionSecti
                                 )}
                             </AnimatePresence>
 
-                            {/* Pagination */}
                             {data && data.pagination.totalPages > 1 && (
                                 <Pagination
                                     currentPage={data.pagination.currentPage}
@@ -368,7 +414,6 @@ export default function CollectionSection({ username, isOwner }: CollectionSecti
                                     limit={data.pagination.limit}
                                     onPageChange={(page) => {
                                         setPage(page);
-                                        // Scroll to top of cars section
                                         setTimeout(() => {
                                             carsGridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                                         }, 100);
@@ -381,7 +426,6 @@ export default function CollectionSection({ username, isOwner }: CollectionSecti
                 </div>
             </div>
 
-            {/* Mobile Filter Drawer */}
             <FilterDrawer
                 isOpen={isFilterDrawerOpen}
                 onClose={() => setIsFilterDrawerOpen(false)}
@@ -398,9 +442,8 @@ export default function CollectionSection({ username, isOwner }: CollectionSecti
                 totalResults={data?.pagination.totalItems || 0}
             />
 
-            {/* Selection Toolbar */}
             <AnimatePresence>
-                {isSelectMode && selection.selectedCount > 0 && (
+                {isSelectMode && mode === 'view' && selection.selectedCount > 0 && (
                     <SelectionToolbar
                         selectedCount={selection.selectedCount}
                         totalItems={data?.pagination.totalItems || 0}
@@ -414,7 +457,6 @@ export default function CollectionSection({ username, isOwner }: CollectionSecti
                 )}
             </AnimatePresence>
 
-            {/* Add to Group Modal */}
             <AnimatePresence>
                 {showGroupModal && (
                     <>

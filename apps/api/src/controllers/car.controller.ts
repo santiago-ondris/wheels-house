@@ -40,6 +40,7 @@ export class CarController {
         @Query('conditions') conditions?: string,
         @Query('countries') countries?: string,
         @Query('search') search?: string,
+        @Query('groupId') groupId?: string,
     ) {
         const query: CollectionQueryDTO = {
             page: page ? parseInt(page) : 1,
@@ -53,6 +54,7 @@ export class CarController {
             conditions: conditions ? conditions.split(',') : undefined,
             countries: countries ? countries.split(',') : undefined,
             search,
+            groupId: groupId ? parseInt(groupId) : undefined,
         };
 
         return await this.carService.listCarsPaginatedService(username, query);
@@ -106,7 +108,6 @@ export class CarController {
         return await this.carService.getFeaturedCarService();
     }
 
-    // Bulk add cars to group
     @UseGuards(JwtAuthGuard)
     @Post('bulk/add-to-group')
     async bulkAddToGroup(@Request() req, @Body() body: BulkAddToGroupDTO) {

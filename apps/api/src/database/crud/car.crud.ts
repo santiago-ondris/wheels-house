@@ -1,8 +1,8 @@
 import { CarPictureToDB, CarToDB, CarUpdateDTO } from "src/dto/car.dto";
 import { CollectionQueryDTO } from "src/dto/collection-query.dto";
 import { db } from "../index";
-import { car, carPicture, user } from "../schema";
-import { count, eq, or, and, ilike, asc, desc, sql, SQL } from 'drizzle-orm';
+import { car, carPicture, user, groupedCar } from "../schema";
+import { count, eq, or, and, ilike, asc, desc, sql, SQL, inArray } from 'drizzle-orm';
 
 // Create
 
@@ -181,6 +181,17 @@ export async function getCarsFromUserIdPaginated(userId: number, query: Collecti
     } = query;
 
     const conditions_list: SQL[] = [eq(car.userId, userId)];
+
+    // Filter by group if provided
+    if (query.groupId) {
+        // Subquery to get carIds in the group
+        const carsInGroup = db
+            .select({ carId: groupedCar.carId })
+            .from(groupedCar)
+            .where(eq(groupedCar.groupId, query.groupId));
+
+        conditions_list.push(inArray(car.carId, carsInGroup));
+    }
 
     // Filtros con logica OR
     if (brands && brands.length > 0) {

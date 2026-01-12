@@ -12,6 +12,7 @@ import CarDetailPage from "../pages/car/CarDetailPage";
 import EditCarPage from "../pages/car/EditCarPage";
 import CreateGroupPage from "../pages/groups/CreateGroupPage";
 import EditGroupPage from "../pages/groups/EditGroupPage";
+import GroupManageCarsPage from "../pages/groups/GroupManageCarsPage";
 import GroupDetailPage from "../pages/groups/GroupDetailPage";
 import GroupsListPage from "../pages/groups/GroupsListPage";
 import HallOfFamePage from "../pages/hall-of-fame/HallOfFamePage";
@@ -56,6 +57,11 @@ export default function AppRoutes() {
         <Route path="/collection/group/edit/:groupId" element={
           <ProtectedRoute>
             <EditGroupPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/collection/group/manage/:groupId" element={
+          <ProtectedRoute>
+            <GroupManageCarsPage />
           </ProtectedRoute>
         } />
 

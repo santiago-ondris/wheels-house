@@ -21,6 +21,9 @@ export class CollectionQueryDTO {
 
     // Busqueda de texto
     search?: string;
+
+    // Filtro por grupo
+    groupId?: number;
 }
 
 export interface PaginationMeta {

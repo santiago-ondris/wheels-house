@@ -141,6 +141,7 @@ export interface CollectionQueryParams {
     conditions?: string[];
     countries?: string[];
     search?: string;
+    groupId?: number;
 }
 
 export async function listCarsPaginated(username: string, params: CollectionQueryParams): Promise<PaginatedCarsResponse> {
@@ -157,6 +158,7 @@ export async function listCarsPaginated(username: string, params: CollectionQuer
     if (params.conditions?.length) queryParts.push(`conditions=${params.conditions.join(',')}`);
     if (params.countries?.length) queryParts.push(`countries=${params.countries.join(',')}`);
     if (params.search) queryParts.push(`search=${encodeURIComponent(params.search)}`);
+    if (params.groupId) queryParts.push(`groupId=${params.groupId}`);
 
     const queryString = queryParts.length > 0 ? `?${queryParts.join('&')}` : '';
 
