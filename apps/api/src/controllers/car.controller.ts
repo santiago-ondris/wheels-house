@@ -3,7 +3,7 @@ import { CarUpdateDTO, CreateCarDTO } from 'src/dto/car.dto';
 import { CollectionQueryDTO, BulkAddToGroupDTO } from 'src/dto/collection-query.dto';
 import { CarService } from 'src/services/car.service';
 import { JwtAuthGuard } from 'src/validators/auth.validator';
-import { createCarValidator, deleteCarValidator, getCarValidator, listCarsValidator, updateCarGroupsValidator, updateCarValidator } from 'src/validators/car.validator';
+import { bulkAddToGroupValidator, createCarValidator, deleteCarValidator, getCarValidator, getWishlistValidator, listCarsValidator, updateCarGroupsValidator, updateCarValidator, wishedCarToCollectionValidator } from 'src/validators/car.validator';
 
 @Controller('car')
 export class CarController {
@@ -111,11 +111,28 @@ export class CarController {
     @UseGuards(JwtAuthGuard)
     @Post('bulk/add-to-group')
     async bulkAddToGroup(@Request() req, @Body() body: BulkAddToGroupDTO) {
+        await bulkAddToGroupValidator(req.user, body);
+
         return await this.carService.bulkAddToGroupService(
             req.user.username,
             body.groupId,
             body.carIds,
             body.filterQuery
         );
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Put('wishedCarToCollection/:carId')
+    async wishedCarToCollection(@Request() req, @Param('carId') carId: number, @Body() carChanges: CarUpdateDTO) {
+        await wishedCarToCollectionValidator(req.user, carId, carChanges);
+
+        return await this.carService.wishedCarToCollectionService(carId, carChanges);
+    }
+
+    @Get('wishlist/:username')
+    async getWishlist(@Param('username') username: string) {
+        await getWishlistValidator(username);
+
+        return await this.carService.getWishlistService(username);
     }
 }

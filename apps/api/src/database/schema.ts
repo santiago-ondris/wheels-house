@@ -38,7 +38,8 @@ export const car = pgTable("car", {
     designer: text("designer"),
     series: text("series"),
     country: text("country"),
-    condition: text("condition").notNull().default("Abierto")
+    condition: text("condition").notNull().default("Abierto"),
+    wished: boolean("wished").notNull().default(false)
 });
 
 export const carPicture = pgTable("carPicture", {
@@ -62,6 +63,10 @@ export const group = pgTable("group", {
 }, (t) => [
     unique().on(t.name, t.userId)
 ]);
+
+
+
+
 
 
 // export const carInCollection = pgTable("carInCollection",{

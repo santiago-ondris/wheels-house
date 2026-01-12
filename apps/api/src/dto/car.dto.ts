@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsArray } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsArray, IsBoolean } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class CreateCarDTO {
@@ -51,6 +51,10 @@ export class CreateCarDTO {
     @IsNotEmpty()
     condition: string;
 
+    @IsBoolean()
+    @IsOptional()
+    wished: boolean = false;
+
     @IsArray()
     @IsOptional()
     groups: number[] | null = []; // Groups Ids.
@@ -68,15 +72,16 @@ export class CarToDB {
     series: string | null;
     country: string | null;
     condition: string;
+    wished: boolean = false;
 
     constructor(
         userId: number, name: string, color: string, brand: string, scale: string,
-        manufacturer: string, condition: string, description: string | null = '', designer: string | null = '',
+        manufacturer: string, condition: string, wished: boolean = false, description: string | null = '', designer: string | null = '',
         series: string | null = '', country: string | null = ''
     ) {
         this.userId = userId, this.name = name, this.color = color;
         this.brand = brand, this.scale = scale, this.manufacturer = manufacturer;
-        this.condition = condition;
+        this.condition = condition, this.wished = wished;
         this.description = description, this.designer = designer, this.series = series;
         this.country = country;
     }
@@ -97,14 +102,14 @@ export class CarInfo extends CreateCarDTO {
     condition: string;
     constructor(
         carId: number, name: string, color: string, brand: string, scale: string,
-        manufacturer: string, condition: string, description: string | null = '', 
+        manufacturer: string, condition: string, wished: boolean = false, description: string | null = '', 
         designer: string | null = '', series: string | null = '', pictures: string[] | null = [], 
         country: string | null = ''
     ) {
         super();
         this.carId = carId, this.name = name, this.color = color;
         this.brand = brand, this.scale = scale, this.manufacturer = manufacturer;
-        this.condition = condition;
+        this.condition = condition, this.wished = wished;
         this.description = description, this.designer = designer, this.series = series;
         this.pictures = pictures, this.country = country;
     }
@@ -114,11 +119,11 @@ export class CarInfoWithOwner extends CarInfo {
     ownerUsername: string;
     constructor(
         carId: number, name: string, color: string, brand: string, scale: string,
-        manufacturer: string, condition: string, ownerUsername: string, 
+        manufacturer: string, condition: string, wished: boolean = false, ownerUsername: string, 
         description: string | null = '', designer: string | null = '', series: string | null = '',
         pictures: string[] | null = [], country: string | null = ''
     ) {
-        super(carId, name, color, brand, scale, manufacturer, condition, description, designer, series, pictures, country);
+        super(carId, name, color, brand, scale, manufacturer, condition, wished, description, designer, series, pictures, country);
         this.ownerUsername = ownerUsername;
     }
 }
@@ -167,6 +172,10 @@ export class CarUpdateDTO {
     @IsString()
     @IsNotEmpty()
     condition: string;
+
+    @IsBoolean()
+    @IsOptional()
+    wished: boolean = false;
 
     @IsArray()
     @IsOptional()

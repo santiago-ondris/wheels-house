@@ -1,0 +1,1 @@
+ALTER TABLE "car" ADD COLUMN "wished" boolean DEFAULT false NOT NULL;
