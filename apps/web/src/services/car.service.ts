@@ -100,3 +100,90 @@ export async function getSuggestions(): Promise<CarSuggestions> {
         }
     });
 }
+
+// Paginated collection types
+export interface PaginationMeta {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    limit: number;
+}
+
+export interface FilterOption {
+    name: string;
+    count: number;
+}
+
+export interface FilterOptions {
+    brands: FilterOption[];
+    colors: FilterOption[];
+    manufacturers: FilterOption[];
+    scales: FilterOption[];
+    conditions: FilterOption[];
+    countries: FilterOption[];
+}
+
+export interface PaginatedCarsResponse {
+    items: CarData[];
+    pagination: PaginationMeta;
+    filters: FilterOptions;
+}
+
+export interface CollectionQueryParams {
+    page?: number;
+    limit?: number;
+    sortBy?: 'id' | 'name' | 'brand' | 'country';
+    sortOrder?: 'asc' | 'desc';
+    brands?: string[];
+    colors?: string[];
+    manufacturers?: string[];
+    scales?: string[];
+    conditions?: string[];
+    countries?: string[];
+    search?: string;
+}
+
+export async function listCarsPaginated(username: string, params: CollectionQueryParams): Promise<PaginatedCarsResponse> {
+    const queryParts: string[] = [];
+
+    if (params.page) queryParts.push(`page=${params.page}`);
+    if (params.limit) queryParts.push(`limit=${params.limit}`);
+    if (params.sortBy) queryParts.push(`sortBy=${params.sortBy}`);
+    if (params.sortOrder) queryParts.push(`sortOrder=${params.sortOrder}`);
+    if (params.brands?.length) queryParts.push(`brands=${params.brands.join(',')}`);
+    if (params.colors?.length) queryParts.push(`colors=${params.colors.join(',')}`);
+    if (params.manufacturers?.length) queryParts.push(`manufacturers=${params.manufacturers.join(',')}`);
+    if (params.scales?.length) queryParts.push(`scales=${params.scales.join(',')}`);
+    if (params.conditions?.length) queryParts.push(`conditions=${params.conditions.join(',')}`);
+    if (params.countries?.length) queryParts.push(`countries=${params.countries.join(',')}`);
+    if (params.search) queryParts.push(`search=${encodeURIComponent(params.search)}`);
+
+    const queryString = queryParts.length > 0 ? `?${queryParts.join('&')}` : '';
+
+    return apiRequest<PaginatedCarsResponse>(`/car/collection/${username}${queryString}`, {
+        method: 'GET',
+    });
+}
+
+export interface BulkAddToGroupRequest {
+    groupId: number;
+    carIds?: number[];
+    filterQuery?: CollectionQueryParams;
+}
+
+export interface BulkAddToGroupResponse {
+    addedCount: number;
+    alreadyInGroup: number;
+    totalRequested: number;
+}
+
+export async function bulkAddToGroup(request: BulkAddToGroupRequest): Promise<BulkAddToGroupResponse> {
+    const token = localStorage.getItem("auth_token");
+    return apiRequest<BulkAddToGroupResponse>('/car/bulk/add-to-group', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(request),
+    });
+}

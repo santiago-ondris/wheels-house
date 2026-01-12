@@ -4,17 +4,49 @@ import type { HotWheelMock } from "../../data/mockHotWheels";
 interface Props {
   car: HotWheelMock;
   onClick?: () => void;
+  selectable?: boolean;
+  isSelected?: boolean;
+  onSelect?: () => void;
 }
 
-export default function HotWheelCardList({ car, onClick }: Props) {
+export default function HotWheelCardList({ car, onClick, selectable, isSelected, onSelect }: Props) {
+  const handleCardClick = () => {
+    if (selectable) {
+      // In selection mode, clicking anywhere selects
+      onSelect?.();
+    } else {
+      // Normal mode, navigate to detail
+      onClick?.();
+    }
+  };
+
   return (
     <motion.div
       layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      onClick={onClick}
-      className="flex items-center gap-4 bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-3 cursor-pointer hover:bg-white/10 transition-colors"
+      onClick={handleCardClick}
+      className={`flex items-center gap-4 bg-white/5 backdrop-blur-md border rounded-xl p-3 cursor-pointer hover:bg-white/10 transition-all ${isSelected ? 'border-accent ring-2 ring-accent/30' : 'border-white/10'
+        }`}
     >
+      {/* Selection indicator */}
+      {selectable && (
+        <div
+          className={`w-6 h-6 rounded flex items-center justify-center shrink-0 transition-all pointer-events-none ${isSelected
+              ? 'bg-accent text-white'
+              : 'bg-white/10 text-white/50'
+            }`}
+        >
+          {isSelected ? (
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          ) : (
+            <div className="w-3 h-3 border border-current rounded-sm" />
+          )}
+        </div>
+      )}
+
       <img
         src={car.image}
         alt={car.name}
@@ -33,3 +65,4 @@ export default function HotWheelCardList({ car, onClick }: Props) {
     </motion.div>
   );
 }
+

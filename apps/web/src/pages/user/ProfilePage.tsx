@@ -93,7 +93,7 @@ export default function ProfilePage() {
             />
 
             <CollectionSection
-                cars={profile.cars}
+                username={profile.username}
                 isOwner={isOwner}
             />
         </motion.div>
