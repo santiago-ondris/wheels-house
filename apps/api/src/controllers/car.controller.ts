@@ -1,10 +1,9 @@
 import { Controller, Get, Post, Put, Body, UseGuards, Request, Param, Delete, Query } from '@nestjs/common';
-import { car } from 'src/database/schema';
 import { CarUpdateDTO, CreateCarDTO } from 'src/dto/car.dto';
 import { CollectionQueryDTO, BulkAddToGroupDTO } from 'src/dto/collection-query.dto';
 import { CarService } from 'src/services/car.service';
 import { JwtAuthGuard } from 'src/validators/auth.validator';
-import { createCarValidator, deleteCarValidator, getCarValidator, getWishlistValidator, listCarsValidator, updateCarGroupsValidator, updateCarValidator, wishedCarToCollectionValidator } from 'src/validators/car.validator';
+import { bulkAddToGroupValidator, createCarValidator, deleteCarValidator, getCarValidator, getWishlistValidator, listCarsValidator, updateCarGroupsValidator, updateCarValidator, wishedCarToCollectionValidator } from 'src/validators/car.validator';
 
 @Controller('car')
 export class CarController {
@@ -13,7 +12,6 @@ export class CarController {
     @UseGuards(JwtAuthGuard)
     @Post('/create')
     async createCar(@Request() req, @Body() carData: CreateCarDTO) {
-        console.log("HOLA");
         await createCarValidator(carData, req.user);
 
         return await this.carService.createCarService(carData, req.user);
@@ -113,6 +111,8 @@ export class CarController {
     @UseGuards(JwtAuthGuard)
     @Post('bulk/add-to-group')
     async bulkAddToGroup(@Request() req, @Body() body: BulkAddToGroupDTO) {
+        await bulkAddToGroupValidator(req.user, body);
+
         return await this.carService.bulkAddToGroupService(
             req.user.username,
             body.groupId,

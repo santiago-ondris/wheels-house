@@ -80,6 +80,14 @@ export const CAR_ALREADY_OWNED = new HttpException(
     HttpStatus.CONFLICT
 );
 
+export const WISHED_CAR_CAN_NOT_BE_IN_GROUP = new HttpException(
+    {
+        status: HttpStatus.CONFLICT,
+        error: 'Wished car can not be in group.' 
+    },
+    HttpStatus.CONFLICT
+);
+
 export function validCarPicture(url: string): boolean {
     const cloudinaryRegex = /^https:\/\/res\.cloudinary\.com\/dyx7kjnjq\/image\/upload\/v\d+\/wheels-house\/cars\/[a-zA-Z0-9_-]+\.(jpg|jpeg|png|webp)$/;
     

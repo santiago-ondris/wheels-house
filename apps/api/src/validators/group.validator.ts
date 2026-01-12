@@ -3,7 +3,7 @@ import { getGroupFromId, getGroupFromNameAndUserId } from "src/database/crud/gro
 import { getUserFromUsername } from "src/database/crud/user.crud";
 import { CreateGroupDTO, UpdateGroupDTO } from "src/dto/group.dto";
 import { TokenData } from "src/dto/user.dto";
-import { CAR_DO_NOT_BELONG_TO_USER, INEXISTENT_CAR } from "src/utils/car.utils";
+import { CAR_DO_NOT_BELONG_TO_USER, INEXISTENT_CAR, WISHED_CAR_CAN_NOT_BE_IN_GROUP } from "src/utils/car.utils";
 import { DESCRIPTION_MAX_LENGTH, DESCRIPTION_TOO_LONG, DUPLICATED_CAR, GROUP_DO_NOT_BELONG_TO_USER, GROUP_NAME_IN_USE, GROUP_PICTURE_FORMAT_NOT_VALID, 
     INEXISTENT_GROUP, 
     NAME_MAX_LENGTH, NAME_TOO_LONG, validGroupPicture } from "src/utils/group.utils";
@@ -80,6 +80,10 @@ export async function updateGroupValidator(userData: TokenData, groupId: number,
         throw INEXISTENT_GROUP;
     }
 
+    if(group.userId != user.userId) {
+        throw GROUP_DO_NOT_BELONG_TO_USER;
+    }
+
     const groupWithName = await getGroupFromNameAndUserId(groupChanges.name, user.userId);
 
     if(groupWithName != null && group.name != groupChanges.name) {
@@ -100,8 +104,6 @@ export async function updateGroupValidator(userData: TokenData, groupId: number,
 
     const withoutDuplicate = [...new Set(groupChanges.cars!)];
 
-    console.log(groupChanges.cars!, " anddd ", withoutDuplicate);
-
     if(withoutDuplicate.length != groupChanges.cars!.length) {
         throw DUPLICATED_CAR;
     }
@@ -115,6 +117,10 @@ export async function updateGroupValidator(userData: TokenData, groupId: number,
         
         if(carFromDB.userId != user.userId) {
             throw CAR_DO_NOT_BELONG_TO_USER;
+        }
+
+        if(carFromDB.wished) {
+            throw WISHED_CAR_CAN_NOT_BE_IN_GROUP;
         }
     }
 }

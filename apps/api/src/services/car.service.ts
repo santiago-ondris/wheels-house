@@ -339,6 +339,14 @@ export class CarService {
                 await this.uploadService.deleteImage(getPublicIdFromURL(pictureDeleted.url));
             }
         }
+
+        for(const groupId of carChanges.groups!) {
+            const createdGroupedCar = await createGroupedCars({carId, groupId});
+
+            if(createdGroupedCar == null) {
+                throw ERROR_UPDATING_CAR;
+            }
+        }
     }
 
     async getWishlistService(username: string) {
