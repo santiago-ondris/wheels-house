@@ -14,6 +14,7 @@ export interface CarData {
     country?: string;
     condition?: string;
     ownerUsername?: string;
+    wished?: boolean;
 }
 
 export interface CarSuggestions {
@@ -187,5 +188,62 @@ export async function bulkAddToGroup(request: BulkAddToGroupRequest): Promise<Bu
             'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(request),
+    });
+}
+
+// Wishlist functions
+export interface WishlistCarData extends CarData {
+    wished: boolean;
+}
+
+export async function getWishlist(username: string): Promise<WishlistCarData[]> {
+    return apiRequest<WishlistCarData[]>(`/car/wishlist/${username}`, {
+        method: 'GET',
+    });
+}
+
+export interface WishedCarToCollectionDTO {
+    name: string;
+    color: string;
+    brand: string;
+    scale: string;
+    manufacturer: string;
+    condition: string;
+    wished: false;
+    description?: string;
+    designer?: string;
+    series?: string;
+    pictures?: string[];
+    country?: string;
+    groups?: number[];
+}
+
+export async function wishedCarToCollection(carId: number, data: WishedCarToCollectionDTO): Promise<void> {
+    const token = localStorage.getItem("auth_token");
+    const API_URL = `http://${window.location.hostname}:3000`;
+    
+    const response = await fetch(`${API_URL}/car/wishedCarToCollection/${carId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) {
+        const error = await response.json();
+        throw error;
+    }
+}
+
+export async function createWishedCar(data: CarData & { wished: true }): Promise<number> {
+    const token = localStorage.getItem("auth_token");
+    return apiRequest<number>('/car/create', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data),
     });
 }

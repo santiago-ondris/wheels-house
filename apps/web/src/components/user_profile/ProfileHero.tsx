@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { User, Calendar, BarChart2 } from "lucide-react";
+import { User, Calendar, BarChart2, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface ProfileHeroProps {
@@ -78,6 +78,13 @@ export default function ProfileHero({
                                 >
                                     <BarChart2 size={14} />
                                     VER_ESTADÍSTICAS
+                                </Link>
+                                <Link
+                                    to={`/wishlist/${username}`}
+                                    className="flex items-center gap-2 text-[14px] text-amber-400 font-bold transition-colors border-b border-amber-400/20 hover:border-amber-400"
+                                >
+                                    <Star size={14} />
+                                    VER_WISHLIST
                                 </Link>
                             </div>
                         </p>
@@ -166,6 +173,12 @@ export default function ProfileHero({
                                 className="text-[10px] text-emerald-400 font-mono tracking-tighter uppercase hover:text-white transition-colors"
                             >
                                 [ VER_ESTADÍSTICAS ]
+                            </Link>
+                            <Link
+                                to={`/wishlist/${username}`}
+                                className="text-[10px] text-amber-400 font-mono tracking-tighter uppercase hover:text-white transition-colors"
+                            >
+                                [ WISHLIST ]
                             </Link>
                         </div>
                     </div>

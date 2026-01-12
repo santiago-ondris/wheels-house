@@ -24,7 +24,6 @@ const features = [
     title: "Wishlist",
     description: "Guarda los que te faltan y no pierdas el rastro.",
     route: "wishlist",
-    disabled: true,
   },
 ];
 
@@ -38,13 +37,8 @@ export default function HomePage() {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
-  const handleFeatureClick = (e: React.MouseEvent, route: string, disabled?: boolean) => {
+  const handleFeatureClick = (e: React.MouseEvent, route: string) => {
     e.preventDefault();
-
-    if (disabled) {
-      // Feature próximamente - no hacer nada o mostrar toast
-      return;
-    }
 
     if (!isAuthenticated) {
       setIsLoginOpen(true);
@@ -56,6 +50,8 @@ export default function HomePage() {
       navigate(`/collection/${user?.username}`);
     } else if (route === "groups") {
       navigate(`/collection/${user?.username}/groups`);
+    } else if (route === "wishlist") {
+      navigate(`/wishlist/${user?.username}`);
     }
   };
 
@@ -165,20 +161,19 @@ export default function HomePage() {
               transition={{ duration: 0.6, delay: index * 0.1 }}
             >
               <button
-                onClick={(e) => handleFeatureClick(e, feature.route, feature.disabled)}
-                className={`group block h-full w-full text-left bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-colors ${feature.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                onClick={(e) => handleFeatureClick(e, feature.route)}
+                className="group block h-full w-full text-left bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-colors"
               >
                 <span className="text-accent/60 text-sm">0{index + 1}</span>
                 <feature.icon className="w-10 h-10 text-accent mt-4" />
                 <h3 className="text-xl font-bold text-white mt-4">
                   {feature.title}
-                  {feature.disabled && <span className="text-xs font-normal text-white/40 ml-2">(próximamente)</span>}
                 </h3>
                 <p className="text-white/50 mt-2 text-sm">
                   {feature.description}
                 </p>
                 <span className="inline-flex items-center gap-1 text-accent text-sm mt-4 group-hover:gap-2 transition-all">
-                  {feature.disabled ? 'Próximamente' : 'Explorar'}
+                  Explorar
                   <ArrowRight className="w-4 h-4" />
                 </span>
               </button>
