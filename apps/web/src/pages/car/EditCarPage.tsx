@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-    ArrowLeft,
     Car,
     FileText,
     User,
@@ -16,6 +15,7 @@ import {
     Folder,
     Check,
 } from "lucide-react";
+import PageHeader from "../../components/ui/PageHeader";
 import { carSchema, CarFormData } from "../../lib/validations/car";
 import { updateCar, getCar, getCarGroups, updateCarGroups } from "../../services/car.service";
 import { listGroups, GroupBasicInfo } from "../../services/group.service";
@@ -158,38 +158,22 @@ export default function EditCarPage() {
 
     return (
         <div className="min-h-screen pb-32 md:pb-8">
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="sticky top-0 z-40 bg-dark/80 backdrop-blur-xl border-b border-white/5"
-            >
-                <div className="container mx-auto px-4 py-4">
-                    <div className="flex items-center gap-4">
-                        <button
-                            onClick={handleCancel}
-                            className="p-2 text-white/60 hover:text-white transition-colors rounded-xl hover:bg-white/5 active:scale-95"
-                        >
-                            <ArrowLeft className="w-5 h-5" />
-                        </button>
-                        <div className="flex-1">
-                            <h1 className="text-xl md:text-2xl font-bold text-white">
-                                Editar Auto
-                            </h1>
-                            <p className="text-white/40 text-xs md:text-sm">
-                                Modificá los detalles de tu colección
-                            </p>
-                        </div>
-                        <button
-                            onClick={handleSubmit}
-                            disabled={isLoading}
-                            className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-accent hover:bg-accent/80 disabled:bg-accent/50 text-white font-bold rounded-xl transition-all hover:scale-105 active:scale-95"
-                        >
-                            <Save className="w-4 h-4" />
-                            {isLoading ? "Guardando..." : "Guardar Cambios"}
-                        </button>
-                    </div>
-                </div>
-            </motion.div>
+            <PageHeader
+                title="Editar Auto"
+                subtitle="Modificar detalles del modelo"
+                icon={Car}
+                onBack={handleCancel}
+                actions={
+                    <button
+                        onClick={handleSubmit}
+                        disabled={isLoading}
+                        className="hidden md:flex items-center gap-2 px-5 py-2 bg-accent hover:bg-accent/80 disabled:bg-accent/50 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all"
+                    >
+                        <Save className="w-4 h-4" />
+                        {isLoading ? "Guardando..." : "Guardar"}
+                    </button>
+                }
+            />
 
             <motion.div
                 initial={{ opacity: 0, y: 20 }}

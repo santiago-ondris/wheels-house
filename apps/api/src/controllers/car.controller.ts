@@ -1,5 +1,6 @@
-import { Controller, Get, Post, Put, Body, UseGuards, Request, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, UseGuards, Request, Param, Delete, Query } from '@nestjs/common';
 import { CarUpdateDTO, CreateCarDTO } from 'src/dto/car.dto';
+import { CollectionQueryDTO, BulkAddToGroupDTO } from 'src/dto/collection-query.dto';
 import { CarService } from 'src/services/car.service';
 import { JwtAuthGuard } from 'src/validators/auth.validator';
 import { createCarValidator, deleteCarValidator, getCarValidator, listCarsValidator, updateCarGroupsValidator, updateCarValidator } from 'src/validators/car.validator';
@@ -22,6 +23,41 @@ export class CarController {
         await listCarsValidator(req.user, username);
 
         return await this.carService.listCarsService(username);
+    }
+
+    // Paginated list with filtering and sorting
+    @Get('collection/:username')
+    async listCarsPaginated(
+        @Param('username') username: string,
+        @Query('page') page?: string,
+        @Query('limit') limit?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortOrder') sortOrder?: string,
+        @Query('brands') brands?: string,
+        @Query('colors') colors?: string,
+        @Query('manufacturers') manufacturers?: string,
+        @Query('scales') scales?: string,
+        @Query('conditions') conditions?: string,
+        @Query('countries') countries?: string,
+        @Query('search') search?: string,
+        @Query('groupId') groupId?: string,
+    ) {
+        const query: CollectionQueryDTO = {
+            page: page ? parseInt(page) : 1,
+            limit: limit ? parseInt(limit) : 15,
+            sortBy: sortBy as any || 'id',
+            sortOrder: sortOrder as any || 'desc',
+            brands: brands ? brands.split(',') : undefined,
+            colors: colors ? colors.split(',') : undefined,
+            manufacturers: manufacturers ? manufacturers.split(',') : undefined,
+            scales: scales ? scales.split(',') : undefined,
+            conditions: conditions ? conditions.split(',') : undefined,
+            countries: countries ? countries.split(',') : undefined,
+            search,
+            groupId: groupId ? parseInt(groupId) : undefined,
+        };
+
+        return await this.carService.listCarsPaginatedService(username, query);
     }
 
     // @UseGuards(JwtAuthGuard)
@@ -70,5 +106,16 @@ export class CarController {
     @Get('featured')
     async getFeaturedCar() {
         return await this.carService.getFeaturedCarService();
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('bulk/add-to-group')
+    async bulkAddToGroup(@Request() req, @Body() body: BulkAddToGroupDTO) {
+        return await this.carService.bulkAddToGroupService(
+            req.user.username,
+            body.groupId,
+            body.carIds,
+            body.filterQuery
+        );
     }
 }

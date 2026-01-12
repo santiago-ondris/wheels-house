@@ -5,8 +5,10 @@ import { CarInfo, CarInfoWithOwner, CarPictureToDB, CarToDB, CarUpdateDTO, Creat
 import { ERROR_CREATING_CAR, ERROR_DELETING_CAR, ERROR_UPDATING_CAR } from 'src/utils/car.utils';
 import {
     createCar, deleteCar, getCarByIdWithOwner, getCarsFromUserId, updateCar, createCarPicture, getPicturesFromCar,
-    deleteAllCarPictures, deleteCarPicture, updateCarPicture, getTotalCarsCount, getCarByOffset, getUniqueCarValues
+    deleteAllCarPictures, deleteCarPicture, updateCarPicture, getTotalCarsCount, getCarByOffset, getUniqueCarValues,
+    getCarsFromUserIdPaginated, getFilterOptionsForUser, getCarIdsFromUserIdWithFilter
 } from 'src/database/crud/car.crud';
+import { CollectionQueryDTO, PaginatedCarsResponse } from 'src/dto/collection-query.dto';
 import { createGroupedCars, deleteGroupedCarsFromCarId, getGroupsFromCarId } from 'src/database/crud/group.crud';
 import { UploadService } from './upload.service';
 import { getPublicIdFromURL } from 'src/utils/upload.utils';
@@ -152,7 +154,7 @@ export class CarService {
             throw ERROR_DELETING_CAR;
         }
 
-        for(const picture of picturesDeleted) {
+        for (const picture of picturesDeleted) {
             await this.uploadService.deleteImage(getPublicIdFromURL(picture.url));
         }
 
@@ -220,5 +222,68 @@ export class CarService {
     async getCarGroupsService(carId: number) {
         const groups = await getGroupsFromCarId(carId);
         return groups.map(g => g.groupId);
+    }
+
+    async listCarsPaginatedService(username: string, query: CollectionQueryDTO): Promise<PaginatedCarsResponse<CarInfo>> {
+        const user = await getUserFromUsername(username);
+
+        // Get paginated data
+        const { items, pagination } = await getCarsFromUserIdPaginated(user.userId, query);
+
+        // Get pictures for each car
+        const listedCars: CarInfo[] = [];
+        for (const carData of items) {
+            const carPicturesFromDB = await getPicturesFromCar(carData.carId);
+            const carPictures = carPicturesFromDB.map(picture => picture.url);
+
+            listedCars.push(new CarInfo(
+                carData.carId, carData.name, carData.color, carData.brand,
+                carData.scale, carData.manufacturer, carData.condition, carData.description,
+                carData.designer, carData.series, carPictures, carData.country
+            ));
+        }
+
+        // Get filter options
+        const filters = await getFilterOptionsForUser(user.userId);
+
+        return {
+            items: listedCars,
+            pagination,
+            filters
+        };
+    }
+
+    async bulkAddToGroupService(username: string, groupId: number, carIds?: number[], filterQuery?: CollectionQueryDTO) {
+        const user = await getUserFromUsername(username);
+
+        let targetCarIds: number[];
+
+        if (carIds && carIds.length > 0) {
+            // Use provided IDs directly
+            targetCarIds = carIds;
+        } else if (filterQuery) {
+            // Get IDs from filter (Option A)
+            targetCarIds = await getCarIdsFromUserIdWithFilter(user.userId, filterQuery);
+        } else {
+            return { addedCount: 0, alreadyInGroup: 0, totalRequested: 0 };
+        }
+
+        let addedCount = 0;
+        let alreadyInGroup = 0;
+
+        for (const carId of targetCarIds) {
+            const result = await createGroupedCars({ groupId, carId });
+            if (result && result.length > 0) {
+                addedCount++;
+            } else {
+                alreadyInGroup++;
+            }
+        }
+
+        return {
+            addedCount,
+            alreadyInGroup,
+            totalRequested: targetCarIds.length
+        };
     }
 }

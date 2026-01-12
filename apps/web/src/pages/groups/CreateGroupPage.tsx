@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-    ArrowLeft,
     Folder,
     FileText,
     Save,
@@ -10,6 +9,7 @@ import {
     Star,
     Check,
 } from "lucide-react";
+import PageHeader from "../../components/ui/PageHeader";
 import { createGroup, CreateGroupData } from "../../services/group.service";
 import { listCars, CarData } from "../../services/car.service";
 import toast from "react-hot-toast";
@@ -112,38 +112,22 @@ export default function CreateGroupPage() {
 
     return (
         <div className="min-h-screen pb-32 md:pb-8">
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="sticky top-0 z-40 bg-dark/80 backdrop-blur-xl border-b border-white/5"
-            >
-                <div className="container mx-auto px-4 py-4">
-                    <div className="flex items-center gap-4">
-                        <button
-                            onClick={handleCancel}
-                            className="p-2 text-white/60 hover:text-white transition-colors rounded-xl hover:bg-white/5 active:scale-95"
-                        >
-                            <ArrowLeft className="w-5 h-5" />
-                        </button>
-                        <div className="flex-1">
-                            <h1 className="text-xl md:text-2xl font-bold text-white">
-                                Crear Grupo
-                            </h1>
-                            <p className="text-white/40 text-xs md:text-sm">
-                                Organizá tus autos como quieras
-                            </p>
-                        </div>
-                        <button
-                            onClick={() => handleSubmit()}
-                            disabled={isLoading}
-                            className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-accent hover:bg-accent/80 disabled:bg-accent/50 text-white font-bold rounded-xl transition-all hover:scale-105 active:scale-95"
-                        >
-                            <Save className="w-4 h-4" />
-                            {isLoading ? "Creando..." : "Crear Grupo"}
-                        </button>
-                    </div>
-                </div>
-            </motion.div>
+            <PageHeader
+                title="Crear Grupo"
+                subtitle="Organizá tus autos como quieras"
+                icon={Folder}
+                onBack={handleCancel}
+                actions={
+                    <button
+                        onClick={() => handleSubmit()}
+                        disabled={isLoading}
+                        className="hidden md:flex items-center gap-2 px-5 py-2 bg-accent hover:bg-accent/80 disabled:bg-accent/50 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all"
+                    >
+                        <Save className="w-4 h-4" />
+                        {isLoading ? "Creando..." : "Crear"}
+                    </button>
+                }
+            />
 
             <motion.div
                 initial={{ opacity: 0, y: 20 }}

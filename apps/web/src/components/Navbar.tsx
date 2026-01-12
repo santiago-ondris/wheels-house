@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Car, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import UserMenu from "./layout/UserMenu";
 import MobileMenu from "./layout/MobileMenu";
@@ -18,23 +18,17 @@ export default function Navbar() {
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-2">
-              <div className="p-2 bg-accent/20 rounded-lg">
-                <Car className="w-5 h-5 text-accent" />
-              </div>
-              <span className="text-white font-bold text-xl">Wheels House</span>
+              <img src="/LOGO.svg" alt="Wheels House Logo" className="h-12 w-auto" />
             </Link>
-
-            <div className="hidden md:flex items-center gap-6">
-              <Link to="/hall-of-fame" className="text-white/70 hover:text-white transition-colors">
-                Salón de la Fama
-              </Link>
-            </div>
           </div>
 
           <div className="flex items-center gap-4">
             {isAuthenticated ? (
               <>
                 <div className="hidden md:flex items-center gap-6 mr-4">
+                  <Link to="/hall-of-fame" className="text-white/70 hover:text-white transition-colors">
+                    Salón de la Fama
+                  </Link>
                   <Link to={`/collection/${user?.username}`} className="text-white/70 hover:text-white transition-colors">
                     Mi Colección
                   </Link>
@@ -59,7 +53,10 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <div className="hidden md:flex items-center gap-4">
+                <div className="hidden md:flex items-center gap-6">
+                  <Link to="/hall-of-fame" className="text-white/70 hover:text-white transition-colors mr-2">
+                    Salón de la Fama
+                  </Link>
                   <button
                     onClick={() => setIsLoginOpen(true)}
                     className="px-4 py-2 text-white hover:text-accent transition-colors"

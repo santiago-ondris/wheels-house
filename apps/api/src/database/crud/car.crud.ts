@@ -1,7 +1,8 @@
 import { CarPictureToDB, CarToDB, CarUpdateDTO } from "src/dto/car.dto";
+import { CollectionQueryDTO } from "src/dto/collection-query.dto";
 import { db } from "../index";
-import { car, carPicture, user } from "../schema";
-import { count, eq } from 'drizzle-orm';
+import { car, carPicture, user, groupedCar } from "../schema";
+import { count, eq, or, and, ilike, asc, desc, sql, SQL, inArray } from 'drizzle-orm';
 
 // Create
 
@@ -73,7 +74,7 @@ export async function getUniqueCarValues(userId: number) {
         })
         .from(car)
         .where(eq(car.userId, userId));
-    
+
     return result;
 }
 
@@ -161,4 +162,192 @@ export async function deleteCarsFromUserId(userId: number) {
     } catch {
         return null;
     }
+}
+
+// Query paginada con filtros y ordenamiento
+export async function getCarsFromUserIdPaginated(userId: number, query: CollectionQueryDTO) {
+    const {
+        page = 1,
+        limit = 15,
+        sortBy = 'id',
+        sortOrder = 'desc',
+        brands,
+        colors,
+        manufacturers,
+        scales,
+        conditions,
+        countries,
+        search
+    } = query;
+
+    const conditions_list: SQL[] = [eq(car.userId, userId)];
+
+    // Filter by group if provided
+    if (query.groupId) {
+        // Subquery to get carIds in the group
+        const carsInGroup = db
+            .select({ carId: groupedCar.carId })
+            .from(groupedCar)
+            .where(eq(groupedCar.groupId, query.groupId));
+
+        conditions_list.push(inArray(car.carId, carsInGroup));
+    }
+
+    // Filtros con logica OR
+    if (brands && brands.length > 0) {
+        conditions_list.push(or(...brands.map(b => eq(car.brand, b)))!);
+    }
+    if (colors && colors.length > 0) {
+        conditions_list.push(or(...colors.map(c => eq(car.color, c)))!);
+    }
+    if (manufacturers && manufacturers.length > 0) {
+        conditions_list.push(or(...manufacturers.map(m => eq(car.manufacturer, m)))!);
+    }
+    if (scales && scales.length > 0) {
+        conditions_list.push(or(...scales.map(s => eq(car.scale, s)))!);
+    }
+    if (conditions && conditions.length > 0) {
+        conditions_list.push(or(...conditions.map(c => eq(car.condition, c)))!);
+    }
+    if (countries && countries.length > 0) {
+        conditions_list.push(or(...countries.map(c => eq(car.country, c)))!);
+    }
+
+    // Busqueda de texto
+    if (search && search.trim()) {
+        const searchPattern = `%${search.trim()}%`;
+        conditions_list.push(
+            or(
+                ilike(car.name, searchPattern),
+                ilike(car.brand, searchPattern),
+                ilike(car.series, searchPattern)
+            )!
+        );
+    }
+
+    const whereClause = and(...conditions_list);
+
+    // Ordenamiento
+    const sortColumn = {
+        'id': car.carId,
+        'name': car.name,
+        'brand': car.brand,
+        'country': car.country
+    }[sortBy] || car.carId;
+
+    const orderFn = sortOrder === 'asc' ? asc : desc;
+
+    // Conteo total de items que coinciden con el filtro
+    const countResult = await db
+        .select({ value: count() })
+        .from(car)
+        .where(whereClause);
+    const totalItems = countResult[0].value;
+
+    // Paginacion   
+    const offset = (page - 1) * limit;
+    const items = await db
+        .select({
+            carId: car.carId,
+            name: car.name,
+            color: car.color,
+            brand: car.brand,
+            scale: car.scale,
+            manufacturer: car.manufacturer,
+            description: car.description,
+            designer: car.designer,
+            series: car.series,
+            country: car.country,
+            condition: car.condition,
+        })
+        .from(car)
+        .where(whereClause)
+        .orderBy(orderFn(sortColumn))
+        .limit(limit)
+        .offset(offset);
+
+    return {
+        items,
+        pagination: {
+            currentPage: page,
+            totalPages: Math.ceil(totalItems / limit),
+            totalItems,
+            limit
+        }
+    };
+}
+
+export async function getCarIdsFromUserIdWithFilter(userId: number, query: CollectionQueryDTO) {
+    const { brands, colors, manufacturers, scales, conditions, countries, search } = query;
+
+    const conditions_list: SQL[] = [eq(car.userId, userId)];
+
+    if (brands && brands.length > 0) {
+        conditions_list.push(or(...brands.map(b => eq(car.brand, b)))!);
+    }
+    if (colors && colors.length > 0) {
+        conditions_list.push(or(...colors.map(c => eq(car.color, c)))!);
+    }
+    if (manufacturers && manufacturers.length > 0) {
+        conditions_list.push(or(...manufacturers.map(m => eq(car.manufacturer, m)))!);
+    }
+    if (scales && scales.length > 0) {
+        conditions_list.push(or(...scales.map(s => eq(car.scale, s)))!);
+    }
+    if (conditions && conditions.length > 0) {
+        conditions_list.push(or(...conditions.map(c => eq(car.condition, c)))!);
+    }
+    if (countries && countries.length > 0) {
+        conditions_list.push(or(...countries.map(c => eq(car.country, c)))!);
+    }
+
+    if (search && search.trim()) {
+        const searchPattern = `%${search.trim()}%`;
+        conditions_list.push(
+            or(
+                ilike(car.name, searchPattern),
+                ilike(car.brand, searchPattern),
+                ilike(car.series, searchPattern)
+            )!
+        );
+    }
+
+    const result = await db
+        .select({ carId: car.carId })
+        .from(car)
+        .where(and(...conditions_list));
+
+    return result.map(r => r.carId);
+}
+
+export async function getFilterOptionsForUser(userId: number) {
+    const cars = await db.select({
+        brand: car.brand,
+        color: car.color,
+        manufacturer: car.manufacturer,
+        scale: car.scale,
+        condition: car.condition,
+        country: car.country,
+    }).from(car).where(eq(car.userId, userId));
+
+    const countBy = <T extends string | null>(items: T[]): { name: string; count: number }[] => {
+        const map = new Map<string, number>();
+        items.forEach(item => {
+            if (item) {
+                map.set(item, (map.get(item) || 0) + 1);
+            }
+        });
+        return Array.from(map.entries())
+            .map(([name, count]) => ({ name, count }))
+            .sort((a, b) => b.count - a.count);
+    };
+
+    return {
+        brands: countBy(cars.map(c => c.brand)),
+        colors: countBy(cars.map(c => c.color)),
+        manufacturers: countBy(cars.map(c => c.manufacturer)),
+        scales: countBy(cars.map(c => c.scale)),
+        conditions: countBy(cars.map(c => c.condition)),
+        countries: countBy(cars.map(c => c.country)),
+    };
 }
