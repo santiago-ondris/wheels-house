@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowDown, ArrowUp, Edit, Trash2, ArrowLeft } from "lucide-react";
+import { ArrowDown, ArrowUp, Edit, Trash2, ArrowLeft, Star } from "lucide-react";
 import { getCar, deleteCar, CarData } from "../../services/car.service";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -43,11 +43,20 @@ export const CarDetailPage = () => {
         if (!car?.carId) return;
         try {
             await deleteCar(car.carId);
-            toast.success("Auto eliminado correctamente");
-            navigate(`/collection/${car.ownerUsername}`);
+            toast.success(car.wished ? "Auto eliminado de la wishlist" : "Auto eliminado correctamente");
+            navigate(car.wished ? `/wishlist/${car.ownerUsername}` : `/collection/${car.ownerUsername}`);
         } catch (error) {
             console.error("Error deleting car:", error);
             toast.error("Error al eliminar el auto");
+        }
+    };
+
+    const handleEdit = () => {
+        if (!car?.carId) return;
+        if (car.wished) {
+            navigate(`/wishlist/edit/${car.carId}`);
+        } else {
+            navigate(`/collection/edit/${car.carId}`);
         }
     };
 
@@ -91,6 +100,12 @@ export const CarDetailPage = () => {
                             <span className="uppercase tracking-widest">{car.brand}</span>
                             <span className="w-1 h-1 bg-gray-600 rounded-full" />
                             <span className="text-white font-bold">{car.name}</span>
+                            {car.wished && (
+                                <span className="ml-2 px-2 py-0.5 bg-amber-500/20 text-amber-400 text-[10px] font-bold uppercase tracking-wider rounded-full flex items-center gap-1">
+                                    <Star className="w-3 h-3" />
+                                    Wishlist
+                                </span>
+                            )}
                         </motion.div>
                         <motion.button
                             initial={{ opacity: 0, x: 20 }}
@@ -105,8 +120,11 @@ export const CarDetailPage = () => {
                     {isOwner && (
                         <div className="flex gap-3">
                             <button
-                                onClick={() => navigate(`/collection/edit/${car.carId}`)}
-                                className="p-2 border border-white/10 rounded-lg hover:bg-white/10 transition-colors text-white/70 hover:text-white"
+                                onClick={handleEdit}
+                                className={`p-2 border rounded-lg transition-colors ${car.wished 
+                                    ? 'border-amber-500/30 hover:bg-amber-500/10 text-amber-400 hover:text-amber-300'
+                                    : 'border-white/10 hover:bg-white/10 text-white/70 hover:text-white'
+                                }`}
                             >
                                 <Edit size={18} />
                             </button>
@@ -183,7 +201,10 @@ export const CarDetailPage = () => {
                         ¿Estás seguro que querés eliminar el <span className="font-bold text-white">{car.name}</span>?
                         <br /><br />
                         <span className="text-danger font-medium italic">
-                            Esta acción eliminará el auto de toda tu colección (no solo de este grupo) y no se puede deshacer.
+                            {car.wished 
+                                ? "Este auto se eliminará de tu wishlist."
+                                : "Esta acción eliminará el auto de toda tu colección (no solo de este grupo) y no se puede deshacer."
+                            }
                         </span>
                     </p>
                     <div className="flex gap-3">

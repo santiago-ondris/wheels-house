@@ -24,6 +24,11 @@ import ResetPasswordPage from "../pages/login/ResetPasswordPage";
 import SettingsPage from "../pages/user/SettingsPage";
 import ContactPage from "../pages/ContactPage";
 import RoadmapPage from "../pages/RoadmapPage";
+import WishlistPage from "../pages/wishlist/WishlistPage";
+import AddToWishlistPage from "../pages/wishlist/AddToWishlistPage";
+import MoveToCollectionPage from "../pages/wishlist/MoveToCollectionPage";
+import EditWishlistPage from "../pages/wishlist/EditWishlistPage";
+
 
 export default function AppRoutes() {
   return (
@@ -71,6 +76,24 @@ export default function AppRoutes() {
         <Route path="/collection/:username/stats" element={<StatsPage />} />
         <Route path="/collection/:username/groups" element={<GroupsListPage />} />
         <Route path="/collection/:username/group/:groupName" element={<GroupDetailPage />} />
+
+        {/* Wishlist Routes */}
+        <Route path="/wishlist/add" element={
+          <ProtectedRoute>
+            <AddToWishlistPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/wishlist/edit/:carId" element={
+          <ProtectedRoute>
+            <EditWishlistPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/wishlist/got-it/:carId" element={
+          <ProtectedRoute>
+            <MoveToCollectionPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/wishlist/:username" element={<WishlistPage />} />
 
         <Route path="/hall-of-fame" element={<HallOfFamePage />} />
         <Route path="/hall-of-fame/founders" element={<FoundersPage />} />

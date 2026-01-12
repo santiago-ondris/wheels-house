@@ -56,11 +56,11 @@ export async function getCarByIdWithOwner(carId: number) {
 }
 
 export async function getCarsFromUserId(userId: number) {
-    return await db.select().from(car).where(and(eq(car.userId, userId),eq(car.wished, false)));
+    return await db.select().from(car).where(and(eq(car.userId, userId), eq(car.wished, false)));
 }
 
 export async function getWishedCarsFromUserId(userId: number) {
-    return await db.select().from(car).where(and(eq(car.userId, userId),eq(car.wished, true)));
+    return await db.select().from(car).where(and(eq(car.userId, userId), eq(car.wished, true)));
 }
 
 //functions for featured car
@@ -78,7 +78,7 @@ export async function getUniqueCarValues(userId: number) {
             designer: car.designer,
         })
         .from(car)
-        .where(and(eq(car.userId, userId),eq(car.wished, false)));
+        .where(and(eq(car.userId, userId), eq(car.wished, false)));
 
     return result;
 }
