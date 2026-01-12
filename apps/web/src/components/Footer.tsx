@@ -1,6 +1,8 @@
+import { Link } from "react-router-dom";
+
 export default function Footer() {
   return (
-    <footer className="w-full bg-[#0a0a0b] border-t border-white/5 pt-16 pb-12 mt-20">
+    <footer className="w-full bg-[#0a0a0b] border-t border-white/5 pt-16 pb-12 mt-0">
       <div className="container mx-auto px-6 max-w-6xl">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-12 mb-16">
           {/* Logo & Info Field */}
@@ -35,9 +37,9 @@ export default function Footer() {
               <li><button className="group flex items-center gap-2 text-white/40 hover:text-white font-mono text-[12px] uppercase transition-all tracking-widest">
                 <span className="opacity-0 group-hover:opacity-100 text-accent transition-opacity">//</span> Sobre_nosotros
               </button></li>
-              <li><button className="group flex items-center gap-2 text-white/40 hover:text-white font-mono text-[12px] uppercase transition-all tracking-widest">
+              <li><Link to="/roadmap" className="group flex items-center gap-2 text-white/40 hover:text-white font-mono text-[12px] uppercase transition-all tracking-widest">
                 <span className="opacity-0 group-hover:opacity-100 text-accent transition-opacity">//</span> Roadmap
-              </button></li>
+              </Link></li>
               <li><button className="group flex items-center gap-2 text-white/40 hover:text-white font-mono text-[12px] uppercase transition-all tracking-widest">
                 <span className="opacity-0 group-hover:opacity-100 text-accent transition-opacity">//</span> Política_de_privacidad
               </button></li>
@@ -54,12 +56,12 @@ export default function Footer() {
               <h4 className="text-[14px] font-mono font-black uppercase tracking-[0.2em]">Contacto</h4>
             </div>
             <ul className="space-y-3">
-              <li><button className="group flex items-center gap-2 text-white/40 hover:text-white font-mono text-[12px] uppercase transition-all tracking-widest">
+              <li><Link to="/contact" className="group flex items-center gap-2 text-white/40 hover:text-white font-mono text-[12px] uppercase transition-all tracking-widest">
                 <span className="opacity-0 group-hover:opacity-100 text-accent transition-opacity">//</span> Contactanos
-              </button></li>
-              <li><button className="group flex items-center gap-2 text-white/40 hover:text-white font-mono text-[12px] uppercase transition-all tracking-widest">
+              </Link></li>
+              <li><Link to="/contact" className="group flex items-center gap-2 text-white/40 hover:text-white font-mono text-[12px] uppercase transition-all tracking-widest">
                 <span className="opacity-0 group-hover:opacity-100 text-accent transition-opacity">//</span> Proponer_Mejoras
-              </button></li>
+              </Link></li>
             </ul>
           </div>
         </div>
