@@ -7,10 +7,7 @@ export default function Footer() {
           <div className="col-span-2 space-y-6">
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-accent flex items-center justify-center -skew-x-12">
-                  <span className="text-dark font-black text-[10px] italic skew-x-12 leading-none">WH</span>
-                </div>
-                <span className="text-xl font-black text-white italic tracking-tighter uppercase">WHEELS_HOUSE</span>
+                <img src="/LOGO.svg" alt="Wheels House Logo" className="h-16 w-auto" />
               </div>
               <div className="inline-block px-2 py-0.5 bg-accent/10 border-l-2 border-accent">
                 <span className="text-[9px] font-mono font-bold text-accent uppercase tracking-[0.2em]">
