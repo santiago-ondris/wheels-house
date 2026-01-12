@@ -1,6 +1,6 @@
 import { db } from "../index";
 import { car, carPicture } from "../schema";
-import { eq, sql } from 'drizzle-orm';
+import { eq, sql, and } from 'drizzle-orm';
 
 export async function getCarsForStats(userId: number) {
     const result = await db
@@ -14,7 +14,7 @@ export async function getCarsForStats(userId: number) {
             country: car.country
         })
         .from(car)
-        .where(eq(car.userId, userId));
+        .where(and(eq(car.userId, userId), eq(car.wished, false)));
 
     return result;
 }
@@ -26,7 +26,7 @@ export async function getTotalPhotosCount(userId: number) {
         })
         .from(carPicture)
         .innerJoin(car, eq(car.carId, carPicture.carId))
-        .where(eq(car.userId, userId));
+        .where(and(eq(car.userId, userId), eq(car.wished, false)));
 
     return result[0]?.count || 0;
 }
