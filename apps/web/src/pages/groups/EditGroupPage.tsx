@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-    ArrowLeft,
     Folder,
     FileText,
     Save,
@@ -11,6 +10,7 @@ import {
     Check,
     Trash2,
 } from "lucide-react";
+import PageHeader from "../../components/ui/PageHeader";
 import { getGroup, updateGroup, deleteGroup, UpdateGroupData } from "../../services/group.service";
 import { listCars, CarData } from "../../services/car.service";
 import toast from "react-hot-toast";
@@ -145,30 +145,16 @@ export default function EditGroupPage() {
 
     return (
         <div className="min-h-screen pb-32 md:pb-8">
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="sticky top-0 z-40 bg-dark/80 backdrop-blur-xl border-b border-white/5"
-            >
-                <div className="container mx-auto px-4 py-4">
-                    <div className="flex items-center gap-4">
-                        <button
-                            onClick={handleCancel}
-                            className="p-2 text-white/60 hover:text-white transition-colors rounded-xl hover:bg-white/5 active:scale-95"
-                        >
-                            <ArrowLeft className="w-5 h-5" />
-                        </button>
-                        <div className="flex-1">
-                            <h1 className="text-xl md:text-2xl font-bold text-white">
-                                Editar Grupo
-                            </h1>
-                            <p className="text-white/40 text-xs md:text-sm">
-                                Modificá los detalles del grupo
-                            </p>
-                        </div>
+            <PageHeader
+                title="Editar Grupo"
+                subtitle="Modificar detalles del grupo"
+                icon={Folder}
+                onBack={handleCancel}
+                actions={
+                    <>
                         <button
                             onClick={() => setShowDeleteConfirm(true)}
-                            className="hidden md:flex items-center gap-2 px-4 py-2.5 border border-danger/50 text-danger hover:bg-danger/10 font-bold rounded-xl transition-all"
+                            className="hidden md:flex items-center gap-2 px-4 py-2 border border-danger/50 text-danger hover:bg-danger/10 text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all"
                         >
                             <Trash2 className="w-4 h-4" />
                             Eliminar
@@ -176,14 +162,14 @@ export default function EditGroupPage() {
                         <button
                             onClick={() => handleSubmit()}
                             disabled={isLoading}
-                            className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-accent hover:bg-accent/80 disabled:bg-accent/50 text-white font-bold rounded-xl transition-all hover:scale-105 active:scale-95"
+                            className="hidden md:flex items-center gap-2 px-5 py-2 bg-accent hover:bg-accent/80 disabled:bg-accent/50 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all"
                         >
                             <Save className="w-4 h-4" />
                             {isLoading ? "Guardando..." : "Guardar"}
                         </button>
-                    </div>
-                </div>
-            </motion.div>
+                    </>
+                }
+            />
 
             <motion.div
                 initial={{ opacity: 0, y: 20 }}

@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Folder, Plus, ChevronRight } from "lucide-react";
+import { Folder, Plus, ChevronRight } from "lucide-react";
 import { listGroups, GroupBasicInfo } from "../../services/group.service";
 import { useAuth } from "../../contexts/AuthContext";
+import PageHeader from "../../components/ui/PageHeader";
 import toast from "react-hot-toast";
 
 export default function GroupsListPage() {
@@ -49,43 +50,23 @@ export default function GroupsListPage() {
     return (
         <div className="min-h-screen pb-8">
             {/* Header */}
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="sticky top-0 z-40 bg-dark/80 backdrop-blur-xl border-b border-white/5"
-            >
-                <div className="container mx-auto px-4 py-4">
-                    <div className="flex items-center gap-4">
+            <PageHeader
+                title="Grupos"
+                subtitle={`@${username} // ${groups.length} ${groups.length === 1 ? 'grupo' : 'grupos'}`}
+                icon={Folder}
+                onBack={handleBack}
+                actions={
+                    isOwner ? (
                         <button
-                            onClick={handleBack}
-                            className="p-2 text-white/60 hover:text-white transition-colors rounded-xl hover:bg-white/5 active:scale-95"
+                            onClick={() => navigate("/collection/group/new")}
+                            className="flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent/80 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all"
                         >
-                            <ArrowLeft className="w-5 h-5" />
+                            <Plus className="w-4 h-4" />
+                            <span className="hidden md:inline">Crear</span>
                         </button>
-                        <div className="flex-1">
-                            <h1 className="text-xl md:text-2xl font-bold text-white">
-                                Grupos
-                            </h1>
-                            <p className="text-white/40 text-xs md:text-sm">
-                                <Link to={`/collection/${username}`} className="hover:text-accent transition-colors">
-                                    @{username}
-                                </Link>
-                                {" · "}
-                                {groups.length} {groups.length === 1 ? "grupo" : "grupos"}
-                            </p>
-                        </div>
-                        {isOwner && (
-                            <button
-                                onClick={() => navigate("/collection/group/new")}
-                                className="flex items-center gap-2 px-4 py-2.5 bg-accent hover:bg-accent/80 text-white font-bold rounded-xl transition-all"
-                            >
-                                <Plus className="w-4 h-4" />
-                                <span className="hidden md:inline">Crear Grupo</span>
-                            </button>
-                        )}
-                    </div>
-                </div>
-            </motion.div>
+                    ) : undefined
+                }
+            />
 
             {/* Groups Grid */}
             <motion.div

@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Edit, Folder, Star, Car } from "lucide-react";
+import { Edit, Folder } from "lucide-react";
 import { getGroupByName, GroupData } from "../../services/group.service";
 import { useAuth } from "../../contexts/AuthContext";
+import PageHeader from "../../components/ui/PageHeader";
+import HotWheelCardGrid from "../../components/collection/HotWheelCardGrid";
 import GroupNotFoundPage from "./GroupNotFoundPage";
 
 export default function GroupDetailPage() {
@@ -55,48 +57,23 @@ export default function GroupDetailPage() {
     return (
         <div className="min-h-screen pb-8">
             {/* Header */}
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="sticky top-0 z-40 bg-dark/80 backdrop-blur-xl border-b border-white/5"
-            >
-                <div className="container mx-auto px-4 py-4">
-                    <div className="flex items-center gap-4">
+            <PageHeader
+                title={group.name}
+                subtitle={`@${username} // ${group.totalCars || group.cars?.length || 0} autos${group.featured ? ' // DESTACADO' : ''}`}
+                icon={Folder}
+                onBack={handleBack}
+                actions={
+                    isOwner && group.groupId ? (
                         <button
-                            onClick={handleBack}
-                            className="p-2 text-white/60 hover:text-white transition-colors rounded-xl hover:bg-white/5 active:scale-95"
+                            onClick={() => navigate(`/collection/group/edit/${group.groupId}`)}
+                            className="flex items-center gap-2 px-4 py-2 border border-white/10 text-white/70 hover:text-white hover:bg-white/5 text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all"
                         >
-                            <ArrowLeft className="w-5 h-5" />
+                            <Edit className="w-4 h-4" />
+                            <span className="hidden md:inline">Editar</span>
                         </button>
-                        <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                                <h1 className="text-xl md:text-2xl font-bold text-white">
-                                    {group.name}
-                                </h1>
-                                {group.featured && (
-                                    <Star className="w-5 h-5 text-accent fill-accent" />
-                                )}
-                            </div>
-                            <p className="text-white/40 text-xs md:text-sm">
-                                <Link to={`/collection/${username}`} className="hover:text-accent transition-colors">
-                                    @{username}
-                                </Link>
-                                {" · "}
-                                {group.totalCars || group.cars?.length || 0} autos
-                            </p>
-                        </div>
-                        {isOwner && group.groupId && (
-                            <button
-                                onClick={() => navigate(`/collection/group/edit/${group.groupId}`)}
-                                className="flex items-center gap-2 px-4 py-2 border border-white/10 text-white/70 hover:text-white hover:bg-white/5 font-bold rounded-xl transition-all"
-                            >
-                                <Edit className="w-4 h-4" />
-                                <span className="hidden md:inline">Editar</span>
-                            </button>
-                        )}
-                    </div>
-                </div>
-            </motion.div>
+                    ) : undefined
+                }
+            />
 
             {/* Description */}
             {group.description && (
@@ -120,29 +97,20 @@ export default function GroupDetailPage() {
                 {group.cars && group.cars.length > 0 ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {group.cars.map((car) => (
-                            <Link
+                            <HotWheelCardGrid
                                 key={car.carId}
-                                to={`/car/${car.carId}`}
-                                className="group relative rounded-xl overflow-hidden border border-white/5 hover:border-accent/50 transition-all"
-                            >
-                                <div className="aspect-4/3 bg-white/5">
-                                    {car.pictures && car.pictures[0] ? (
-                                        <img
-                                            src={car.pictures[0]}
-                                            alt={car.name}
-                                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-white/20">
-                                            <Car className="w-12 h-12" />
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="p-3 bg-dark/80">
-                                    <p className="text-white font-medium truncate">{car.name}</p>
-                                    <p className="text-white/40 text-sm">{car.brand}</p>
-                                </div>
-                            </Link>
+                                car={{
+                                    id: String(car.carId),
+                                    name: car.name || '',
+                                    brand: car.brand || '',
+                                    year: 0,
+                                    manufacturer: car.manufacturer || undefined,
+                                    image: car.pictures && car.pictures[0]
+                                        ? car.pictures[0]
+                                        : "https://placehold.co/400x300/1A1B4B/D9731A?text=No+Image"
+                                }}
+                                onClick={() => navigate(`/car/${car.carId}`)}
+                            />
                         ))}
                     </div>
                 ) : (

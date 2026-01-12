@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-    ArrowLeft,
     Car,
     FileText,
     User,
@@ -16,6 +15,7 @@ import {
     Folder,
     Check,
 } from "lucide-react";
+import PageHeader from "../../components/ui/PageHeader";
 import { carSchema, CarFormData } from "../../lib/validations/car";
 import { createCar, updateCarGroups } from "../../services/car.service";
 import { listGroups, GroupBasicInfo } from "../../services/group.service";
@@ -115,15 +115,15 @@ export default function AddCarPage() {
     const updateField = (field: keyof CarFormData, value: string) => {
         setFormData((prev) => {
             const newData = { ...prev, [field]: value };
-            
+
             // Auto-detect nationality if brand changes
             if (field === "brand") {
                 newData.country = brandNationalities[value] || "";
             }
-            
+
             return newData;
         });
-        
+
         if (errors[field]) {
             setErrors((prev) => ({ ...prev, [field]: undefined }));
         }
@@ -139,38 +139,22 @@ export default function AddCarPage() {
 
     return (
         <div className="min-h-screen pb-32 md:pb-8">
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="sticky top-0 z-40 bg-dark/80 backdrop-blur-xl border-b border-white/5"
-            >
-                <div className="container mx-auto px-4 py-4">
-                    <div className="flex items-center gap-4">
-                        <button
-                            onClick={handleCancel}
-                            className="p-2 text-white/60 hover:text-white transition-colors rounded-xl hover:bg-white/5 active:scale-95"
-                        >
-                            <ArrowLeft className="w-5 h-5" />
-                        </button>
-                        <div className="flex-1">
-                            <h1 className="text-xl md:text-2xl font-bold text-white">
-                                Agregar Auto
-                            </h1>
-                            <p className="text-white/40 text-xs md:text-sm">
-                                Sumá un nuevo modelo a tu colección
-                            </p>
-                        </div>
-                        <button
-                            onClick={handleSubmit}
-                            disabled={isLoading}
-                            className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-accent hover:bg-accent/80 disabled:bg-accent/50 text-white font-bold rounded-xl transition-all hover:scale-105 active:scale-95"
-                        >
-                            <Save className="w-4 h-4" />
-                            {isLoading ? "Guardando..." : "Guardar"}
-                        </button>
-                    </div>
-                </div>
-            </motion.div>
+            <PageHeader
+                title="Agregar Auto"
+                subtitle="Nuevo modelo a tu colección"
+                icon={Car}
+                onBack={handleCancel}
+                actions={
+                    <button
+                        onClick={handleSubmit}
+                        disabled={isLoading}
+                        className="hidden md:flex items-center gap-2 px-5 py-2 bg-accent hover:bg-accent/80 disabled:bg-accent/50 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all"
+                    >
+                        <Save className="w-4 h-4" />
+                        {isLoading ? "Guardando..." : "Guardar"}
+                    </button>
+                }
+            />
 
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -296,7 +280,7 @@ export default function AddCarPage() {
                                         icon={<Layers className="w-5 h-5" />}
                                     />
                                 </div>
- 
+
                                 <div>
                                     <label className="block text-white/50 uppercase tracking-widest text-[10px] font-bold mb-1.5 ml-1">
                                         Diseñador
@@ -357,14 +341,14 @@ export default function AddCarPage() {
                                             key={group.groupId}
                                             onClick={() => toggleGroup(group.groupId)}
                                             className={`relative cursor-pointer rounded-xl p-4 border-2 transition-all ${selectedGroups.includes(group.groupId)
-                                                    ? "border-accent bg-accent/10"
-                                                    : "border-white/10 bg-white/[0.02] hover:border-white/20"
+                                                ? "border-accent bg-accent/10"
+                                                : "border-white/10 bg-white/[0.02] hover:border-white/20"
                                                 }`}
                                         >
                                             <div className="flex items-center gap-3">
                                                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${selectedGroups.includes(group.groupId)
-                                                        ? "bg-accent text-white"
-                                                        : "bg-white/5 text-white/40"
+                                                    ? "bg-accent text-white"
+                                                    : "bg-white/5 text-white/40"
                                                     }`}>
                                                     <Folder className="w-4 h-4" />
                                                 </div>
