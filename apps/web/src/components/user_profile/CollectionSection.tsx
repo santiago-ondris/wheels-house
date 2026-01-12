@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Car, SlidersHorizontal, Search, X } from "lucide-react";
@@ -40,6 +40,7 @@ export default function CollectionSection({ username, isOwner }: CollectionSecti
     const [showGroupModal, setShowGroupModal] = useState(false);
     const [groups, setGroups] = useState<Group[]>([]);
     const [searchInput, setSearchInput] = useState(params.search);
+    const carsGridRef = useRef<HTMLDivElement>(null);
 
     // Get page IDs for selection
     const pageIds = data?.items.map(car => car.carId!) || [];
@@ -225,7 +226,7 @@ export default function CollectionSection({ username, isOwner }: CollectionSecti
                 {/* Main Content Area */}
                 <div className="flex-1 min-w-0">
                     {/* Controls Bar */}
-                    <div className="flex flex-col sm:flex-row gap-3 mb-6">
+                    <div ref={carsGridRef} className="flex flex-col sm:flex-row gap-3 mb-6">
                         {/* Search */}
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
@@ -365,7 +366,13 @@ export default function CollectionSection({ username, isOwner }: CollectionSecti
                                     totalPages={data.pagination.totalPages}
                                     totalItems={data.pagination.totalItems}
                                     limit={data.pagination.limit}
-                                    onPageChange={setPage}
+                                    onPageChange={(page) => {
+                                        setPage(page);
+                                        // Scroll to top of cars section
+                                        setTimeout(() => {
+                                            carsGridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                        }, 100);
+                                    }}
                                     onLimitChange={setLimit}
                                 />
                             )}
