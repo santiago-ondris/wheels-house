@@ -245,7 +245,7 @@ export class CarService {
         }
 
         // Get filter options
-        const filters = await getFilterOptionsForUser(user.userId);
+        const filters = await getFilterOptionsForUser(user.userId, query.groupId);
 
         return {
             items: listedCars,
