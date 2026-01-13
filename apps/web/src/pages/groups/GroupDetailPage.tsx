@@ -105,6 +105,7 @@ export default function GroupDetailPage() {
                         isOwner={isOwner}
                         groupId={group.groupId}
                         mode="view"
+                        enableMultiSelect={false}
                     />
                 </div>
             )}

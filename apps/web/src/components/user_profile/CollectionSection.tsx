@@ -26,6 +26,7 @@ interface CollectionSectionProps {
     mode?: 'view' | 'select' | 'manage_group';
     initialSelection?: number[];
     onSaveSelection?: (selectedIds: number[]) => Promise<void>;
+    enableMultiSelect?: boolean;
 }
 
 interface Group {
@@ -39,7 +40,8 @@ export default function CollectionSection({
     groupId,
     mode = 'view',
     initialSelection = [],
-    onSaveSelection
+    onSaveSelection,
+    enableMultiSelect = true
 }: CollectionSectionProps) {
     const navigate = useNavigate();
     const location = useLocation();
@@ -240,7 +242,7 @@ export default function CollectionSection({
                         </button>
                     )}
 
-                    {isOwner && mode === 'view' && !isSelectMode && (
+                    {isOwner && mode === 'view' && !isSelectMode && enableMultiSelect && (
                         <button
                             onClick={() => setIsSelectMode(true)}
                             className="p-2 text-white/40 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
