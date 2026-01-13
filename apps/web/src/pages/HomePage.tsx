@@ -90,7 +90,7 @@ export default function HomePage() {
                 HOUSE
               </h1>
               <p className="text-white/60 text-base md:text-lg mt-4 md:mt-6 max-w-md mx-auto md:mx-0">
-                Tu colección de vehículos a escala organizada, accesible desde cualquier lugar, con imágenes y grupos personalizados.
+                Tu colección de vehículos a escala organizada, accesible desde cualquier lugar, con imágenes, grupos personalizados y lista para compartir.
               </p>
 
               {/* Mobile Hero Image */}
@@ -119,13 +119,21 @@ export default function HomePage() {
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               ) : (
-                <button
-                  onClick={() => setIsLoginOpen(true)}
-                  className="inline-flex items-center gap-2 mt-6 md:mt-8 px-6 py-3 bg-accent hover:bg-accent/80 text-white font-bold rounded-lg transition-colors"
-                >
-                  Login
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+                <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 mt-6 md:mt-8">
+                  <Link
+                    to="/register"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3 bg-accent hover:bg-accent/80 text-white font-bold rounded-lg transition-colors border border-accent"
+                  >
+                    Crear cuenta
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                  <button
+                    onClick={() => setIsLoginOpen(true)}
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3 bg-white/5 hover:bg-white/10 text-white font-bold rounded-lg transition-colors border border-white/10"
+                  >
+                    Iniciar sesión
+                  </button>
+                </div>
               )}
             </motion.div>
 
