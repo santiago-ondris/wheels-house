@@ -208,7 +208,7 @@ export const CarDetailPage = () => {
                         <span className="text-danger font-medium italic">
                             {car.wished 
                                 ? "Este auto se eliminará de tu wishlist."
-                                : "Esta acción eliminará el auto de toda tu colección (no solo de este grupo) y no se puede deshacer."
+                                : "Esta acción eliminará el auto de toda tu colección y no se puede deshacer."
                             }
                         </span>
                     </p>

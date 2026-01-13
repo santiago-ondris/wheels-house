@@ -7,49 +7,49 @@ export async function registerValidator(registerData: RegisterDTO) {
         throw userUtils.INVALID_PASSWORD_EXCEPTION;
     }
 
-    if(!userUtils.isValidEmail(registerData.email)) {
+    if (!userUtils.isValidEmail(registerData.email)) {
         throw userUtils.INVALID_EMAIL_ADDRESS;
     }
 
-    if(!userUtils.validUserPicture(registerData.picture)) {
+    if (!userUtils.validUserPicture(registerData.picture)) {
         throw userUtils.USER_PICTURE_FORMAT_NOT_VALID;
     }
 
-    if(registerData.username.includes('@')) {
+    if (registerData.username.includes('@')) {
         throw userUtils.INVALID_USERNAME;
     }
 
     // Query username in use.
     const userFromUsername = await getUserFromUsername(registerData.username);
-    if(userFromUsername != null) {
+    if (userFromUsername != null) {
         throw userUtils.USERNAME_ALREADY_IN_USE;
     }
-    
+
     // Query email in use.
     const userFromEmail = await getUserFromEmail(registerData.email);
-    if(userFromEmail != null) {
+    if (userFromEmail != null) {
         throw userUtils.EMAIL_ALREADY_IN_USE;
     }
-    
+
     return true;
 }
 
-export async function loginValidator(loginData: LoginDTO){
+export async function loginValidator(loginData: LoginDTO) {
     const user = await getUserFromUsernameOrEmail(loginData.usernameOrEmail);
 
-    if(!user) {
+    if (!user) {
         throw userUtils.INVALID_CREDENTIALS;
     }
 
     const validPassword = await userUtils.verifyPassword(loginData.password, user.hashedPassword);
 
-    if(!validPassword) {
+    if (!validPassword) {
         throw userUtils.INVALID_CREDENTIALS;
     }
 }
 
 export async function updateUserValidator(userData: TokenData, userChanges: UpdateUserProfileDTO) {
-    if(!userUtils.validUserPicture(userChanges.picture)) {
+    if (!userUtils.validUserPicture(userChanges.picture)) {
         throw userUtils.USER_PICTURE_FORMAT_NOT_VALID;
     }
 }
@@ -59,7 +59,7 @@ export async function updatePasswordValidator(userData: TokenData, updatePasswor
 
     const validOldPassword = await userUtils.verifyPassword(updatePasswordData.oldPassword, user.hashedPassword);
 
-    if(!validOldPassword) {
+    if (!validOldPassword) {
         throw userUtils.INVALID_CREDENTIALS;
     }
 
@@ -71,7 +71,7 @@ export async function updatePasswordValidator(userData: TokenData, updatePasswor
 export async function forgotPasswordValidator(forgotPasswordData: ForgotPasswordDTO) {
     const user = await getUserFromUsernameOrEmail(forgotPasswordData.usernameOrEmail);
 
-    if(user == null) {
+    if (user == null) {
         throw userUtils.INEXISTENT_USER;
     }
 }
@@ -79,25 +79,25 @@ export async function forgotPasswordValidator(forgotPasswordData: ForgotPassword
 export async function resetPasswordValidator(requestToken: string, resetPasswordData: ResetPasswordDTO) {
     const splitToken = requestToken.split('.');
 
-    if(splitToken.length != 2) {
+    if (splitToken.length != 2) {
         throw userUtils.INVALID_CREDENTIALS;
     }
 
     const selector = splitToken[0], validator = splitToken[1];
-    
+
     const user = await getUserFromRequestTokenSelector(selector);
 
-    if(user == null) {
-        throw userUtils.INVALID_CREDENTIALS;
+    if (user == null) {
+        throw userUtils.EXPIRED_RESET_TOKEN;
     }
 
     const validToken = await userUtils.verifyTokenValidator(validator, user.resetPasswordHashedValidator!);
 
-    if(!validToken) {
+    if (!validToken) {
         throw userUtils.INVALID_CREDENTIALS;
     }
 
-    if(!userUtils.validatePassword(resetPasswordData.newPassword)) {
+    if (!userUtils.validatePassword(resetPasswordData.newPassword)) {
         throw userUtils.INVALID_PASSWORD_EXCEPTION;
     }
 }
