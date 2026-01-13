@@ -7,12 +7,12 @@ export const user = pgTable("user", {
     lastName: text("lastName").notNull(),
     email: text("email").notNull().unique(),
     hashedPassword: text("hashedPassword").notNull(),
-    createdDate: timestamp("createdDate", {withTimezone: true}).defaultNow(),
+    createdDate: timestamp("createdDate", { withTimezone: true }).defaultNow(),
     picture: text("picture"),
     biography: text("biography"),
     resetPasswordRequestSelector: text("resetPasswordRequestSelector"),
     resetPasswordHashedValidator: text("resetPasswordHashedValidator"),
-    resetPasswordTokenExpires: timestamp("resetPasswordTokenExpires", {withTimezone: true})
+    resetPasswordTokenExpires: timestamp("resetPasswordTokenExpires", { withTimezone: true })
     // for the future:
     // verificationCode: integer("verificationCode").notNull(),
     // verified: boolean("verified"),
@@ -87,4 +87,13 @@ export const groupedCar = pgTable("groupedCar", {
     groupId: integer("groupId").references(() => group.groupId).notNull(),
 }, (t) => [
     unique().on(t.carId, t.groupId)
+]);
+
+export const searchHistory = pgTable("searchHistory", {
+    searchHistoryId: serial("searchHistoryId").primaryKey(),
+    userId: integer("userId").references(() => user.userId).notNull(),
+    searchedUserId: integer("searchedUserId").references(() => user.userId).notNull(),
+    searchedAt: timestamp("searchedAt", { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [
+    unique().on(t.userId, t.searchedUserId)
 ]);

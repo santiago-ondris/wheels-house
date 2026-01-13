@@ -46,6 +46,27 @@ export async function searchUsers(query: string): Promise<BasicUser[]> {
     return apiRequest<BasicUser[]>(`/search?q=${encodeURIComponent(query)}`);
 }
 
+export async function getSearchHistory(): Promise<BasicUser[]> {
+    const token = localStorage.getItem("auth_token");
+    // Add timestamp to prevent caching
+    return apiRequest<BasicUser[]>(`/search-history?t=${new Date().getTime()}`, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+}
+
+export async function addToSearchHistory(searchedUsername: string): Promise<void> {
+    const token = localStorage.getItem("auth_token");
+    return apiRequest<void>('/search-history', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ searchedUsername }),
+    });
+}
+
 export async function getUserStats(username: string): Promise<UserStats> {
     return apiRequest<UserStats>(`/stats/${username}`);
 }
