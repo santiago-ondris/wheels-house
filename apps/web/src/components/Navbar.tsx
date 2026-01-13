@@ -57,6 +57,9 @@ export default function Navbar() {
                   <Link to="/hall-of-fame" className="text-white/70 hover:text-white transition-colors mr-2">
                     Salón de la Fama
                   </Link>
+                  <div className="w-64 mr-2">
+                    <UserSearch variant="desktop" />
+                  </div>
                   <button
                     onClick={() => setIsLoginOpen(true)}
                     className="px-4 py-2 text-white hover:text-accent transition-colors"
@@ -71,7 +74,15 @@ export default function Navbar() {
                   </Link>
                 </div>
 
-                <MobileMenu onLoginClick={() => setIsLoginOpen(true)} />
+                <div className="flex items-center gap-2 md:hidden">
+                  <button
+                    onClick={() => setIsSearchOpen(true)}
+                    className="p-2 text-white/70 hover:text-white transition-colors"
+                  >
+                    <Search className="w-5 h-5" />
+                  </button>
+                  <MobileMenu onLoginClick={() => setIsLoginOpen(true)} />
+                </div>
               </>
             )}
           </div>
