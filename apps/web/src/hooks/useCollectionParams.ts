@@ -59,7 +59,10 @@ export function useCollectionParams() {
         search: searchParams.get('search') || DEFAULTS.search,
     }), [searchParams]);
 
-    const setParams = useCallback((updates: Partial<CollectionParams>) => {
+    const setParams = useCallback((updates: Partial<CollectionParams>, options?: { replace?: boolean }) => {
+        const isOnlyPageChange = Object.keys(updates).length === 1 && 'page' in updates;
+        const shouldReplace = options?.replace ?? !isOnlyPageChange;
+
         setSearchParams(prev => {
             const newParams = new URLSearchParams(prev);
 
@@ -90,7 +93,7 @@ export function useCollectionParams() {
             });
 
             return newParams;
-        }, { replace: true });
+        }, { replace: shouldReplace });
     }, [params, setSearchParams]);
 
     const setPage = useCallback((page: number) => setParams({ page }), [setParams]);

@@ -21,11 +21,22 @@ export default function RootLayout() {
                 </main>
                 <Footer />
             </div>
-            
+
             {/* ScrollRestoration handles scroll position on navigation */}
-            {/* Default behavior: stores scroll by navigation key, restores on back */}
-            <ScrollRestoration />
-            
+            {/* For collection pages, we disable auto-restoration since we handle it manually */}
+            {/* after async content loads via useCollectionScrollRestore hook */}
+            <ScrollRestoration
+                getKey={(location) => {
+                    // For collection pages, return a constant key to prevent React Router
+                    // from auto-restoring scroll (we handle it manually after content loads)
+                    if (location.pathname.startsWith('/collection/')) {
+                        return 'collection-manual';
+                    }
+                    // For other pages, use pathname + search for proper restoration
+                    return location.pathname + location.search;
+                }}
+            />
+
             <Toaster
                 position="bottom-right"
                 toastOptions={{

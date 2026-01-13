@@ -5,6 +5,7 @@ import { Plus, Car, SlidersHorizontal, Search, X, Save } from "lucide-react";
 import toast from "react-hot-toast";
 
 import { useCollectionParams } from "../../hooks/useCollectionParams";
+import { useCollectionScrollRestore } from "../../hooks/useCollectionScrollRestore";
 import { useSelectionState } from "../../hooks/useSelectionState";
 import { listCarsPaginated, PaginatedCarsResponse, bulkAddToGroup, CollectionQueryParams } from "../../services/car.service";
 import { listGroups } from "../../services/group.service";
@@ -44,12 +45,18 @@ export default function CollectionSection({
     const location = useLocation();
     const { params, setPage, setLimit, setSort, setSearch, toggleFilter, clearFilters, hasActiveFilters } = useCollectionParams();
 
+    const prevGroupIdRef = useRef<number | undefined>(groupId);
     useEffect(() => {
-        setPage(1);
-    }, [groupId]);
+        if (prevGroupIdRef.current !== undefined && groupId !== prevGroupIdRef.current) {
+            setPage(1);
+        }
+        prevGroupIdRef.current = groupId;
+    }, [groupId, setPage]);
 
     const [isLoading, setIsLoading] = useState(true);
     const [data, setData] = useState<PaginatedCarsResponse | null>(null);
+
+    const { saveScrollPosition } = useCollectionScrollRestore(!isLoading && data !== null);
     const [view, setView] = useState<"grid" | "list">("grid");
     const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
     const [isSelectMode, setIsSelectMode] = useState(mode === 'manage_group');
@@ -68,7 +75,6 @@ export default function CollectionSection({
         }
     }, [mode, initialSelection]);
 
-    // Refetch when navigating back to this page (location.key changes)
     useEffect(() => {
         const fetchCars = async () => {
             setIsLoading(true);
@@ -170,6 +176,15 @@ export default function CollectionSection({
             setIsSaving(false);
         }
     };
+    // Helper to navigate to car detail
+    const handleCarClick = useCallback((carId: string) => {
+        if (mode === 'manage_group') {
+            selection.toggle(Number(carId));
+        } else {
+            saveScrollPosition();
+            navigate(`/car/${carId}`);
+        }
+    }, [mode, selection, navigate, saveScrollPosition]);
 
     const mappedCars = (data?.items || []).map((car) => ({
         id: String(car.carId),
@@ -378,7 +393,7 @@ export default function CollectionSection({
                                                 <HotWheelCardGrid
                                                     key={car.id}
                                                     car={car}
-                                                    onClick={() => mode === 'manage_group' ? selection.toggle(Number(car.id)) : navigate(`/car/${car.id}`)}
+                                                    onClick={() => handleCarClick(car.id)}
                                                     selectable={isSelectMode}
                                                     isSelected={selection.isSelected(Number(car.id))}
                                                     onSelect={() => selection.toggle(Number(car.id))}
@@ -398,7 +413,7 @@ export default function CollectionSection({
                                             <HotWheelCardList
                                                 key={car.id}
                                                 car={car}
-                                                onClick={() => mode === 'manage_group' ? selection.toggle(Number(car.id)) : navigate(`/car/${car.id}`)}
+                                                onClick={() => handleCarClick(car.id)}
                                                 selectable={isSelectMode}
                                                 isSelected={selection.isSelected(Number(car.id))}
                                                 onSelect={() => selection.toggle(Number(car.id))}
