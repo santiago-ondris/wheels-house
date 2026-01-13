@@ -328,15 +328,29 @@ export async function getCarIdsFromUserIdWithFilter(userId: number, query: Colle
     return result.map(r => r.carId);
 }
 
-export async function getFilterOptionsForUser(userId: number) {
-    const cars = await db.select({
-        brand: car.brand,
-        color: car.color,
-        manufacturer: car.manufacturer,
-        scale: car.scale,
-        condition: car.condition,
-        country: car.country,
-    }).from(car).where(and(eq(car.userId, userId), eq(car.wished, false)));
+export async function getFilterOptionsForUser(userId: number, groupId: number | undefined) {
+    const cars = !groupId ? (
+        // If groudId is undefined
+        await db.select({
+            brand: car.brand,
+            color: car.color,
+            manufacturer: car.manufacturer,
+            scale: car.scale,
+            condition: car.condition,
+            country: car.country,
+        }).from(car).where(and(eq(car.userId, userId), eq(car.wished, false)))
+    ) : (
+        // If groupId is defined
+        await db.select({
+            brand: car.brand,
+            color: car.color,
+            manufacturer: car.manufacturer,
+            scale: car.scale,
+            condition: car.condition,
+            country: car.country,
+        }).from(car).innerJoin(groupedCar, eq(groupedCar.carId, car.carId)).where(and(
+            eq(car.userId, userId), eq(car.wished, false), eq(groupedCar.groupId, groupId)))
+    );
 
     const countBy = <T extends string | null>(items: T[]): { name: string; count: number }[] => {
         const map = new Map<string, number>();
