@@ -62,7 +62,7 @@ export default function RegisterForm() {
 
       await login(result.data.username, result.data.password);
       toast.success("¡Cuenta creada exitosamente!");
-      navigate(`/collection/${result.data.username}`);
+      navigate('/onboarding');
     } catch (error: any) {
       const errorMsg = error?.error || "";
 
@@ -202,9 +202,12 @@ export default function RegisterForm() {
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-accent uppercase tracking-widest text-xs mb-2">
+        <label htmlFor="password" className="block text-accent uppercase tracking-widest text-xs mb-1">
           Contraseña
         </label>
+        <p className="text-white/30 text-[10px] font-mono mb-2">
+          Mínimo 8 caracteres, una mayúscula y una minúscula
+        </p>
         <PasswordInput
           id="password"
           placeholder="••••••••"

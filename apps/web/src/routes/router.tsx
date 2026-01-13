@@ -29,6 +29,7 @@ import WishlistPage from "../pages/wishlist/WishlistPage";
 import AddToWishlistPage from "../pages/wishlist/AddToWishlistPage";
 import MoveToCollectionPage from "../pages/wishlist/MoveToCollectionPage";
 import EditWishlistPage from "../pages/wishlist/EditWishlistPage";
+import OnboardingPage from "../pages/onboarding/OnboardingPage";
 
 // Components
 import ProtectedRoute from "../components/auth/ProtectedRoute";
@@ -44,31 +45,35 @@ export const router = createBrowserRouter([
             { path: "reset-password", element: <ResetPasswordPage /> },
             { path: "auth-required", element: <AuthRequiredPage /> },
             { path: "car/:carId", element: <CarDetailPage /> },
-            
+
             // Protected routes
-            { 
-                path: "settings", 
-                element: <ProtectedRoute><SettingsPage /></ProtectedRoute> 
+            {
+                path: "onboarding",
+                element: <ProtectedRoute><OnboardingPage /></ProtectedRoute>
             },
-            { 
-                path: "collection/add", 
-                element: <ProtectedRoute><AddCarPage /></ProtectedRoute> 
+            {
+                path: "settings",
+                element: <ProtectedRoute><SettingsPage /></ProtectedRoute>
             },
-            { 
-                path: "collection/edit/:carId", 
-                element: <ProtectedRoute><EditCarPage /></ProtectedRoute> 
+            {
+                path: "collection/add",
+                element: <ProtectedRoute><AddCarPage /></ProtectedRoute>
             },
-            { 
-                path: "collection/group/new", 
-                element: <ProtectedRoute><CreateGroupPage /></ProtectedRoute> 
+            {
+                path: "collection/edit/:carId",
+                element: <ProtectedRoute><EditCarPage /></ProtectedRoute>
             },
-            { 
-                path: "collection/group/edit/:groupId", 
-                element: <ProtectedRoute><EditGroupPage /></ProtectedRoute> 
+            {
+                path: "collection/group/new",
+                element: <ProtectedRoute><CreateGroupPage /></ProtectedRoute>
             },
-            { 
-                path: "collection/group/manage/:groupId", 
-                element: <ProtectedRoute><GroupManageCarsPage /></ProtectedRoute> 
+            {
+                path: "collection/group/edit/:groupId",
+                element: <ProtectedRoute><EditGroupPage /></ProtectedRoute>
+            },
+            {
+                path: "collection/group/manage/:groupId",
+                element: <ProtectedRoute><GroupManageCarsPage /></ProtectedRoute>
             },
 
             // User collection routes (public viewing)
@@ -78,17 +83,17 @@ export const router = createBrowserRouter([
             { path: "collection/:username/group/:groupName", element: <GroupDetailPage /> },
 
             // Wishlist routes
-            { 
-                path: "wishlist/add", 
-                element: <ProtectedRoute><AddToWishlistPage /></ProtectedRoute> 
+            {
+                path: "wishlist/add",
+                element: <ProtectedRoute><AddToWishlistPage /></ProtectedRoute>
             },
-            { 
-                path: "wishlist/edit/:carId", 
-                element: <ProtectedRoute><EditWishlistPage /></ProtectedRoute> 
+            {
+                path: "wishlist/edit/:carId",
+                element: <ProtectedRoute><EditWishlistPage /></ProtectedRoute>
             },
-            { 
-                path: "wishlist/got-it/:carId", 
-                element: <ProtectedRoute><MoveToCollectionPage /></ProtectedRoute> 
+            {
+                path: "wishlist/got-it/:carId",
+                element: <ProtectedRoute><MoveToCollectionPage /></ProtectedRoute>
             },
             { path: "wishlist/:username", element: <WishlistPage /> },
 
