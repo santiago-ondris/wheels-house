@@ -72,10 +72,12 @@ export default function CollectionSection({
     const selection = useSelectionState(pageIds, data?.pagination.totalItems || 0);
 
     useEffect(() => {
-        if (mode === 'manage_group' && initialSelection.length > 0) {
+        if (mode === 'manage_group') {
             selection.setInitialSelection(initialSelection);
         }
-    }, [mode, initialSelection]);
+        // Solo ejecutar una vez al montar
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
         const fetchCars = async () => {

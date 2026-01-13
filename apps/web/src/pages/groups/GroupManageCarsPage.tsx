@@ -1,21 +1,27 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Folder } from "lucide-react";
 import { getGroup, updateGroup, GroupData } from "../../services/group.service";
 import { useAuth } from "../../contexts/AuthContext";
 import PageHeader from "../../components/ui/PageHeader";
 import CollectionSection from "../../components/user_profile/CollectionSection";
 import toast from "react-hot-toast";
-import { useNavigateBack } from "../../hooks/useNavigateBack";
 
 export default function GroupManageCarsPage() {
     const { groupId } = useParams<{ groupId: string }>();
     const { user } = useAuth();
     const [group, setGroup] = useState<GroupData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const navigate = useNavigate();
 
-    // Get the safe back navigation function
-    const navigateBack = useNavigateBack(`/collection/${user?.username}/groups`);
+    // Navigate to group detail page (not browser history)
+    const navigateToGroupDetail = () => {
+        if (group && user) {
+            navigate(`/collection/${user.username}/group/${encodeURIComponent(group.name)}`);
+        } else {
+            navigate(`/collection/${user?.username}/groups`);
+        }
+    };
 
     // ScrollRestoration handles scroll automatically
     useEffect(() => {
@@ -31,7 +37,7 @@ export default function GroupManageCarsPage() {
         } catch (error) {
             console.error("Error fetching group:", error);
             toast.error("Error al cargar el grupo");
-            navigateBack();
+            navigateToGroupDetail();
         } finally {
             setIsLoading(false);
         }
@@ -52,7 +58,7 @@ export default function GroupManageCarsPage() {
             });
 
             toast.success("Vehículos actualizados correctamente");
-            navigateBack();
+            navigateToGroupDetail();
         } catch (error) {
             console.error("Error saving group cars:", error);
             toast.error("Error al guardar cambios");
@@ -60,7 +66,7 @@ export default function GroupManageCarsPage() {
     };
 
     // Use the navigateBack function directly
-    const handleBack = navigateBack;
+    const handleBack = navigateToGroupDetail;
 
     if (isLoading) {
         return (

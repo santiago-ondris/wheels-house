@@ -7,7 +7,6 @@ import { useAuth } from "../../contexts/AuthContext";
 import PageHeader from "../../components/ui/PageHeader";
 import CollectionSection from "../../components/user_profile/CollectionSection";
 import GroupNotFoundPage from "./GroupNotFoundPage";
-import { useNavigateBack } from "../../hooks/useNavigateBack";
 
 export default function GroupDetailPage() {
     const { username, groupName } = useParams<{ username: string; groupName: string }>();
@@ -40,8 +39,8 @@ export default function GroupDetailPage() {
         }
     };
 
-    // Safe back navigation with fallback
-    const handleBack = useNavigateBack(`/collection/${username}/groups`);
+    // Always navigate to groups list, not browser history
+    const handleBack = () => navigate(`/collection/${username}/groups`);
 
     if (isLoading) {
         return (
