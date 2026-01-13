@@ -64,7 +64,7 @@ export default function HallOfFamePage() {
 
     return (
         <div className="min-h-[80vh] py-12 px-6">
-            <div className="container mx-auto max-w-5xl relative">
+            <div className="container mx-auto max-w-8xl relative">
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -82,7 +82,7 @@ export default function HallOfFamePage() {
                     variants={container}
                     initial="hidden"
                     animate="show"
-                    className="grid grid-cols-1 md:grid-cols-2 gap-8"
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
                 >
                     {categories.map((category) => (
                         <motion.div key={category.title} variants={item}>
@@ -90,7 +90,6 @@ export default function HallOfFamePage() {
                                 to={category.path}
                                 className="group relative block h-full p-8 rounded-[2.5rem] border border-white/10 bg-white/[0.02] backdrop-blur-2xl transition-all duration-500 hover:border-white/20 overflow-hidden shadow-2xl"
                             >
-                                {/* NEON GLOW (The identity color) */}
                                 <div
                                     className="absolute -top-12 -right-12 w-64 h-64 rounded-full blur-[80px] opacity-20 group-hover:opacity-60 transition-opacity duration-700 pointer-events-none"
                                     style={{ backgroundColor: category.glowColor }}
