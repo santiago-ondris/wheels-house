@@ -57,7 +57,7 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col">
-      <section className="relative min-h-[80vh] flex items-center overflow-hidden">
+      <section className="relative min-h-[auto] md:min-h-[80vh] flex items-center overflow-hidden">
         {/* Background Gradients */}
         <div className="absolute inset-0 bg-linear-to-br from-primary/20 via-background to-secondary/20" />
 
@@ -72,30 +72,48 @@ export default function HomePage() {
         <div className="absolute top-20 right-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
         <div className="absolute bottom-20 left-20 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
 
-        <div className="relative z-10 container mx-auto px-6 py-20">
+        <div className="relative z-10 container mx-auto px-6 py-12 md:py-20">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8 lg:gap-16">
             <motion.div
               variants={fadeInUp}
               initial="initial"
               animate="animate"
               transition={{ duration: 0.6 }}
-              className="max-w-2xl relative z-10"
+              className="max-w-2xl relative z-10 text-center md:text-left"
             >
               <span className="text-accent uppercase tracking-widest text-sm font-bold">
                 Collection Manager
               </span>
-              <h1 className="text-6xl md:text-8xl font-bold text-white mt-4 leading-tight">
+              <h1 className="text-5xl md:text-6xl lg:text-8xl font-bold text-white mt-3 md:mt-4 leading-tight">
                 WHEELS
                 <br />
                 HOUSE
               </h1>
-              <p className="text-white/60 text-lg mt-6 max-w-md">
+              <p className="text-white/60 text-base md:text-lg mt-4 md:mt-6 max-w-md mx-auto md:mx-0">
                 Tu colección de vehículos a escala organizada, accesible desde cualquier lugar, con imágenes y grupos personalizados.
               </p>
+
+              {/* Mobile Hero Image */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="md:hidden w-full max-w-[260px] mx-auto mt-6"
+              >
+                <div className="relative">
+                  <div className="absolute inset-0 bg-accent/20 blur-[60px] rounded-full" />
+                  <img
+                    src="/heroimage.png"
+                    alt="Wheels House Hero"
+                    className="w-full h-auto object-contain drop-shadow-xl relative z-10"
+                  />
+                </div>
+              </motion.div>
+
               {isAuthenticated ? (
                 <Link
                   to={`/collection/${user?.username}`}
-                  className="inline-flex items-center gap-2 mt-8 px-6 py-3 bg-accent hover:bg-accent/80 text-white font-bold rounded-lg transition-colors"
+                  className="inline-flex items-center gap-2 mt-6 md:mt-8 px-6 py-3 bg-accent hover:bg-accent/80 text-white font-bold rounded-lg transition-colors"
                 >
                   Ir a mi colección
                   <ArrowRight className="w-4 h-4" />
@@ -103,7 +121,7 @@ export default function HomePage() {
               ) : (
                 <button
                   onClick={() => setIsLoginOpen(true)}
-                  className="inline-flex items-center gap-2 mt-8 px-6 py-3 bg-accent hover:bg-accent/80 text-white font-bold rounded-lg transition-colors"
+                  className="inline-flex items-center gap-2 mt-6 md:mt-8 px-6 py-3 bg-accent hover:bg-accent/80 text-white font-bold rounded-lg transition-colors"
                 >
                   Login
                   <ArrowRight className="w-4 h-4" />
@@ -111,6 +129,7 @@ export default function HomePage() {
               )}
             </motion.div>
 
+            {/* Desktop Hero Image */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
