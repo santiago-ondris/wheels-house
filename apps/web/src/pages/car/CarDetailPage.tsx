@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowDown, ArrowUp, Edit, Trash2, ArrowLeft, Star } from "lucide-react";
 import { getCar, deleteCar, CarData } from "../../services/car.service";
 import { useAuth } from "../../contexts/AuthContext";
+import { useNavigateBack } from "../../hooks/useNavigateBack";
 
 import { CarMasonryGrid } from "../../components/cars/CarMasonryGrid";
 import Modal from "../../components/ui/Modal";
@@ -12,6 +13,7 @@ import toast from "react-hot-toast";
 export const CarDetailPage = () => {
     const { carId } = useParams<{ carId: string }>();
     const navigate = useNavigate();
+    const location = useLocation();
     const { user } = useAuth();
     const [car, setCar] = useState<CarData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -19,12 +21,12 @@ export const CarDetailPage = () => {
 
     const isOwner = user?.username === car?.ownerUsername;
 
+    // Refetch when carId changes OR when we navigate back (location.key changes)
     useEffect(() => {
-        window.scrollTo(0, 0);
         if (carId) {
             fetchCarData(carId);
         }
-    }, [carId]);
+    }, [carId, location.key]);
 
     const fetchCarData = async (id: string) => {
         setIsLoading(true);
@@ -60,9 +62,12 @@ export const CarDetailPage = () => {
         }
     };
 
-    const handleBack = () => {
-        navigate(-1);
-    };
+    // Safe back navigation with fallback to owner's collection
+    const handleBack = useNavigateBack(
+        car?.wished 
+            ? `/wishlist/${car?.ownerUsername || user?.username}` 
+            : `/collection/${car?.ownerUsername || user?.username || ''}`
+    );
 
     const galleryRef = useRef<HTMLDivElement>(null);
     const detailsRef = useRef<HTMLDivElement>(null);

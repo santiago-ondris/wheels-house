@@ -26,6 +26,7 @@ import toast from "react-hot-toast";
 import { useAuth } from "../../contexts/AuthContext";
 import { useCarSuggestions } from "../../hooks/useCarSuggestions";
 import SuggestionInput from "../../components/ui/SuggestionInput";
+import { useNavigateBack } from "../../hooks/useNavigateBack";
 
 export default function MoveToCollectionPage() {
     const { carId } = useParams<{ carId: string }>();
@@ -52,8 +53,11 @@ export default function MoveToCollectionPage() {
     const [selectedGroups, setSelectedGroups] = useState<number[]>([]);
     const { suggestions } = useCarSuggestions();
 
+    // Safe back navigation with fallback
+    const navigateBack = useNavigateBack(`/wishlist/${user?.username}`);
+
+    // ScrollRestoration handles scroll automatically
     useEffect(() => {
-        window.scrollTo(0, 0);
         if (carId) {
             fetchCarData();
         }
@@ -83,7 +87,7 @@ export default function MoveToCollectionPage() {
         } catch (error) {
             console.error("Error fetching car:", error);
             toast.error("Error al cargar los datos del auto");
-            navigate(-1);
+            navigateBack();
         } finally {
             setIsFetching(false);
         }
@@ -135,9 +139,7 @@ export default function MoveToCollectionPage() {
         }
     };
 
-    const handleCancel = () => {
-        navigate(-1);
-    };
+    const handleCancel = navigateBack;
 
     const updateField = (field: keyof CarFormData, value: string) => {
         setFormData((prev) => {

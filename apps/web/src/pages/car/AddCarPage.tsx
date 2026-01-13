@@ -26,6 +26,7 @@ import toast from "react-hot-toast";
 import { useAuth } from "../../contexts/AuthContext";
 import { useCarSuggestions } from "../../hooks/useCarSuggestions";
 import SuggestionInput from "../../components/ui/SuggestionInput";
+import { useNavigateBack } from "../../hooks/useNavigateBack";
 
 export default function AddCarPage() {
     const navigate = useNavigate();
@@ -44,10 +45,7 @@ export default function AddCarPage() {
         pictures: [],
     });
 
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
-
+    // ScrollRestoration handles scroll automatically
 
     const [errors, setErrors] = useState<Partial<Record<keyof CarFormData, string>>>({});
     const [isLoading, setIsLoading] = useState(false);
@@ -56,7 +54,6 @@ export default function AddCarPage() {
     const { suggestions } = useCarSuggestions();
 
     useEffect(() => {
-        window.scrollTo(0, 0);
         if (user?.username) {
             fetchGroups();
         }
@@ -99,7 +96,8 @@ export default function AddCarPage() {
             }
 
             toast.success("¡Auto agregado a tu colección!");
-            navigate(`/collection/${user?.username}`, { replace: true });
+            // Use navigate(-1) to go back to the existing collection entry
+            navigate(-1);
         } catch (error: any) {
             toast.error("Error al agregar el auto. Intentá de nuevo.");
             console.error(error);
@@ -108,9 +106,8 @@ export default function AddCarPage() {
         }
     };
 
-    const handleCancel = () => {
-        navigate(-1);
-    };
+    // Safe back navigation with fallback
+    const handleCancel = useNavigateBack(`/collection/${user?.username || ''}`);
 
     const updateField = (field: keyof CarFormData, value: string) => {
         setFormData((prev) => {

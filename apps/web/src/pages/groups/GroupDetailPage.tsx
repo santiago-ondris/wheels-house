@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Edit, Folder, Grid } from "lucide-react";
 import { getGroupByName, GroupData } from "../../services/group.service";
@@ -7,10 +7,12 @@ import { useAuth } from "../../contexts/AuthContext";
 import PageHeader from "../../components/ui/PageHeader";
 import CollectionSection from "../../components/user_profile/CollectionSection";
 import GroupNotFoundPage from "./GroupNotFoundPage";
+import { useNavigateBack } from "../../hooks/useNavigateBack";
 
 export default function GroupDetailPage() {
     const { username, groupName } = useParams<{ username: string; groupName: string }>();
     const navigate = useNavigate();
+    const location = useLocation();
     const { user } = useAuth();
     const [group, setGroup] = useState<GroupData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -18,12 +20,12 @@ export default function GroupDetailPage() {
 
     const isOwner = user?.username === username;
 
+    // Refetch when navigating back to this page (location.key changes)
     useEffect(() => {
-        window.scrollTo(0, 0);
         if (username && groupName) {
             fetchGroupData();
         }
-    }, [username, groupName]);
+    }, [username, groupName, location.key]);
 
     const fetchGroupData = async () => {
         try {
@@ -38,9 +40,8 @@ export default function GroupDetailPage() {
         }
     };
 
-    const handleBack = () => {
-        navigate(-1);
-    };
+    // Safe back navigation with fallback
+    const handleBack = useNavigateBack(`/collection/${username}/groups`);
 
     if (isLoading) {
         return (

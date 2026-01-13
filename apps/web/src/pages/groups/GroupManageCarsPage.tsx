@@ -1,21 +1,24 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Folder } from "lucide-react";
 import { getGroup, updateGroup, GroupData } from "../../services/group.service";
 import { useAuth } from "../../contexts/AuthContext";
 import PageHeader from "../../components/ui/PageHeader";
 import CollectionSection from "../../components/user_profile/CollectionSection";
 import toast from "react-hot-toast";
+import { useNavigateBack } from "../../hooks/useNavigateBack";
 
 export default function GroupManageCarsPage() {
     const { groupId } = useParams<{ groupId: string }>();
-    const navigate = useNavigate();
     const { user } = useAuth();
     const [group, setGroup] = useState<GroupData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
+    // Get the safe back navigation function
+    const navigateBack = useNavigateBack(`/collection/${user?.username}/groups`);
+
+    // ScrollRestoration handles scroll automatically
     useEffect(() => {
-        window.scrollTo(0, 0);
         if (groupId) {
             fetchGroupData();
         }
@@ -28,7 +31,7 @@ export default function GroupManageCarsPage() {
         } catch (error) {
             console.error("Error fetching group:", error);
             toast.error("Error al cargar el grupo");
-            navigate(-1);
+            navigateBack();
         } finally {
             setIsLoading(false);
         }
@@ -49,16 +52,15 @@ export default function GroupManageCarsPage() {
             });
 
             toast.success("Vehículos actualizados correctamente");
-            navigate(-1);
+            navigateBack();
         } catch (error) {
             console.error("Error saving group cars:", error);
             toast.error("Error al guardar cambios");
         }
     };
 
-    const handleBack = () => {
-        navigate(-1);
-    };
+    // Use the navigateBack function directly
+    const handleBack = navigateBack;
 
     if (isLoading) {
         return (

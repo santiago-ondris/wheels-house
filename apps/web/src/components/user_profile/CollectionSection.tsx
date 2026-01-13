@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Car, SlidersHorizontal, Search, X, Save } from "lucide-react";
 import toast from "react-hot-toast";
@@ -41,6 +41,7 @@ export default function CollectionSection({
     onSaveSelection
 }: CollectionSectionProps) {
     const navigate = useNavigate();
+    const location = useLocation();
     const { params, setPage, setLimit, setSort, setSearch, toggleFilter, clearFilters, hasActiveFilters } = useCollectionParams();
 
     useEffect(() => {
@@ -67,6 +68,7 @@ export default function CollectionSection({
         }
     }, [mode, initialSelection]);
 
+    // Refetch when navigating back to this page (location.key changes)
     useEffect(() => {
         const fetchCars = async () => {
             setIsLoading(true);
@@ -87,7 +89,7 @@ export default function CollectionSection({
         };
 
         fetchCars();
-    }, [username, params, groupId, mode]);
+    }, [username, params, groupId, mode, location.key]);
 
     useEffect(() => {
         if (isOwner && mode === 'view') {

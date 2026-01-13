@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -22,6 +22,7 @@ import toast from "react-hot-toast";
 import { useAuth } from "../../contexts/AuthContext";
 import { useCarSuggestions } from "../../hooks/useCarSuggestions";
 import SuggestionInput from "../../components/ui/SuggestionInput";
+import { useNavigateBack } from "../../hooks/useNavigateBack";
 
 export default function AddToWishlistPage() {
     const navigate = useNavigate();
@@ -40,13 +41,14 @@ export default function AddToWishlistPage() {
         pictures: [],
     });
 
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
+    // ScrollRestoration handles scroll automatically
 
     const [errors, setErrors] = useState<Partial<Record<keyof CarFormData, string>>>({});
     const [isLoading, setIsLoading] = useState(false);
     const { suggestions } = useCarSuggestions();
+
+    // Safe back navigation with fallback
+    const handleCancel = useNavigateBack(`/wishlist/${user?.username}`);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -74,7 +76,9 @@ export default function AddToWishlistPage() {
             });
 
             toast.success("¡Auto agregado a tu wishlist!");
-            navigate(`/wishlist/${user?.username}`, { replace: true });
+            // Use navigate(-1) to go back to the existing Wishlist entry
+            // instead of creating a new history entry
+            navigate(-1);
         } catch (error: any) {
             toast.error("Error al agregar el auto. Intentá de nuevo.");
             console.error(error);
@@ -83,9 +87,7 @@ export default function AddToWishlistPage() {
         }
     };
 
-    const handleCancel = () => {
-        navigate(-1);
-    };
+
 
     const updateField = (field: keyof CarFormData, value: string) => {
         setFormData((prev) => {

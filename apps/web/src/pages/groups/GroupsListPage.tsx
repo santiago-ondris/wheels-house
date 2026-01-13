@@ -6,6 +6,7 @@ import { listGroups, GroupBasicInfo } from "../../services/group.service";
 import { useAuth } from "../../contexts/AuthContext";
 import PageHeader from "../../components/ui/PageHeader";
 import toast from "react-hot-toast";
+import { useNavigateBack } from "../../hooks/useNavigateBack";
 
 export default function GroupsListPage() {
     const { username } = useParams<{ username: string }>();
@@ -16,8 +17,8 @@ export default function GroupsListPage() {
 
     const isOwner = user?.username === username;
 
+    // ScrollRestoration handles scroll automatically
     useEffect(() => {
-        window.scrollTo(0, 0);
         if (username) {
             fetchGroups();
         }
@@ -35,9 +36,8 @@ export default function GroupsListPage() {
         }
     };
 
-    const handleBack = () => {
-        navigate(-1);
-    };
+    // Safe back navigation with fallback
+    const handleBack = useNavigateBack(`/collection/${username}`);
 
     if (isLoading) {
         return (
