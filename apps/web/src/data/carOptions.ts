@@ -120,7 +120,8 @@ export const colors = [
     "Mostaza",
     "Cian",
     "Púrpura",
-    "Bordo"
+    "Bordo",
+    "Violeta"
 ];
 
 export const colorMap: Record<string, string> = {
@@ -149,7 +150,8 @@ export const colorMap: Record<string, string> = {
     'Mostaza': '#ca8a04',
     'Cian': '#06b6d4',
     'Púrpura': '#7e22ce',
-    'Bordo': '#7f1d1d'
+    'Bordo': '#7f1d1d',
+    'Violeta': '#8b5cf6'
 };
 
 export const carConditions = [

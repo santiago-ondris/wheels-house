@@ -159,7 +159,7 @@ export default function AddCarPage() {
                 transition={{ delay: 0.1 }}
                 className="container mx-auto px-4 py-6"
             >
-                <form onSubmit={handleSubmit} className="max-w-5xl mx-auto">
+                <form onSubmit={handleSubmit} className="max-w-7xl mx-auto">
                     <div className="mb-8">
                         <div className="flex items-center gap-2 mb-4">
                             <Sparkles className="w-4 h-4 text-accent" />

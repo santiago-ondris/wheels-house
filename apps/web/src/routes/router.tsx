@@ -9,6 +9,7 @@ import StatsPage from "../pages/user/StatsPage";
 import SettingsPage from "../pages/user/SettingsPage";
 import AddCarPage from "../pages/car/AddCarPage";
 import EditCarPage from "../pages/car/EditCarPage";
+import QuickAddPage from "../pages/car/QuickAddPage";
 import CarDetailPage from "../pages/car/CarDetailPage";
 import RegisterPage from "../pages/login/RegisterPage";
 import AuthRequiredPage from "../pages/login/AuthRequiredPage";
@@ -58,6 +59,10 @@ export const router = createBrowserRouter([
             {
                 path: "collection/add",
                 element: <ProtectedRoute><AddCarPage /></ProtectedRoute>
+            },
+            {
+                path: "collection/quick-add",
+                element: <ProtectedRoute><QuickAddPage /></ProtectedRoute>
             },
             {
                 path: "collection/edit/:carId",
