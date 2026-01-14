@@ -6,6 +6,7 @@ import UserMenu from "./layout/UserMenu";
 import MobileMenu from "./layout/MobileMenu";
 import LoginModal from "./auth/LoginModal";
 import UserSearch from "./ui/UserSearch";
+import MobileUserSearch from "./ui/MobileUserSearch";
 
 export default function Navbar() {
   const { isAuthenticated, user } = useAuth();
@@ -33,7 +34,7 @@ export default function Navbar() {
                     Mi Colección
                   </Link>
                   <div className="w-64">
-                    <UserSearch variant="desktop" />
+                    <UserSearch />
                   </div>
                 </div>
 
@@ -57,6 +58,9 @@ export default function Navbar() {
                   <Link to="/hall-of-fame" className="text-white/70 hover:text-white transition-colors mr-2">
                     Salón de la Fama
                   </Link>
+                  <div className="w-64 mr-2">
+                    <UserSearch />
+                  </div>
                   <button
                     onClick={() => setIsLoginOpen(true)}
                     className="px-4 py-2 text-white hover:text-accent transition-colors"
@@ -71,29 +75,23 @@ export default function Navbar() {
                   </Link>
                 </div>
 
-                <MobileMenu onLoginClick={() => setIsLoginOpen(true)} />
+                <div className="flex items-center gap-2 md:hidden">
+                  <button
+                    onClick={() => setIsSearchOpen(true)}
+                    className="p-2 text-white/70 hover:text-white transition-colors"
+                  >
+                    <Search className="w-5 h-5" />
+                  </button>
+                  <MobileMenu onLoginClick={() => setIsLoginOpen(true)} />
+                </div>
               </>
             )}
           </div>
         </div>
+      </nav>
 
-        {/* Mobile Search */}
-        {isSearchOpen && (
-          <div className="fixed inset-0 z-50 bg-[#121212] flex flex-col animate-in fade-in duration-200">
-            <div className="p-4 flex items-center gap-4 border-b border-white/10">
-              <div className="flex-1">
-                <UserSearch variant="mobile" autoFocus onClose={() => setIsSearchOpen(false)} />
-              </div>
-              <button
-                onClick={() => setIsSearchOpen(false)}
-                className="p-2 text-white/50 hover:text-white transition-colors"
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        )}
-      </nav >
+      {/* Mobile Search - FUERA del nav para evitar stacking issues */}
+      {isSearchOpen && <MobileUserSearch onClose={() => setIsSearchOpen(false)} />}
 
       <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
     </>

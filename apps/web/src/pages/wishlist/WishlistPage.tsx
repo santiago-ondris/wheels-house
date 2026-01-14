@@ -1,25 +1,31 @@
 import { useState, useEffect } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Star, Plus, Check, Car, ImageOff, Pencil, Trash2 } from "lucide-react";
 import PageHeader from "../../components/ui/PageHeader";
 import { getWishlist, deleteCar, WishlistCarData } from "../../services/car.service";
 import { useAuth } from "../../contexts/AuthContext";
 import toast from "react-hot-toast";
+import { useNavigateBack } from "../../hooks/useNavigateBack";
 
 export default function WishlistPage() {
     const { username } = useParams<{ username: string }>();
     const { user, isAuthenticated } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
     const [wishlist, setWishlist] = useState<WishlistCarData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     const isOwner = isAuthenticated && user?.username === username;
 
+    // Safe back navigation with fallback
+    const handleBack = useNavigateBack(`/collection/${username}`);
+
+    // Refetch when username changes OR when we navigate back to this page
+    // location.key changes on each navigation, triggering refetch
     useEffect(() => {
-        window.scrollTo(0, 0);
         fetchWishlist();
-    }, [username]);
+    }, [username, location.key]);
 
     const fetchWishlist = async () => {
         if (!username) return;
@@ -95,7 +101,7 @@ export default function WishlistPage() {
                 title="Wishlist"
                 subtitle={isOwner ? "Vehículos que buscás" : `Wishlist de @${username}`}
                 icon={Star}
-                onBack={() => navigate(-1)}
+                onBack={handleBack}
                 actions={
                     isOwner && (
                         <Link

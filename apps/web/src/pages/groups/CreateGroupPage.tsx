@@ -14,6 +14,7 @@ import { createGroup, CreateGroupData } from "../../services/group.service";
 import { listCars, CarData } from "../../services/car.service";
 import toast from "react-hot-toast";
 import { useAuth } from "../../contexts/AuthContext";
+import { useNavigateBack } from "../../hooks/useNavigateBack";
 
 interface GroupFormData {
     name: string;
@@ -37,8 +38,8 @@ export default function CreateGroupPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [isFetchingCars, setIsFetchingCars] = useState(true);
 
+    // ScrollRestoration handles scroll automatically
     useEffect(() => {
-        window.scrollTo(0, 0);
         if (user?.username) {
             fetchUserCars();
         }
@@ -97,9 +98,8 @@ export default function CreateGroupPage() {
         }
     };
 
-    const handleCancel = () => {
-        navigate(-1);
-    };
+    // Safe back navigation with fallback
+    const handleCancel = useNavigateBack(`/collection/${user?.username}/groups`);
 
     const toggleCar = (carId: number) => {
         setFormData((prev) => ({

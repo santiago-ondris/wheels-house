@@ -22,6 +22,7 @@ import toast from "react-hot-toast";
 import { useAuth } from "../../contexts/AuthContext";
 import { useCarSuggestions } from "../../hooks/useCarSuggestions";
 import SuggestionInput from "../../components/ui/SuggestionInput";
+import { useNavigateBack } from "../../hooks/useNavigateBack";
 
 export default function EditWishlistPage() {
     const { carId } = useParams<{ carId: string }>();
@@ -46,8 +47,11 @@ export default function EditWishlistPage() {
     const [isFetching, setIsFetching] = useState(true);
     const { suggestions } = useCarSuggestions();
 
+    // Safe back navigation with fallback
+    const navigateBack = useNavigateBack(`/wishlist/${user?.username}`);
+
+    // ScrollRestoration handles scroll automatically
     useEffect(() => {
-        window.scrollTo(0, 0);
         if (carId) {
             fetchCarData();
         }
@@ -74,7 +78,7 @@ export default function EditWishlistPage() {
         } catch (error) {
             console.error("Error fetching car:", error);
             toast.error("Error al cargar los datos del auto");
-            navigate(-1);
+            navigateBack();
         } finally {
             setIsFetching(false);
         }
@@ -107,7 +111,8 @@ export default function EditWishlistPage() {
             });
 
             toast.success("¡Auto actualizado!");
-            navigate(`/wishlist/${user?.username}`, { replace: true });
+            // Use navigate(-1) to go back to the existing Wishlist entry
+            navigate(-1);
         } catch (error: any) {
             toast.error("Error al actualizar el auto. Intentá de nuevo.");
             console.error(error);
@@ -116,9 +121,7 @@ export default function EditWishlistPage() {
         }
     };
 
-    const handleCancel = () => {
-        navigate(-1);
-    };
+    const handleCancel = navigateBack;
 
     const updateField = (field: keyof CarFormData, value: string) => {
         setFormData((prev) => {

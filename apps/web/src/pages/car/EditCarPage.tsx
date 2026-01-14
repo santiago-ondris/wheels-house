@@ -26,6 +26,7 @@ import toast from "react-hot-toast";
 import { useAuth } from "../../contexts/AuthContext";
 import { useCarSuggestions } from "../../hooks/useCarSuggestions";
 import SuggestionInput from "../../components/ui/SuggestionInput";
+import { useNavigateBack } from "../../hooks/useNavigateBack";
 
 export default function EditCarPage() {
     const navigate = useNavigate();
@@ -84,7 +85,7 @@ export default function EditCarPage() {
         } catch (error) {
             console.error("Error fetching data:", error);
             toast.error("Error al cargar datos");
-            navigate(`/collection/${user?.username}`);
+            navigate(`/collection/${user?.username}`, { replace: true });
         } finally {
             setIsFetching(false);
         }
@@ -114,6 +115,7 @@ export default function EditCarPage() {
                 await updateCar(Number(carId), result.data);
                 await updateCarGroups(Number(carId), selectedGroups);
                 toast.success("¡Auto actualizado con éxito!");
+                // Navigate back to the previous page (likely car detail or collection)
                 navigate(-1);
             }
         } catch (error: any) {
@@ -124,9 +126,8 @@ export default function EditCarPage() {
         }
     };
 
-    const handleCancel = () => {
-        navigate(-1);
-    };
+    // Safe back navigation with fallback
+    const handleCancel = useNavigateBack(`/collection/${user?.username || ''}`);
 
     const updateField = (field: keyof CarFormData, value: string) => {
         setFormData((prev) => {

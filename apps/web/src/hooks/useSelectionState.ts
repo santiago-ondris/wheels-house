@@ -28,18 +28,20 @@ export function useSelectionState(pageIds: number[], totalItems: number) {
                 else next.add(id);
                 return next;
             });
-            setSelectAllMode(null);
         }
     }, [selectAllMode]);
 
     const selectPage = useCallback(() => {
-        setSelectedIds(new Set(pageIds));
+        setSelectedIds(prev => {
+            const next = new Set(prev);
+            pageIds.forEach(id => next.add(id));
+            return next;
+        });
         setExcludedIds(new Set());
-        setSelectAllMode('page');
     }, [pageIds]);
 
     const selectAll = useCallback(() => {
-        setSelectedIds(new Set(pageIds)); 
+        setSelectedIds(new Set(pageIds));
         setExcludedIds(new Set());
         setSelectAllMode('all');
     }, [pageIds]);

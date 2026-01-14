@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import ImageAdapter from "../ui/ImageAdapter";
 import { getCuratedCarForCurrentMonth } from "../../data/curatedCars";
 import { useAuth } from "../../contexts/AuthContext";
+import LoginModal from "../auth/LoginModal";
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
@@ -13,6 +14,7 @@ const fadeInUp = {
 
 export default function FeaturedCar() {
     const { user, isAuthenticated } = useAuth();
+    const [isLoginOpen, setIsLoginOpen] = useState(false);
     const featuredCar = getCuratedCarForCurrentMonth();
     const [isMobile, setIsMobile] = useState(false);
 
@@ -28,9 +30,16 @@ export default function FeaturedCar() {
         ? featuredCar.pictures[1]
         : (featuredCar.pictures?.[0] || "https://placehold.co/1200x800/1A1B4B/D9731A?text=No+Image");
 
-    const collectionLink = isAuthenticated && user?.username 
+    const collectionLink = isAuthenticated && user?.username
         ? `/collection/${user.username}`
         : "/collection";
+
+    const handleCollectionClick = (e: React.MouseEvent) => {
+        if (!isAuthenticated) {
+            e.preventDefault();
+            setIsLoginOpen(true);
+        }
+    };
 
     return (
         <section className="container mx-auto px-6 py-10 relative overflow-hidden">
@@ -45,7 +54,7 @@ export default function FeaturedCar() {
                 className="flex items-center justify-between mb-8"
             >
                 <div>
-                    <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter">
+                    <h2 className="text-4xl md:text-6xl font-black text-accent tracking-tighter">
                         Elegido
                         <br />
                         del mes
@@ -55,9 +64,9 @@ export default function FeaturedCar() {
                 <div className="flex-1 hidden lg:flex items-center justify-center overflow-hidden pointer-events-none">
                     <motion.span
                         initial={{ opacity: 0, x: -20 }}
-                        whileInView={{ opacity: 0.5, x: 0 }}
+                        whileInView={{ opacity: 1, x: 0 }}
                         transition={{ duration: 1 }}
-                        className="text-[10rem] font-black tracking-tighter text-emerald-400 whitespace-nowrap select-none"
+                        className="text-[10rem] font-black tracking-tighter text-white whitespace-nowrap select-none"
                     >
                         COLLECTION
                     </motion.span>
@@ -144,6 +153,7 @@ export default function FeaturedCar() {
 
                         <Link
                             to={collectionLink}
+                            onClick={handleCollectionClick}
                             className="group/btn relative px-10 py-5 bg-white text-black font-black rounded-2xl transition-all hover:bg-accent hover:text-white hover:scale-105 active:scale-95 shadow-2xl overflow-hidden flex items-center gap-3"
                         >
                             <span className="relative z-10">IR A MI COLECCION</span>
@@ -153,6 +163,7 @@ export default function FeaturedCar() {
                     </div>
                 </div>
             </motion.div>
+            <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
         </section>
     );
 }

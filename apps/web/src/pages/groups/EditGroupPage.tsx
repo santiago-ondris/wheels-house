@@ -14,6 +14,7 @@ import PageHeader from "../../components/ui/PageHeader";
 import { getGroup, updateGroup, deleteGroup, UpdateGroupData } from "../../services/group.service";
 import toast from "react-hot-toast";
 import { useAuth } from "../../contexts/AuthContext";
+import { useNavigateBack } from "../../hooks/useNavigateBack";
 
 interface GroupFormData {
     name: string;
@@ -38,8 +39,8 @@ export default function EditGroupPage() {
     const [isFetching, setIsFetching] = useState(true);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+    // ScrollRestoration handles scroll automatically
     useEffect(() => {
-        window.scrollTo(0, 0);
         if (groupId && user?.username) {
             fetchData();
         }
@@ -60,7 +61,7 @@ export default function EditGroupPage() {
         } catch (error) {
             console.error("Error fetching data:", error);
             toast.error("Error al cargar el grupo");
-            navigate(`/collection/${user?.username}`);
+            navigate(`/collection/${user?.username}`, { replace: true });
         } finally {
             setIsFetching(false);
         }
@@ -92,7 +93,8 @@ export default function EditGroupPage() {
             };
             await updateGroup(Number(groupId), data);
             toast.success("¡Grupo actualizado!");
-            navigate(`/collection/${user?.username}/group/${encodeURIComponent(formData.name)}`, { replace: true });
+            // Navigate back to the previous page (likely group detail)
+            navigate(-1);
         } catch (error: any) {
             if (error?.error?.includes("more than 4")) {
                 toast.error("No podés tener más de 4 grupos destacados");
@@ -112,7 +114,7 @@ export default function EditGroupPage() {
         try {
             await deleteGroup(Number(groupId));
             toast.success("Grupo eliminado");
-            navigate(`/collection/${user?.username}`);
+            navigate(`/collection/${user?.username}`, { replace: true });
         } catch (error) {
             console.error(error);
             toast.error("Error al eliminar el grupo");
@@ -124,9 +126,8 @@ export default function EditGroupPage() {
 
 
 
-    const handleCancel = () => {
-        navigate(-1);
-    };
+    // Safe back navigation with fallback
+    const handleCancel = useNavigateBack(`/collection/${user?.username}/groups`);
 
     if (isFetching) {
         return <div className="min-h-screen flex items-center justify-center text-white">Cargando...</div>;

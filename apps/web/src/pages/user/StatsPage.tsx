@@ -30,7 +30,7 @@ export default function StatsPage() {
             } catch (error) {
                 console.error("Error fetching stats:", error);
                 toast.error("No pudimos cargar las estadísticas");
-                navigate(`/collection/${username}`);
+                navigate(`/collection/${username}`, { replace: true });
             } finally {
                 setIsLoading(false);
             }

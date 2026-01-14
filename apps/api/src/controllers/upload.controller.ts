@@ -14,12 +14,14 @@ import { diskStorage } from 'multer';
 import { UploadService } from '../services/upload.service';
 import * as fs from 'fs';
 import * as path from 'path';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller('upload')
 export class UploadController {
     constructor(private readonly uploadService: UploadService) { }
 
     @UseGuards(JwtAuthGuard)
+    @UseGuards(ThrottlerGuard)
     @Post('image')
     @UseInterceptors(
         FileInterceptor('file', {
@@ -74,6 +76,7 @@ export class UploadController {
         }
     }
 
+    @UseGuards(ThrottlerGuard)
     @Post('image/public')
     @UseInterceptors(
         FileInterceptor('file', {

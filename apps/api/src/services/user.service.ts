@@ -8,7 +8,8 @@ import {
     getUserFromEmail,
     updateResetPasswordToken,
     getUserFromRequestTokenSelector,
-    updatePasswordFromReset
+    updatePasswordFromReset,
+    deleteSearchHistoryFromUserId
 } from 'src/database/crud/user.crud';
 import { deleteAllCarPictures, deleteCarsFromUserId, getCarsFromUserId, getPicturesFromCar } from 'src/database/crud/car.crud';
 import { deleteGroupedCarsFromCarId, deleteGroupedCarsFromGroupId, deleteGroupsFromUserId, getGroupsFromUserId } from 'src/database/crud/group.crud';
@@ -200,6 +201,11 @@ export class UserService {
 
         const deletedGroups = await deleteGroupsFromUserId(user.userId);
         if (deletedGroups == null) {
+            throw ERROR_DELETING_USER;
+        }
+
+        const deletedSearchHistory = await deleteSearchHistoryFromUserId(user.userId);
+        if(!deletedSearchHistory) {
             throw ERROR_DELETING_USER;
         }
 

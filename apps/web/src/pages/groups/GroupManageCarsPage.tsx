@@ -9,13 +9,22 @@ import toast from "react-hot-toast";
 
 export default function GroupManageCarsPage() {
     const { groupId } = useParams<{ groupId: string }>();
-    const navigate = useNavigate();
     const { user } = useAuth();
     const [group, setGroup] = useState<GroupData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const navigate = useNavigate();
 
+    // Navigate to group detail page (not browser history)
+    const navigateToGroupDetail = () => {
+        if (group && user) {
+            navigate(`/collection/${user.username}/group/${encodeURIComponent(group.name)}`);
+        } else {
+            navigate(`/collection/${user?.username}/groups`);
+        }
+    };
+
+    // ScrollRestoration handles scroll automatically
     useEffect(() => {
-        window.scrollTo(0, 0);
         if (groupId) {
             fetchGroupData();
         }
@@ -28,7 +37,7 @@ export default function GroupManageCarsPage() {
         } catch (error) {
             console.error("Error fetching group:", error);
             toast.error("Error al cargar el grupo");
-            navigate(-1);
+            navigateToGroupDetail();
         } finally {
             setIsLoading(false);
         }
@@ -49,16 +58,15 @@ export default function GroupManageCarsPage() {
             });
 
             toast.success("Vehículos actualizados correctamente");
-            navigate(-1);
+            navigateToGroupDetail();
         } catch (error) {
             console.error("Error saving group cars:", error);
             toast.error("Error al guardar cambios");
         }
     };
 
-    const handleBack = () => {
-        navigate(-1);
-    };
+    // Use the navigateBack function directly
+    const handleBack = navigateToGroupDetail;
 
     if (isLoading) {
         return (

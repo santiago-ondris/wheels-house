@@ -16,8 +16,8 @@ export default function GroupsListPage() {
 
     const isOwner = user?.username === username;
 
+    // ScrollRestoration handles scroll automatically
     useEffect(() => {
-        window.scrollTo(0, 0);
         if (username) {
             fetchGroups();
         }
@@ -35,9 +35,8 @@ export default function GroupsListPage() {
         }
     };
 
-    const handleBack = () => {
-        navigate(-1);
-    };
+    // Always navigate to user profile (not browser history to avoid loops)
+    const handleBack = () => navigate(`/collection/${username}`);
 
     if (isLoading) {
         return (

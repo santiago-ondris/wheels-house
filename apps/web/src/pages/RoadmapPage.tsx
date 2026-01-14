@@ -315,7 +315,7 @@ function TimelineCard({ item, isLeft }: { item: RoadmapItem, isLeft: boolean }) 
             <div className="group relative bg-[#0c0c0e]/90 backdrop-blur-md border border-white/5 p-5 rounded-xl hover:border-white/15 transition-all hover:bg-white/[0.03]">
 
                 {/* Status Badge */}
-                <div className="absolute top-3 right-3 text-[7px] font-mono font-black text-emerald-500 uppercase tracking-[0.12em] px-2 py-0.5 border border-white/5 rounded bg-white/[0.02]">
+                <div className="absolute top-3 right-3 text-[10px] font-mono font-black text-emerald-500 uppercase tracking-[0.12em] px-2 py-0.5 border border-white/5 rounded bg-white/[0.02]">
                     {item.statusLabel}
                 </div>
 
@@ -327,7 +327,7 @@ function TimelineCard({ item, isLeft }: { item: RoadmapItem, isLeft: boolean }) 
                         <h3 className="text-sm font-mono font-black uppercase tracking-tight text-white/90 group-hover:text-white transition-colors pr-14">
                             {item.title}
                         </h3>
-                        <p className="text-[10px] text-white font-mono leading-relaxed group-hover:text-white/45 transition-colors">
+                        <p className="text-[12px] text-white font-mono leading-relaxed group-hover:text-white/45 transition-colors">
                             {item.description}
                         </p>
                     </div>
@@ -365,7 +365,7 @@ function MetadataPanel({ icon: Icon, label, timeline, badge, alignRight }: { ico
             {/* Status Icon + Label */}
             <div className={`flex items-center gap-2 ${alignRight ? 'flex-row-reverse' : ''}`}>
                 <Icon className="w-4 h-4 text-white/20" />
-                <span className="text-[10px] font-mono font-bold text-white/25 uppercase tracking-[0.15em]">
+                <span className="text-[60px] font-mono font-bold text-white/25 uppercase tracking-[0.15em]">
                     {label}
                 </span>
             </div>
