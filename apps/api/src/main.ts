@@ -14,7 +14,7 @@ async function bootstrap() {
     transform: true,
   }));
 
-  // CORS configurado para deploy
+  // CORS configurado para deployment
   app.enableCors({
     origin: process.env.FRONTEND_URL?.split(',') || [
       'http://localhost:5173',
