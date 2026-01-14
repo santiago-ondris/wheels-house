@@ -133,6 +133,17 @@ export default function SettingsPage() {
 
     const handleUpdateProfile = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!firstName.trim()) {
+            toast.error("El nombre es requerido");
+            return;
+        }
+
+        if (!lastName.trim()) {
+            toast.error("El apellido es requerido");
+            return;
+        }
+
         setIsUpdatingProfile(true);
         try {
             await updateProfile({ firstName, lastName, biography, picture });
@@ -214,14 +225,7 @@ export default function SettingsPage() {
                 <div className="container mx-auto px-6 py-4">
                     <div className="flex items-center gap-4">
                         <button
-                            onClick={() => {
-                                if (hasUnsavedChanges()) {
-                                    setPendingAction(() => () => navigate(`/collection/${user?.username}`));
-                                    setShowUnsavedModal(true);
-                                } else {
-                                    navigate(`/collection/${user?.username}`);
-                                }
-                            }}
+                            onClick={() => navigate(`/collection/${user?.username}`)}
                             className="p-2 text-white/40 hover:text-white transition-colors rounded-xl hover:bg-white/5"
                         >
                             <ChevronLeft className="w-5 h-5" />
@@ -243,14 +247,7 @@ export default function SettingsPage() {
             <div className="lg:hidden px-4 py-6">
                 <div className="flex items-center justify-between mb-6">
                     <button
-                        onClick={() => {
-                            if (hasUnsavedChanges()) {
-                                setPendingAction(() => () => navigate(`/collection/${user?.username}`));
-                                setShowUnsavedModal(true);
-                            } else {
-                                navigate(`/collection/${user?.username}`);
-                            }
-                        }}
+                        onClick={() => navigate(`/collection/${user?.username}`)}
                         className="flex items-center gap-2 text-white/40 hover:text-white transition-colors group"
                     >
                         <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
@@ -371,7 +368,6 @@ export default function SettingsPage() {
                                                         value={firstName}
                                                         onChange={(e) => setFirstName(e.target.value)}
                                                         className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent/40 font-mono transition-colors"
-                                                        required
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
@@ -381,7 +377,6 @@ export default function SettingsPage() {
                                                         value={lastName}
                                                         onChange={(e) => setLastName(e.target.value)}
                                                         className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent/40 font-mono transition-colors"
-                                                        required
                                                     />
                                                 </div>
                                             </div>
