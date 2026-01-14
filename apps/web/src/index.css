@@ -49,3 +49,8 @@
     background: color-mix(in srgb, var(--color-blueprint) 2%, transparent);
   }
 }
+
+/* Global button cursor */
+button {
+  cursor: pointer;
+}

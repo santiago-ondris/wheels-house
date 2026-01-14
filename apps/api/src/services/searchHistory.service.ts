@@ -53,4 +53,30 @@ export class SearchHistoryService {
             throw error;
         }
     }
+
+    async removeFromHistory(currentUserId: number, searchedUserId: number) {
+        try {
+            await db.delete(searchHistory)
+                .where(
+                    and(
+                        eq(searchHistory.userId, currentUserId),
+                        eq(searchHistory.searchedUserId, searchedUserId)
+                    )
+                );
+        } catch (error) {
+            console.error("Error removing from search history:", error);
+            throw error;
+        }
+    }
+
+    async clearHistory(currentUserId: number) {
+        try {
+            await db.delete(searchHistory)
+                .where(eq(searchHistory.userId, currentUserId));
+        } catch (error) {
+            console.error("Error clearing search history:", error);
+            throw error;
+        }
+    }
 }
+

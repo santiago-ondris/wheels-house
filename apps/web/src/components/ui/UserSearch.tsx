@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import { Search, Loader2, X, User } from "lucide-react";
+import { Search, Loader2, X, User, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { searchUsers, BasicUser, getSearchHistory, addToSearchHistory } from "../../services/profile.service";
+import { searchUsers, BasicUser, getSearchHistory, addToSearchHistory, removeFromSearchHistory, clearSearchHistory } from "../../services/profile.service";
 import { useAuth } from "../../contexts/AuthContext";
+import toast from "react-hot-toast";
 
 interface UserSearchProps {
     className?: string;
@@ -68,6 +69,30 @@ export default function UserSearch({ className = "" }: UserSearchProps) {
         navigate(`/collection/${username}`);
     };
 
+    const handleRemoveFromHistory = async (e: React.MouseEvent, username: string) => {
+        e.stopPropagation();
+        try {
+            await removeFromSearchHistory(username);
+            setHistory(prev => prev.filter(u => u.username !== username));
+            toast.success("Búsqueda eliminada");
+        } catch (error) {
+            console.error("Error removing from history:", error);
+            toast.error("Error al eliminar");
+        }
+    };
+
+    const handleClearHistory = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        try {
+            await clearSearchHistory();
+            setHistory([]);
+            toast.success("Historial eliminado");
+        } catch (error) {
+            console.error("Error clearing history:", error);
+            toast.error("Error al limpiar historial");
+        }
+    };
+
     return (
         <div ref={searchRef} className={`relative ${className}`}>
             <div className="relative flex items-center">
@@ -100,28 +125,45 @@ export default function UserSearch({ className = "" }: UserSearchProps) {
                 <div className="absolute top-full left-0 right-0 mt-2 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
                     {query.length === 0 && isAuthenticated && history.length > 0 ? (
                         <>
-                            <div className="px-4 py-3 text-xs font-mono text-white/40 uppercase tracking-wider border-b border-white/5 bg-white/5 backdrop-blur-sm sticky top-0 z-10">
-                                Recientes
+                            <div className="px-4 py-3 flex items-center justify-between border-b border-white/5 bg-white/5 backdrop-blur-sm sticky top-0 z-10">
+                                <span className="text-xs font-mono text-white/40 uppercase tracking-wider">
+                                    Recientes
+                                </span>
+                                <button
+                                    onClick={handleClearHistory}
+                                    className="text-xs text-red-400/70 hover:text-red-400 transition-colors flex items-center gap-1"
+                                >
+                                    <Trash2 className="w-3 h-3" />
+                                    Limpiar
+                                </button>
                             </div>
                             <ul className="py-2 max-h-[60vh] overflow-y-auto">
                                 {history.map((user) => (
                                     <li key={user.userId}>
-                                        <button
-                                            onClick={() => handleSelectUser(user.username)}
-                                            className="w-full text-left px-4 py-3 hover:bg-white/5 transition-colors flex items-center gap-4 group border-b border-white/5 last:border-0"
-                                        >
-                                            <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center overflow-hidden border border-white/10 shrink-0">
-                                                {user.picture ? (
-                                                    <img src={user.picture} alt={user.username} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <User className="w-4 h-4 text-accent" />
-                                                )}
-                                            </div>
-                                            <div>
-                                                <p className="text-white font-medium text-sm group-hover:text-accent transition-colors">@{user.username}</p>
-                                                <p className="text-white/50 text-xs">{user.firstName} {user.lastName}</p>
-                                            </div>
-                                        </button>
+                                        <div className="flex items-center group border-b border-white/5 last:border-0">
+                                            <button
+                                                onClick={() => handleSelectUser(user.username)}
+                                                className="flex-1 text-left px-4 py-3 hover:bg-white/5 transition-colors flex items-center gap-4"
+                                            >
+                                                <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center overflow-hidden border border-white/10 shrink-0">
+                                                    {user.picture ? (
+                                                        <img src={user.picture} alt={user.username} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <User className="w-4 h-4 text-accent" />
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <p className="text-white font-medium text-sm group-hover:text-accent transition-colors">@{user.username}</p>
+                                                    <p className="text-white/50 text-xs">{user.firstName} {user.lastName}</p>
+                                                </div>
+                                            </button>
+                                            <button
+                                                onClick={(e) => handleRemoveFromHistory(e, user.username)}
+                                                className="p-2 mr-2 text-white/20 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                        </div>
                                     </li>
                                 ))}
                             </ul>
@@ -162,3 +204,4 @@ export default function UserSearch({ className = "" }: UserSearchProps) {
         </div>
     );
 }
+

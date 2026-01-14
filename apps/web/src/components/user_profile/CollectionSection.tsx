@@ -210,6 +210,7 @@ export default function CollectionSection({
         scales: [],
         conditions: [],
         countries: [],
+        hasPicture: [],
     };
 
     const filters = data?.filters || defaultFilters;
@@ -289,6 +290,7 @@ export default function CollectionSection({
                             selectedScales={params.scales}
                             selectedConditions={params.conditions}
                             selectedCountries={params.countries}
+                            selectedHasPicture={params.hasPicture}
                             onToggleFilter={toggleFilter}
                             onClearFilters={clearFilters}
                             hasActiveFilters={hasActiveFilters}
@@ -428,7 +430,7 @@ export default function CollectionSection({
                                 )}
                             </AnimatePresence>
 
-                            {data && data.pagination.totalPages > 1 && (
+                            {data && (
                                 <Pagination
                                     currentPage={data.pagination.currentPage}
                                     totalPages={data.pagination.totalPages}
@@ -458,6 +460,7 @@ export default function CollectionSection({
                 selectedScales={params.scales}
                 selectedConditions={params.conditions}
                 selectedCountries={params.countries}
+                selectedHasPicture={params.hasPicture}
                 onToggleFilter={toggleFilter}
                 onClearFilters={clearFilters}
                 hasActiveFilters={hasActiveFilters}

@@ -71,7 +71,7 @@ export default function Navbar() {
                     to="/register"
                     className="px-4 py-2 bg-accent hover:bg-accent/80 text-white font-bold rounded-lg transition-colors"
                   >
-                    Registrarse
+                    Crear cuenta
                   </Link>
                 </div>
 

@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { Disclosure, Transition } from "@headlessui/react";
-import { X, Menu as MenuIcon, Home, Car, LogIn, UserPlus, Trophy } from "lucide-react";
+import { X, Menu as MenuIcon, Home, Car, LogIn, UserPlus, Trophy, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -62,6 +62,15 @@ export default function MobileMenu({ onLoginClick }: MobileMenuProps) {
                     Mi Colección
                   </Link>
 
+                  <Link
+                    to="/settings"
+                    onClick={() => close()}
+                    className="flex items-center gap-3 px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors"
+                  >
+                    <User className="w-5 h-5" />
+                    Editar perfil
+                  </Link>
+
                   <button
                     onClick={() => {
                       logout();
@@ -110,7 +119,7 @@ export default function MobileMenu({ onLoginClick }: MobileMenuProps) {
                     className="flex items-center gap-3 px-4 py-3 text-accent hover:bg-accent/20 rounded-lg transition-colors"
                   >
                     <UserPlus className="w-5 h-5" />
-                    Registrarse
+                    Crear cuenta
                   </Link>
                 </div>
               )}

@@ -15,6 +15,7 @@ export interface CollectionParams {
     scales: string[];
     conditions: string[];
     countries: string[];
+    hasPicture: string[];
     search: string;
 }
 
@@ -29,6 +30,7 @@ const DEFAULTS: CollectionParams = {
     scales: [],
     conditions: [],
     countries: [],
+    hasPicture: [],
     search: '',
 };
 
@@ -56,6 +58,7 @@ export function useCollectionParams() {
         scales: parseArray(searchParams.get('scales')),
         conditions: parseArray(searchParams.get('conditions')),
         countries: parseArray(searchParams.get('countries')),
+        hasPicture: parseArray(searchParams.get('hasPicture')),
         search: searchParams.get('search') || DEFAULTS.search,
     }), [searchParams]);
 
@@ -101,7 +104,7 @@ export function useCollectionParams() {
     const setSort = useCallback((sortBy: SortBy, sortOrder: SortOrder) => setParams({ sortBy, sortOrder }), [setParams]);
     const setSearch = useCallback((search: string) => setParams({ search }), [setParams]);
 
-    const toggleFilter = useCallback((field: keyof Pick<CollectionParams, 'brands' | 'colors' | 'manufacturers' | 'scales' | 'conditions' | 'countries'>, value: string) => {
+    const toggleFilter = useCallback((field: keyof Pick<CollectionParams, 'brands' | 'colors' | 'manufacturers' | 'scales' | 'conditions' | 'countries' | 'hasPicture'>, value: string) => {
         const current = params[field];
         const newValues = current.includes(value)
             ? current.filter(v => v !== value)
@@ -117,6 +120,7 @@ export function useCollectionParams() {
             scales: [],
             conditions: [],
             countries: [],
+            hasPicture: [],
             search: '',
             page: 1,
         });
@@ -129,6 +133,7 @@ export function useCollectionParams() {
             params.scales.length > 0 ||
             params.conditions.length > 0 ||
             params.countries.length > 0 ||
+            params.hasPicture.length > 0 ||
             params.search.length > 0;
     }, [params]);
 

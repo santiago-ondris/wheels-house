@@ -18,6 +18,7 @@ export class CollectionQueryDTO {
     scales?: string[];
     conditions?: string[];
     countries?: string[];
+    hasPicture?: string[];
 
     // Busqueda de texto
     search?: string;
@@ -40,6 +41,7 @@ export interface FilterOptions {
     scales: { name: string; count: number }[];
     conditions: { name: string; count: number }[];
     countries: { name: string; count: number }[];
+    hasPicture: { name: string; count: number }[];
 }
 
 export interface PaginatedCarsResponse<T> {

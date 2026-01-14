@@ -2,8 +2,11 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 import { useNavigate } from "react-router-dom";
 import { login as loginService } from "../services/auth.service";
 
+import { getPublicProfile } from "../services/profile.service";
+
 interface User {
   username: string;
+  picture?: string;
 }
 
 interface AuthContextType {
@@ -12,6 +15,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (usernameOrEmail: string, password: string) => Promise<void>;
   logout: () => void;
+  updatePicture: (newPicture: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,26 +32,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("auth_token");
-    if (token) {
-      try {
-        const decoded = decodeToken(token);
-        setUser({ username: decoded.username });
-      } catch {
-        localStorage.removeItem("auth_token");
+    const initAuth = async () => {
+      const token = localStorage.getItem("auth_token");
+      if (token) {
+        try {
+          const decoded = decodeToken(token);
+          try {
+            const profile = await getPublicProfile(decoded.username);
+            setUser({ username: decoded.username, picture: profile.picture });
+          } catch {
+            setUser({ username: decoded.username });
+          }
+        } catch {
+          localStorage.removeItem("auth_token");
+        }
       }
-    }
-    setIsLoading(false);
+      setIsLoading(false);
+    };
+
+    initAuth();
   }, []);
 
   const login = async (usernameOrEmail: string, password: string) => {
-    const response = await loginService({usernameOrEmail, password});
+    const response = await loginService({ usernameOrEmail, password });
     const token = response.authorization;
 
     localStorage.setItem("auth_token", token);
 
     const decoded = decodeToken(token);
-    setUser({ username: decoded.username });
+
+    // Fetch user picture from profile
+    try {
+      const profile = await getPublicProfile(decoded.username);
+      setUser({ username: decoded.username, picture: profile.picture });
+    } catch {
+      setUser({ username: decoded.username });
+    }
   };
 
   const logout = () => {
@@ -58,6 +78,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, 50);
   };
 
+  const updatePicture = (newPicture: string) => {
+    if (user) {
+      setUser({ ...user, picture: newPicture || undefined });
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -66,10 +92,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading,
         login,
         logout,
+        updatePicture,
       }}
     >
       {children}
-    </AuthContext.Provider>  
+    </AuthContext.Provider>
   );
 }
 

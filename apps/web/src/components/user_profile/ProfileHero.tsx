@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { User, Calendar, BarChart2, Star } from "lucide-react";
+import { Calendar, BarChart2, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface ProfileHeroProps {
@@ -50,8 +50,10 @@ export default function ProfileHero({
                                 className="w-full h-full object-cover transition-all duration-500"
                             />
                         ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-white/[0.02]">
-                                <User className="w-10 h-10 text-white/20" />
+                            <div className="w-full h-full flex items-center justify-center bg-accent">
+                                <span className="text-white font-bold text-3xl">
+                                    {username[0].toUpperCase()}
+                                </span>
                             </div>
                         )}
                     </div>
@@ -134,8 +136,10 @@ export default function ProfileHero({
                                 className="w-full h-full object-cover"
                             />
                         ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                                <User className="w-8 h-8 text-white/20" />
+                            <div className="w-full h-full flex items-center justify-center bg-accent">
+                                <span className="text-white font-bold text-2xl">
+                                    {username[0].toUpperCase()}
+                                </span>
                             </div>
                         )}
                     </div>

@@ -122,6 +122,7 @@ export interface FilterOptions {
     scales: FilterOption[];
     conditions: FilterOption[];
     countries: FilterOption[];
+    hasPicture: FilterOption[];
 }
 
 export interface PaginatedCarsResponse {
@@ -141,6 +142,7 @@ export interface CollectionQueryParams {
     scales?: string[];
     conditions?: string[];
     countries?: string[];
+    hasPicture?: string[];
     search?: string;
     groupId?: number;
 }
@@ -158,6 +160,7 @@ export async function listCarsPaginated(username: string, params: CollectionQuer
     if (params.scales?.length) queryParts.push(`scales=${params.scales.join(',')}`);
     if (params.conditions?.length) queryParts.push(`conditions=${params.conditions.join(',')}`);
     if (params.countries?.length) queryParts.push(`countries=${params.countries.join(',')}`);
+    if (params.hasPicture?.length) queryParts.push(`hasPicture=${params.hasPicture.join(',')}`);
     if (params.search) queryParts.push(`search=${encodeURIComponent(params.search)}`);
     if (params.groupId) queryParts.push(`groupId=${params.groupId}`);
 
@@ -221,7 +224,7 @@ export interface WishedCarToCollectionDTO {
 export async function wishedCarToCollection(carId: number, data: WishedCarToCollectionDTO): Promise<void> {
     const token = localStorage.getItem("auth_token");
     const API_URL = `http://${window.location.hostname}:3000`;
-    
+
     const response = await fetch(`${API_URL}/car/wishedCarToCollection/${carId}`, {
         method: 'PUT',
         headers: {
@@ -230,7 +233,7 @@ export async function wishedCarToCollection(carId: number, data: WishedCarToColl
         },
         body: JSON.stringify(data),
     });
-    
+
     if (!response.ok) {
         const error = await response.json();
         throw error;
