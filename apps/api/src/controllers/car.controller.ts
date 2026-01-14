@@ -39,6 +39,7 @@ export class CarController {
         @Query('scales') scales?: string,
         @Query('conditions') conditions?: string,
         @Query('countries') countries?: string,
+        @Query('hasPicture') hasPicture?: string,
         @Query('search') search?: string,
         @Query('groupId') groupId?: string,
     ) {
@@ -53,6 +54,7 @@ export class CarController {
             scales: scales ? scales.split(',') : undefined,
             conditions: conditions ? conditions.split(',') : undefined,
             countries: countries ? countries.split(',') : undefined,
+            hasPicture: hasPicture ? hasPicture.split(',') : undefined,
             search,
             groupId: groupId ? parseInt(groupId) : undefined,
         };

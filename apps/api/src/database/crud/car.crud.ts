@@ -2,7 +2,7 @@ import { CarPictureToDB, CarToDB, CarUpdateDTO } from "src/dto/car.dto";
 import { CollectionQueryDTO } from "src/dto/collection-query.dto";
 import { db } from "../index";
 import { car, carPicture, user, groupedCar } from "../schema";
-import { count, eq, or, and, ilike, asc, desc, sql, SQL, inArray } from 'drizzle-orm';
+import { count, eq, or, and, ilike, asc, desc, sql, SQL, inArray, notInArray } from 'drizzle-orm';
 
 // Create
 
@@ -184,6 +184,7 @@ export async function getCarsFromUserIdPaginated(userId: number, query: Collecti
         scales,
         conditions,
         countries,
+        hasPicture,
         search
     } = query;
 
@@ -198,6 +199,23 @@ export async function getCarsFromUserIdPaginated(userId: number, query: Collecti
             .where(eq(groupedCar.groupId, query.groupId));
 
         conditions_list.push(inArray(car.carId, carsInGroup));
+    }
+
+    // To filter by cars with picture.
+    if (hasPicture && hasPicture.length == 1 && hasPicture[0] == 'Con imagen') {
+        const carsWithPicture = db
+        .select({ carId: car.carId})
+        .from(car)
+        .innerJoin(carPicture, eq(car.carId, carPicture.carId)). groupBy(car.carId);
+
+        conditions_list.push(inArray(car.carId, carsWithPicture));        
+    } else if(hasPicture && hasPicture.length == 1 && hasPicture[0] == 'Sin imagen') {
+        const carsWithPicture = db
+        .select({ carId: car.carId})
+        .from(car)
+        .innerJoin(carPicture, eq(car.carId, carPicture.carId)). groupBy(car.carId);
+
+        conditions_list.push(notInArray(car.carId, carsWithPicture));
     }
 
     // Filtros con logica OR
@@ -286,7 +304,7 @@ export async function getCarsFromUserIdPaginated(userId: number, query: Collecti
 }
 
 export async function getCarIdsFromUserIdWithFilter(userId: number, query: CollectionQueryDTO) {
-    const { brands, colors, manufacturers, scales, conditions, countries, search } = query;
+    const { brands, colors, manufacturers, scales, conditions, countries, hasPicture, search } = query;
 
     const conditions_list: SQL[] = [eq(car.userId, userId), eq(car.wished, false)];
 
@@ -307,6 +325,23 @@ export async function getCarIdsFromUserIdWithFilter(userId: number, query: Colle
     }
     if (countries && countries.length > 0) {
         conditions_list.push(or(...countries.map(c => eq(car.country, c)))!);
+    }
+
+    // To filter by cars with picture.
+    if (hasPicture && hasPicture.length == 1 && hasPicture[0] == 'Con imagen') {
+        const carsWithPicture = db
+        .select({ carId: car.carId})
+        .from(car)
+        .innerJoin(carPicture, eq(car.carId, carPicture.carId)). groupBy(car.carId);
+
+        conditions_list.push(inArray(car.carId, carsWithPicture));        
+    } else if(hasPicture && hasPicture.length == 1 && hasPicture[0] == 'Sin imagen') {
+        const carsWithPicture = db
+        .select({ carId: car.carId})
+        .from(car)
+        .innerJoin(carPicture, eq(car.carId, carPicture.carId)). groupBy(car.carId);
+
+        conditions_list.push(notInArray(car.carId, carsWithPicture));
     }
 
     if (search && search.trim()) {
@@ -364,6 +399,38 @@ export async function getFilterOptionsForUser(userId: number, groupId: number | 
             .sort((a, b) => b.count - a.count);
     };
 
+    // To count cars with pictures.
+    const carsWithPicture = !groupId ? (
+        // If groudId is undefined
+        await db.select({
+            carId: car.carId,
+        }).from(car).where(and(eq(car.userId, userId), eq(car.wished, false)))
+        .innerJoin(carPicture, eq(carPicture.carId, car.carId)).groupBy(car.carId)
+    ) : (
+        // If groupId is defined
+        await db.select({
+            carId: car.carId,
+        }).from(car).innerJoin(groupedCar, eq(groupedCar.carId, car.carId)).where(and(
+            eq(car.userId, userId), eq(car.wished, false), eq(groupedCar.groupId, groupId)))
+        .innerJoin(carPicture, eq(carPicture.carId, car.carId)).groupBy(car.carId)
+    );
+
+    let hasPicture : { name: string; count: number }[] = []; 
+
+    if (carsWithPicture.length > 0) {
+        hasPicture.push({
+            name: "Con imagen",
+            count: carsWithPicture.length
+        });
+    }
+
+    if(cars.length - carsWithPicture.length > 0) {
+        hasPicture.push({
+            name: "Sin imagen",
+            count: cars.length - carsWithPicture.length
+        });
+    }
+
     return {
         brands: countBy(cars.map(c => c.brand)),
         colors: countBy(cars.map(c => c.color)),
@@ -371,5 +438,6 @@ export async function getFilterOptionsForUser(userId: number, groupId: number | 
         scales: countBy(cars.map(c => c.scale)),
         conditions: countBy(cars.map(c => c.condition)),
         countries: countBy(cars.map(c => c.country)),
+        hasPicture
     };
 }
