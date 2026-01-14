@@ -148,7 +148,7 @@ export default function QuickAddPage() {
     return (
         <div className="min-h-screen pb-32 md:pb-8">
             <PageHeader
-                title="Quick Add"
+                title="Carga rápida"
                 subtitle="Carga rápida de vehículos"
                 icon={Zap}
                 onBack={handleCancel}
