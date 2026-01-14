@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowDown, ArrowUp, Edit, Trash2, ArrowLeft, Star } from "lucide-react";
+import { ArrowDown, ArrowUp, Edit, Trash2, ArrowLeft, Star, Loader2 } from "lucide-react";
 import { getCar, deleteCar, CarData } from "../../services/car.service";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigateBack } from "../../hooks/useNavigateBack";
@@ -18,6 +18,7 @@ export const CarDetailPage = () => {
     const [car, setCar] = useState<CarData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const isOwner = user?.username === car?.ownerUsername;
 
@@ -42,7 +43,8 @@ export const CarDetailPage = () => {
     };
 
     const handleDelete = async () => {
-        if (!car?.carId) return;
+        if (!car?.carId || isDeleting) return;
+        setIsDeleting(true);
         try {
             await deleteCar(car.carId);
             toast.success(car.wished ? "Auto eliminado de la wishlist" : "Auto eliminado correctamente");
@@ -50,6 +52,8 @@ export const CarDetailPage = () => {
         } catch (error) {
             console.error("Error deleting car:", error);
             toast.error("Error al eliminar el auto");
+        } finally {
+            setIsDeleting(false);
         }
     };
 
@@ -64,8 +68,8 @@ export const CarDetailPage = () => {
 
     // Safe back navigation with fallback to owner's collection
     const handleBack = useNavigateBack(
-        car?.wished 
-            ? `/wishlist/${car?.ownerUsername || user?.username}` 
+        car?.wished
+            ? `/wishlist/${car?.ownerUsername || user?.username}`
             : `/collection/${car?.ownerUsername || user?.username || ''}`
     );
 
@@ -126,10 +130,10 @@ export const CarDetailPage = () => {
                         <div className="flex gap-3">
                             <button
                                 onClick={handleEdit}
-                                className={`p-2 border rounded-lg transition-colors ${car.wished 
+                                className={`p-2 border rounded-lg transition-colors ${car.wished
                                     ? 'border-amber-500/30 hover:bg-amber-500/10 text-amber-400 hover:text-amber-300'
                                     : 'border-white/10 hover:bg-white/10 text-white/70 hover:text-white'
-                                }`}
+                                    }`}
                             >
                                 <Edit size={18} />
                             </button>
@@ -206,7 +210,7 @@ export const CarDetailPage = () => {
                         ¿Estás seguro que querés eliminar el <span className="font-bold text-white">{car.name}</span>?
                         <br /><br />
                         <span className="text-danger font-medium italic">
-                            {car.wished 
+                            {car.wished
                                 ? "Este auto se eliminará de tu wishlist."
                                 : "Esta acción eliminará el auto de toda tu colección y no se puede deshacer."
                             }
@@ -215,15 +219,24 @@ export const CarDetailPage = () => {
                     <div className="flex gap-3">
                         <button
                             onClick={() => setIsDeleteModalOpen(false)}
-                            className="flex-1 px-6 py-3 border border-white/10 text-white font-bold rounded-xl hover:bg-white/5 transition-all"
+                            disabled={isDeleting}
+                            className="flex-1 px-6 py-3 border border-white/10 text-white font-bold rounded-xl hover:bg-white/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             Cancelar
                         </button>
                         <button
                             onClick={handleDelete}
-                            className="flex-1 px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl transition-all hover:scale-[1.02] shadow-lg shadow-red-500/20"
+                            disabled={isDeleting}
+                            className="flex-1 px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl transition-all hover:scale-[1.02] shadow-lg shadow-red-500/20 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
                         >
-                            Eliminar
+                            {isDeleting ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    Eliminando...
+                                </>
+                            ) : (
+                                'Eliminar'
+                            )}
                         </button>
                     </div>
                 </div>

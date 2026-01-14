@@ -110,7 +110,7 @@ export default function MobileMenu({ onLoginClick }: MobileMenuProps) {
                     className="flex items-center gap-3 px-4 py-3 text-accent hover:bg-accent/20 rounded-lg transition-colors"
                   >
                     <UserPlus className="w-5 h-5" />
-                    Registrarse
+                    Crear cuenta
                   </Link>
                 </div>
               )}

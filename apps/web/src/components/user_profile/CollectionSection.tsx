@@ -427,7 +427,7 @@ export default function CollectionSection({
                                 )}
                             </AnimatePresence>
 
-                            {data && data.pagination.totalPages > 1 && (
+                            {data && (
                                 <Pagination
                                     currentPage={data.pagination.currentPage}
                                     totalPages={data.pagination.totalPages}

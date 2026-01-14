@@ -19,6 +19,7 @@ export class UserStatsDTO {
     scaleDistribution: DistributionItem[];
     colorDistribution: DistributionItem[];
     conditionDistribution: DistributionItem[];
+    countryDistribution: DistributionItem[];
 
     constructor(
         totalCars: number,
@@ -29,7 +30,8 @@ export class UserStatsDTO {
         manufacturerDistribution: DistributionItem[],
         scaleDistribution: DistributionItem[],
         colorDistribution: DistributionItem[],
-        conditionDistribution: DistributionItem[]
+        conditionDistribution: DistributionItem[],
+        countryDistribution: DistributionItem[]
     ) {
         this.totalCars = totalCars;
         this.distinctBrands = distinctBrands;
@@ -40,5 +42,6 @@ export class UserStatsDTO {
         this.scaleDistribution = scaleDistribution;
         this.colorDistribution = colorDistribution;
         this.conditionDistribution = conditionDistribution;
+        this.countryDistribution = countryDistribution;
     }
 }

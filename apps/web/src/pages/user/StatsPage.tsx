@@ -139,9 +139,9 @@ export default function StatsPage() {
                     />
 
                     <DistributionSection
-                        title="Top_Escala"
+                        title="Top_Países"
                         subTitle="TERCERA_ANALÍTICA"
-                        items={stats.scaleDistribution}
+                        items={stats.countryDistribution}
                         total={stats.totalCars}
                         colorClass="bg-emerald-500"
                     />

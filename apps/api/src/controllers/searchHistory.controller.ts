@@ -1,5 +1,5 @@
 
-import { Controller, Post, Body, Get, Req, UseGuards, Param } from '@nestjs/common';
+import { Controller, Post, Body, Get, Delete, Req, UseGuards, Param } from '@nestjs/common';
 import { SearchHistoryService } from '../services/searchHistory.service';
 import { JwtAuthGuard } from '../validators/auth.validator';
 import { db } from '../database';
@@ -13,15 +13,12 @@ export class SearchHistoryController {
     @UseGuards(JwtAuthGuard)
     @Post()
     async addToHistory(@Req() req: any, @Body() body: { searchedUsername: string }) {
-        // Since JWT only has username, we need to fetch the userId
         const [currentUser] = await db.select().from(user).where(eq(user.username, req.user.username)).limit(1);
 
         if (!currentUser) {
             throw new Error("Current user not found");
         }
 
-        // Resolve username to ID first
-        // We accept username because the frontend component works with usernames usually
         const [searchedUser] = await db.select().from(user).where(eq(user.username, body.searchedUsername)).limit(1);
 
         if (searchedUser) {
@@ -41,4 +38,37 @@ export class SearchHistoryController {
 
         return await this.searchHistoryService.getHistory(currentUser.userId);
     }
+
+    @UseGuards(JwtAuthGuard)
+    @Delete(':username')
+    async removeFromHistory(@Req() req: any, @Param('username') searchedUsername: string) {
+        const [currentUser] = await db.select().from(user).where(eq(user.username, req.user.username)).limit(1);
+
+        if (!currentUser) {
+            throw new Error("Current user not found");
+        }
+
+        const [searchedUser] = await db.select().from(user).where(eq(user.username, searchedUsername)).limit(1);
+
+        if (searchedUser) {
+            await this.searchHistoryService.removeFromHistory(currentUser.userId, searchedUser.userId);
+        }
+
+        return { success: true };
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Delete()
+    async clearHistory(@Req() req: any) {
+        const [currentUser] = await db.select().from(user).where(eq(user.username, req.user.username)).limit(1);
+
+        if (!currentUser) {
+            throw new Error("Current user not found");
+        }
+
+        await this.searchHistoryService.clearHistory(currentUser.userId);
+
+        return { success: true };
+    }
 }
+

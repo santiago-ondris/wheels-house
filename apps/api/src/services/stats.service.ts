@@ -15,7 +15,7 @@ export class StatsService {
         const cars = await getCarsForStats(userData.userId);
 
         if (cars.length === 0) {
-            return new UserStatsDTO(0, 0, null, 0, [], [], [], [], []);
+            return new UserStatsDTO(0, 0, null, 0, [], [], [], [], [], []);
         }
 
         const totalCars = cars.length;
@@ -66,7 +66,8 @@ export class StatsService {
             getSortedDistribution(manufacturerCounts),
             getSortedDistribution(scaleCounts),
             getSortedDistribution(colorCounts),
-            getSortedDistribution(conditionCounts)
+            getSortedDistribution(conditionCounts),
+            getSortedDistribution(countryCounts)
         );
     }
 }

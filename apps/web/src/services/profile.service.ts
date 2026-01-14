@@ -28,6 +28,7 @@ export interface UserStats {
     scaleDistribution: DistributionItem[];
     colorDistribution: DistributionItem[];
     conditionDistribution: DistributionItem[];
+    countryDistribution: DistributionItem[];
 }
 
 export interface BasicUser {
@@ -64,6 +65,26 @@ export async function addToSearchHistory(searchedUsername: string): Promise<void
             'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ searchedUsername }),
+    });
+}
+
+export async function removeFromSearchHistory(searchedUsername: string): Promise<void> {
+    const token = localStorage.getItem("auth_token");
+    return apiRequest<void>(`/search-history/${encodeURIComponent(searchedUsername)}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
+    });
+}
+
+export async function clearSearchHistory(): Promise<void> {
+    const token = localStorage.getItem("auth_token");
+    return apiRequest<void>('/search-history', {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
     });
 }
 
