@@ -1,3 +1,5 @@
+// Copiado del archivo del front, podria unificarse en shared
+
 export const scales = [
     "1/64",
     "1/43",
@@ -94,7 +96,6 @@ export const brands = [
 ];
 
 export const colors = [
-    // Basic
     "Negro",
     "Blanco",
     "Gris",
@@ -123,36 +124,6 @@ export const colors = [
     "Bordo",
     "Violeta"
 ];
-
-export const colorMap: Record<string, string> = {
-    'Rojo': '#ef4444',
-    'Azul': '#3b82f6',
-    'Verde': '#22c55e',
-    'Negro': '#111111',
-    'Blanco': '#fcfcfc',
-    'Gris': '#71717a',
-    'Amarillo': '#eab308',
-    'Naranja': '#f97316',
-    'Morado': '#a855f7',
-    'Rosa': '#ec4899',
-    'Dorado': '#fbbf24',
-    'Plata': '#e4e4e7',
-    'Bronce': '#92400e',
-    'Marrón': '#78350f',
-    'Beige': '#f5f5dc',
-    'Celeste': '#7dd3fc',
-    'Turquesa': '#2dd4bf',
-    'Fucsia': '#d946ef',
-    'Magenta': '#d946ef',
-    'Aqua': '#22d3ee',
-    'Crema': '#fef3c7',
-    'Oliva': '#65a30d',
-    'Mostaza': '#ca8a04',
-    'Cian': '#06b6d4',
-    'Púrpura': '#7e22ce',
-    'Bordo': '#7f1d1d',
-    'Violeta': '#8b5cf6'
-};
 
 export const carConditions = [
     "Abierto",

@@ -9,6 +9,7 @@ import StatsPage from "../pages/user/StatsPage";
 import SettingsPage from "../pages/user/SettingsPage";
 import AddCarPage from "../pages/car/AddCarPage";
 import EditCarPage from "../pages/car/EditCarPage";
+import QuickAddPage from "../pages/car/QuickAddPage";
 import CarDetailPage from "../pages/car/CarDetailPage";
 import RegisterPage from "../pages/login/RegisterPage";
 import AuthRequiredPage from "../pages/login/AuthRequiredPage";
@@ -30,6 +31,7 @@ import AddToWishlistPage from "../pages/wishlist/AddToWishlistPage";
 import MoveToCollectionPage from "../pages/wishlist/MoveToCollectionPage";
 import EditWishlistPage from "../pages/wishlist/EditWishlistPage";
 import OnboardingPage from "../pages/onboarding/OnboardingPage";
+import ImportCarsPage from "../pages/import/ImportCarsPage";
 
 // Components
 import ProtectedRoute from "../components/auth/ProtectedRoute";
@@ -60,6 +62,10 @@ export const router = createBrowserRouter([
                 element: <ProtectedRoute><AddCarPage /></ProtectedRoute>
             },
             {
+                path: "collection/quick-add",
+                element: <ProtectedRoute><QuickAddPage /></ProtectedRoute>
+            },
+            {
                 path: "collection/edit/:carId",
                 element: <ProtectedRoute><EditCarPage /></ProtectedRoute>
             },
@@ -74,6 +80,10 @@ export const router = createBrowserRouter([
             {
                 path: "collection/group/manage/:groupId",
                 element: <ProtectedRoute><GroupManageCarsPage /></ProtectedRoute>
+            },
+            {
+                path: "import",
+                element: <ProtectedRoute><ImportCarsPage /></ProtectedRoute>
             },
 
             // User collection routes (public viewing)

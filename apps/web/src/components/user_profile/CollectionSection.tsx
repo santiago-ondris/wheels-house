@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Car, SlidersHorizontal, Search, X, Save } from "lucide-react";
+import { Plus, Car, SlidersHorizontal, Search, X, Save, Zap, FileSpreadsheet } from "lucide-react";
 import toast from "react-hot-toast";
 
 import { useCollectionParams } from "../../hooks/useCollectionParams";
@@ -63,6 +63,7 @@ export default function CollectionSection({
     const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
     const [isSelectMode, setIsSelectMode] = useState(mode === 'manage_group');
     const [showGroupModal, setShowGroupModal] = useState(false);
+    const [showAddModeModal, setShowAddModeModal] = useState(false);
     const [groups, setGroups] = useState<Group[]>([]);
     const [searchInput, setSearchInput] = useState(params.search);
     const [isSaving, setIsSaving] = useState(false);
@@ -265,7 +266,7 @@ export default function CollectionSection({
                     )}
                     {isOwner && mode === 'view' && !isSelectMode && (data?.items?.length ?? 0) > 0 && !groupId && (
                         <button
-                            onClick={() => navigate("/collection/add")}
+                            onClick={() => setShowAddModeModal(true)}
                             className="p-2 bg-accent hover:bg-accent/80 text-white rounded-lg transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
                         >
                             <Plus className="w-4 h-4" />
@@ -371,7 +372,7 @@ export default function CollectionSection({
                                 </button>
                             ) : isOwner && !groupId && (
                                 <button
-                                    onClick={() => navigate("/collection/add")}
+                                    onClick={() => setShowAddModeModal(true)}
                                     className="mt-4 px-6 py-3 bg-accent hover:bg-accent/80 text-white rounded-lg transition-all flex items-center gap-2 mx-auto"
                                 >
                                     <Plus className="w-5 h-5" />
@@ -524,6 +525,97 @@ export default function CollectionSection({
 
                             <button
                                 onClick={() => setShowGroupModal(false)}
+                                className="w-full mt-6 py-3 text-sm font-mono text-white/60 hover:text-white border border-white/10 rounded-xl transition-colors"
+                            >
+                                Cancelar
+                            </button>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+
+            {/* Add Mode Selection Modal */}
+            <AnimatePresence>
+                {showAddModeModal && (
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setShowAddModeModal(false)}
+                            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-md bg-[#0a0a0b] border border-white/10 rounded-2xl p-6 z-50"
+                        >
+                            <h3 className="text-lg font-mono font-bold text-white uppercase tracking-tight mb-2">
+                                Agregar Auto
+                            </h3>
+                            <p className="text-sm text-white/50 mb-6">
+                                ¿Cómo querés cargar tu auto?
+                            </p>
+
+                            <div className="space-y-3">
+                                <button
+                                    onClick={() => {
+                                        setShowAddModeModal(false);
+                                        navigate("/collection/quick-add");
+                                    }}
+                                    className="w-full flex items-start gap-4 p-4 bg-accent/10 hover:bg-accent/20 border border-accent/30 hover:border-accent/50 rounded-xl transition-colors text-left"
+                                >
+                                    <div className="w-10 h-10 bg-accent/20 rounded-lg flex items-center justify-center shrink-0">
+                                        <Zap className="w-5 h-5 text-accent" />
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-white">Carga Rápida</p>
+                                        <p className="text-xs text-white/50 mt-0.5">
+                                            Solo 5 campos. Ideal para cargar muchos autos.
+                                        </p>
+                                    </div>
+                                </button>
+
+                                <button
+                                    onClick={() => {
+                                        setShowAddModeModal(false);
+                                        navigate("/collection/add");
+                                    }}
+                                    className="w-full flex items-start gap-4 p-4 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 hover:border-emerald-500/50 rounded-xl transition-colors text-left"
+                                >
+                                    <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center shrink-0">
+                                        <Car className="w-5 h-5 text-white/60" />
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-white">Carga Completa</p>
+                                        <p className="text-xs text-white/50 mt-0.5">
+                                            Todos los campos, fotos y grupos.
+                                        </p>
+                                    </div>
+                                </button>
+
+                                <button
+                                    onClick={() => {
+                                        setShowAddModeModal(false);
+                                        navigate("/import");
+                                    }}
+                                    className="w-full flex items-start gap-4 p-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl transition-colors text-left"
+                                >
+                                    <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center shrink-0">
+                                        <FileSpreadsheet className="w-5 h-5 text-white/60" />
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-white">Importar desde Excel</p>
+                                        <p className="text-xs text-white/50 mt-0.5">
+                                            Carga masiva desde archivo .xlsx
+                                        </p>
+                                    </div>
+                                </button>
+                            </div>
+
+                            <button
+                                onClick={() => setShowAddModeModal(false)}
                                 className="w-full mt-6 py-3 text-sm font-mono text-white/60 hover:text-white border border-white/10 rounded-xl transition-colors"
                             >
                                 Cancelar
