@@ -63,6 +63,11 @@ export async function getWishedCarsFromUserId(userId: number) {
     return await db.select().from(car).where(and(eq(car.userId, userId), eq(car.wished, true)));
 }
 
+// TODO ver si realmente hace falta
+export async function getCarsByNameAndUser(userId: number) {
+    return await db.select({ name: car.name }).from(car).where(and(eq(car.userId, userId), eq(car.wished, false)));
+}
+
 //functions for featured car
 
 export async function getTotalCarsCount() {

@@ -31,6 +31,7 @@ import AddToWishlistPage from "../pages/wishlist/AddToWishlistPage";
 import MoveToCollectionPage from "../pages/wishlist/MoveToCollectionPage";
 import EditWishlistPage from "../pages/wishlist/EditWishlistPage";
 import OnboardingPage from "../pages/onboarding/OnboardingPage";
+import ImportCarsPage from "../pages/import/ImportCarsPage";
 
 // Components
 import ProtectedRoute from "../components/auth/ProtectedRoute";
@@ -79,6 +80,10 @@ export const router = createBrowserRouter([
             {
                 path: "collection/group/manage/:groupId",
                 element: <ProtectedRoute><GroupManageCarsPage /></ProtectedRoute>
+            },
+            {
+                path: "import",
+                element: <ProtectedRoute><ImportCarsPage /></ProtectedRoute>
             },
 
             // User collection routes (public viewing)

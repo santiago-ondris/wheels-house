@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Car, SlidersHorizontal, Search, X, Save, Zap } from "lucide-react";
+import { Plus, Car, SlidersHorizontal, Search, X, Save, Zap, FileSpreadsheet } from "lucide-react";
 import toast from "react-hot-toast";
 
 import { useCollectionParams } from "../../hooks/useCollectionParams";
@@ -582,15 +582,33 @@ export default function CollectionSection({
                                         setShowAddModeModal(false);
                                         navigate("/collection/add");
                                     }}
-                                    className="w-full flex items-start gap-4 p-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl transition-colors text-left"
+                                    className="w-full flex items-start gap-4 p-4 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 hover:border-emerald-500/50 rounded-xl transition-colors text-left"
                                 >
-                                    <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center shrink-0">
+                                    <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center shrink-0">
                                         <Car className="w-5 h-5 text-white/60" />
                                     </div>
                                     <div>
                                         <p className="font-bold text-white">Carga Completa</p>
                                         <p className="text-xs text-white/50 mt-0.5">
                                             Todos los campos, fotos y grupos.
+                                        </p>
+                                    </div>
+                                </button>
+
+                                <button
+                                    onClick={() => {
+                                        setShowAddModeModal(false);
+                                        navigate("/import");
+                                    }}
+                                    className="w-full flex items-start gap-4 p-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl transition-colors text-left"
+                                >
+                                    <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center shrink-0">
+                                        <FileSpreadsheet className="w-5 h-5 text-white/60" />
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-white">Importar desde Excel</p>
+                                        <p className="text-xs text-white/50 mt-0.5">
+                                            Carga masiva desde archivo .xlsx
                                         </p>
                                     </div>
                                 </button>

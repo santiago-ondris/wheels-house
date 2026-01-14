@@ -17,6 +17,8 @@ import { StatsController } from './controllers/stats.controller';
 import { StatsService } from './services/stats.service';
 import { SearchHistoryController } from './controllers/searchHistory.controller';
 import { SearchHistoryService } from './services/searchHistory.service';
+import { ImportController } from './controllers/import.controller';
+import { ImportService } from './services/import.service';
 
 
 @Module({
@@ -47,7 +49,7 @@ import { SearchHistoryService } from './services/searchHistory.service';
       signOptions: { expiresIn: '7d' },
     }),
   ],
-  controllers: [UserController, CarController, UploadController, GroupController, StatsController, SearchHistoryController],
-  providers: [JwtStrategy, UserService, CarService, UploadService, GroupService, StatsService, SearchHistoryService],
+  controllers: [UserController, CarController, UploadController, GroupController, StatsController, SearchHistoryController, ImportController],
+  providers: [JwtStrategy, UserService, CarService, UploadService, GroupService, StatsService, SearchHistoryService, ImportService],
 })
 export class AppModule { }
