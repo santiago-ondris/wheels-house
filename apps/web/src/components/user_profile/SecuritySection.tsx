@@ -10,6 +10,7 @@ export default function SecuritySection({ username }: { username: string }) {
     // Password States
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
+    const [confirmNewPassword, setConfirmNewPassword] = useState("");
     const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
     const [pwdError, setPwdError] = useState<string | null>(null);
     const [pwdSuccess, setPwdSuccess] = useState(false);
@@ -22,15 +23,27 @@ export default function SecuritySection({ username }: { username: string }) {
 
     const handleUpdatePassword = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsUpdatingPassword(true);
         setPwdError(null);
         setPwdSuccess(false);
+
+        if (newPassword !== confirmNewPassword) {
+            setPwdError("Las contraseñas no coinciden");
+            return;
+        }
+
+        if (newPassword.length < 6) {
+            setPwdError("La contraseña debe tener al menos 6 caracteres");
+            return;
+        }
+
+        setIsUpdatingPassword(true);
 
         try {
             await updatePassword(currentPassword, newPassword);
             setPwdSuccess(true);
             setCurrentPassword("");
             setNewPassword("");
+            setConfirmNewPassword("");
         } catch (err: any) {
             setPwdError(err.message || "Error al actualizar contraseña");
         } finally {
@@ -93,14 +106,27 @@ export default function SecuritySection({ username }: { username: string }) {
                                 required
                             />
                         </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-mono text-white/40 uppercase tracking-widest">Confirmar Nueva Contraseña</label>
+                            <input
+                                type="password"
+                                value={confirmNewPassword}
+                                onChange={(e) => setConfirmNewPassword(e.target.value)}
+                                className={`w-full bg-white/5 border rounded-xl px-4 py-3 text-white focus:outline-none font-mono transition-colors ${confirmNewPassword && newPassword !== confirmNewPassword ? 'border-red-500/50 focus:border-red-500' : 'border-white/10 focus:border-accent/40'}`}
+                                required
+                            />
+                            {confirmNewPassword && newPassword !== confirmNewPassword && (
+                                <p className="text-red-400 text-[10px] font-mono">Las contraseñas no coinciden</p>
+                            )}
+                        </div>
 
                         {pwdError && <p className="text-red-400 text-[10px] font-mono">{pwdError}</p>}
                         {pwdSuccess && <p className="text-accent text-[10px] font-mono uppercase tracking-widest font-bold">✓ Contraseña actualizada!</p>}
 
                         <button
                             type="submit"
-                            disabled={isUpdatingPassword}
-                            className="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white font-bold text-[10px] tracking-widest uppercase transition-all"
+                            disabled={isUpdatingPassword || (confirmNewPassword !== "" && newPassword !== confirmNewPassword)}
+                            className="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white font-bold text-[10px] tracking-widest uppercase transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {isUpdatingPassword ? "PROCESANDO..." : "ACTUALIZAR CREDENCIALES"}
                         </button>

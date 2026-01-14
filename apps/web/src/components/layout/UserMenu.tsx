@@ -13,10 +13,14 @@ export default function UserMenu() {
   return (
     <Menu as="div" className="relative">
       <Menu.Button className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors">
-        <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
-          <span className="text-white font-bold text-sm">
-            {user.username[0].toUpperCase()}
-          </span>
+        <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center overflow-hidden">
+          {user.picture ? (
+            <img src={user.picture} alt={user.username} className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-white font-bold text-sm">
+              {user.username[0].toUpperCase()}
+            </span>
+          )}
         </div>
         <span className="text-white text-sm hidden md:block">{user.username}</span>
         <ChevronDown className="w-4 h-4 text-white/60" />
@@ -45,7 +49,7 @@ export default function UserMenu() {
                     } flex items-center gap-2 w-full px-3 py-2 rounded-lg text-white text-sm transition-colors`}
                 >
                   <User className="w-4 h-4" />
-                  Mi Perfil
+                  Editar perfil
                 </button>
               )}
             </Menu.Item>
