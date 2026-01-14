@@ -68,6 +68,7 @@ export default function CollectionSection({
     const [searchInput, setSearchInput] = useState(params.search);
     const [isSaving, setIsSaving] = useState(false);
     const carsGridRef = useRef<HTMLDivElement>(null);
+    const sectionRef = useRef<HTMLElement>(null);
 
     const pageIds = data?.items.map(car => car.carId!) || [];
     const selection = useSelectionState(pageIds, data?.pagination.totalItems || 0);
@@ -217,6 +218,7 @@ export default function CollectionSection({
 
     return (
         <motion.section
+            ref={sectionRef}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
@@ -439,7 +441,7 @@ export default function CollectionSection({
                                     onPageChange={(page) => {
                                         setPage(page);
                                         setTimeout(() => {
-                                            carsGridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                            sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                                         }, 100);
                                     }}
                                     onLimitChange={setLimit}

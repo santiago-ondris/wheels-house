@@ -11,10 +11,24 @@ async function bootstrap() {
 
   // Agregar este pipe global
   app.useGlobalPipes(new ValidationPipe({
-    transform: true, // <--- IMPORTANTE: Esto habilita class-transformer para que funcione
+    transform: true,
   }));
-  app.enableCors();
-  await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
+
+  // CORS configurado para deploy
+  app.enableCors({
+    origin: process.env.FRONTEND_URL?.split(',') || [
+      'http://localhost:5173',
+      'http://localhost:4173', // preview build local
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
+
+  const port = process.env.PORT ?? 3000;
+  await app.listen(port, '0.0.0.0');
+  
+  console.log(`🚀 Backend running on port ${port}`);
+  console.log(`🌍 Allowed origins: ${process.env.FRONTEND_URL || 'localhost:5173'}`);
 }
 bootstrap();
-

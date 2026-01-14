@@ -1,5 +1,4 @@
-// const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'; todo -> eso cuando tengamos los environments seteados
-const API_URL = `http://${window.location.hostname}:3000`;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export async function apiRequest<T>(
   endpoint: string,
@@ -7,6 +6,7 @@ export async function apiRequest<T>(
 ): Promise<T> {
   const response = await fetch(`${API_URL}${endpoint}`, {
     ...options,
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       ...options.headers,
@@ -20,3 +20,6 @@ export async function apiRequest<T>(
 
   return response.json();
 }
+
+// Export para debugging (opcional)
+export { API_URL };

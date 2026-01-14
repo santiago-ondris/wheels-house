@@ -3,6 +3,8 @@ dist
 .turbo
 .env
 .env.local
+.env.production
+.env.development
 *.log
 .DS_Store
 GUIA_GIT_AZURE.md
