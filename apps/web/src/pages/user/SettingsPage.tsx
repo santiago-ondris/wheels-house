@@ -12,7 +12,7 @@ import toast from "react-hot-toast";
 type SettingsTab = "profile" | "security";
 
 export default function SettingsPage() {
-    const { user, logout } = useAuth();
+    const { user, logout, updatePicture } = useAuth();
     const navigate = useNavigate();
 
     const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
@@ -24,9 +24,9 @@ export default function SettingsPage() {
     const [biography, setBiography] = useState("");
     const [picture, setPicture] = useState("");
     const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
-    const [isUploadingImage, setIsUploadingImage] = useState(false);
     const [tempImage, setTempImage] = useState<string | null>(null);
     const [isCropping, setIsCropping] = useState(false);
+    const [pendingPictureBlob, setPendingPictureBlob] = useState<Blob | null>(null);
 
     // Password States
     const [oldPassword, setOldPassword] = useState("");
@@ -111,19 +111,12 @@ export default function SettingsPage() {
 
     const handleCropSave = async (croppedBlob: Blob) => {
         setIsCropping(false);
-        setIsUploadingImage(true);
-        try {
-            const { uploadImage } = await import("../../services/upload.service");
-            const file = new File([croppedBlob], "avatar.jpg", { type: "image/jpeg" });
-            const imageUrl = await uploadImage(file);
-            setPicture(imageUrl);
-            toast.success("Avatar actualizado");
-        } catch (error: any) {
-            toast.error(error.message || "Error al subir imagen");
-        } finally {
-            setIsUploadingImage(false);
-            setTempImage(null);
-        }
+        // Store the blob locally and create a preview URL
+        setPendingPictureBlob(croppedBlob);
+        const previewUrl = URL.createObjectURL(croppedBlob);
+        setPicture(previewUrl);
+        setTempImage(null);
+        toast.success("Foto lista para guardar");
     };
 
     const handleCropCancel = () => {
@@ -146,12 +139,25 @@ export default function SettingsPage() {
 
         setIsUpdatingProfile(true);
         try {
-            await updateProfile({ firstName, lastName, biography, picture });
+            let finalPictureUrl = picture;
+
+            // If there's a pending blob, upload it now
+            if (pendingPictureBlob) {
+                const { uploadImage } = await import("../../services/upload.service");
+                const file = new File([pendingPictureBlob], "avatar.jpg", { type: "image/jpeg" });
+                finalPictureUrl = await uploadImage(file);
+                setPendingPictureBlob(null);
+                setPicture(finalPictureUrl);
+            }
+
+            await updateProfile({ firstName, lastName, biography, picture: finalPictureUrl });
             // Update original values after successful save
             setOriginalFirstName(firstName);
             setOriginalLastName(lastName);
             setOriginalBiography(biography);
-            setOriginalPicture(picture);
+            setOriginalPicture(finalPictureUrl);
+            // Update navbar avatar
+            updatePicture(finalPictureUrl);
             toast.success("Perfil actualizado");
         } catch (error: any) {
             toast.error(error.message || "Error al actualizar perfil");
@@ -324,11 +330,6 @@ export default function SettingsPage() {
                                                         <User className="text-white/20" size={40} />
                                                     )}
                                                 </div>
-                                                {isUploadingImage && (
-                                                    <div className="absolute inset-0 bg-dark/60 rounded-full flex items-center justify-center">
-                                                        <div className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
-                                                    </div>
-                                                )}
                                             </div>
                                             <div className="space-y-3 text-center">
                                                 <div className="space-y-1">
@@ -337,13 +338,12 @@ export default function SettingsPage() {
                                                 </div>
                                                 <div className="flex flex-col gap-2">
                                                     <label className="cursor-pointer px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg font-mono text-[10px] uppercase tracking-widest transition-all">
-                                                        {isUploadingImage ? "SUBIENDO..." : "CAMBIAR FOTO"}
+                                                        CAMBIAR FOTO
                                                         <input
                                                             type="file"
                                                             className="hidden"
                                                             accept="image/*"
                                                             onChange={handleImageUpload}
-                                                            disabled={isUploadingImage}
                                                         />
                                                     </label>
                                                     {picture && (

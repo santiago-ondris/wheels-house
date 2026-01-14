@@ -15,6 +15,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (usernameOrEmail: string, password: string) => Promise<void>;
   logout: () => void;
+  updatePicture: (newPicture: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -77,6 +78,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, 50);
   };
 
+  const updatePicture = (newPicture: string) => {
+    if (user) {
+      setUser({ ...user, picture: newPicture || undefined });
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -85,6 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading,
         login,
         logout,
+        updatePicture,
       }}
     >
       {children}

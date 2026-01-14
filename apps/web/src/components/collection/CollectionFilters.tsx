@@ -67,7 +67,8 @@ interface CollectionFiltersProps {
     selectedScales: string[];
     selectedConditions: string[];
     selectedCountries: string[];
-    onToggleFilter: (field: 'brands' | 'colors' | 'manufacturers' | 'scales' | 'conditions' | 'countries', value: string) => void;
+    selectedHasPicture: string[];
+    onToggleFilter: (field: 'brands' | 'colors' | 'manufacturers' | 'scales' | 'conditions' | 'countries' | 'hasPicture', value: string) => void;
     onClearFilters: () => void;
     hasActiveFilters: boolean;
 }
@@ -80,6 +81,7 @@ export default function CollectionFilters({
     selectedScales,
     selectedConditions,
     selectedCountries,
+    selectedHasPicture,
     onToggleFilter,
     onClearFilters,
     hasActiveFilters,
@@ -142,6 +144,12 @@ export default function CollectionFilters({
                 options={filters.countries}
                 selected={selectedCountries}
                 onToggle={(v) => onToggleFilter('countries', v)}
+            />
+            <FilterSection
+                title="Con Imagen"
+                options={filters.hasPicture}
+                selected={selectedHasPicture}
+                onToggle={(v) => onToggleFilter('hasPicture', v)}
             />
         </div>
     );

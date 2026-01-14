@@ -209,6 +209,7 @@ export default function CollectionSection({
         scales: [],
         conditions: [],
         countries: [],
+        hasPicture: [],
     };
 
     const filters = data?.filters || defaultFilters;
@@ -288,6 +289,7 @@ export default function CollectionSection({
                             selectedScales={params.scales}
                             selectedConditions={params.conditions}
                             selectedCountries={params.countries}
+                            selectedHasPicture={params.hasPicture}
                             onToggleFilter={toggleFilter}
                             onClearFilters={clearFilters}
                             hasActiveFilters={hasActiveFilters}
@@ -457,6 +459,7 @@ export default function CollectionSection({
                 selectedScales={params.scales}
                 selectedConditions={params.conditions}
                 selectedCountries={params.countries}
+                selectedHasPicture={params.hasPicture}
                 onToggleFilter={toggleFilter}
                 onClearFilters={clearFilters}
                 hasActiveFilters={hasActiveFilters}
