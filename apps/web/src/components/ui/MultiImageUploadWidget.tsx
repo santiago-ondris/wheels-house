@@ -50,11 +50,21 @@ export default function MultiImageUploadWidget({
 
         if (validFiles.length === 0) return;
 
-        // Process and upload in parallel, collecting results
-        const results = await Promise.all(validFiles.map(file => processAndUploadFile(file)));
-
-        // Filter out nulls (failures) and add to current values
-        const successfulUrls = results.filter((url): url is string => url !== null);
+        // Subimos de a 2 imágenes en paralelo para balancear velocidad vs rate limiting (errores 429 en producción).
+        // Si Railway sigue bloqueando, bajar CHUNK_SIZE a 1. Si funciona bien, se puede probar con 3.
+        const CHUNK_SIZE = 2;
+        const successfulUrls: string[] = [];
+        
+        for (let i = 0; i < validFiles.length; i += CHUNK_SIZE) {
+            const chunk = validFiles.slice(i, i + CHUNK_SIZE);
+            const results = await Promise.all(chunk.map(file => processAndUploadFile(file)));
+            
+            for (const result of results) {
+                if (result !== null) {
+                    successfulUrls.push(result);
+                }
+            }
+        }
 
         if (successfulUrls.length > 0) {
             onChange([...values, ...successfulUrls]);
