@@ -5,6 +5,7 @@ import { useState } from "react";
 import LoginModal from "../components/auth/LoginModal";
 import { useAuth } from "../contexts/AuthContext";
 import FeaturedCar from "../components/home/FeaturedCar";
+import FeaturedCollections from "../components/home/FeaturedCollections";
 
 const features = [
   {
@@ -157,6 +158,8 @@ export default function HomePage() {
       </section>
 
       <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+
+      <FeaturedCollections />
 
       <section className="container mx-auto px-6 py-6">
         <motion.div
