@@ -18,16 +18,16 @@ import bcrypt from "bcrypt";
 import { randomBytes } from 'crypto';
 import { UploadService } from './upload.service';
 import { getPublicIdFromURL } from 'src/utils/upload.utils';
-import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
+import { EmailService } from './email.service';
 
 @Injectable()
 export class UserService {
     constructor(
         private readonly jwtService: JwtService,
         private readonly uploadService: UploadService,
-        private readonly mailerService: MailerService,
-        private readonly configService: ConfigService
+        private readonly configService: ConfigService,
+        private readonly emailService: EmailService
     ) { }
 
     async registerService(registerData: RegisterDTO) {
@@ -291,21 +291,7 @@ export class UserService {
 
         const url = `${domain}/reset-password?token=${selector + '.' + validator}`;
 
-        try {
-            await this.mailerService.sendMail({
-                to: user.email,
-                subject: 'Wheels House - Recuperación de contraseña',
-                html: `
-                    <p>Hola, ${user.username}.</p>
-                    <p>Ingresá al link a continuación para cambiar tu contraseña: <a href=${url}>${url}</a>.</p>
-                    <p>Si no solicitaste este cambio, ignorá este correo.</p>
-                    <p>El equipo de Wheels House.</p>
-                `,
-            });
-        } catch (error) {
-            console.error("Error sending recovery email:", error);
-            throw ERROR_SENDING_EMAIL;
-        }
+        await this.emailService.sendForgotPasswordEmail(user.email, user.username, url);
 
         return true;
     }
