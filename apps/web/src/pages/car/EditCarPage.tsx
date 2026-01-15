@@ -398,28 +398,32 @@ export default function EditCarPage() {
                         </button>
                     </div>
 
-                    {/* Mobile buttons at the end of scroll */}
-                    <div className="md:hidden mt-8 grid grid-cols-2 gap-3">
-                        <button
-                            type="button"
-                            onClick={handleCancel}
-                            disabled={isLoading}
-                            className="px-6 py-4 border border-white/10 text-white font-bold rounded-xl hover:bg-white/5 transition-all active:scale-95"
-                        >
-                            Cancelar
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={isLoading}
-                            className="flex items-center justify-center gap-2 px-6 py-4 bg-accent hover:bg-accent/80 disabled:bg-accent/50 text-white font-bold rounded-xl transition-all active:scale-95 shadow-lg shadow-accent/30"
-                        >
-                            <Save className="w-5 h-5" />
-                            {isLoading ? "Guardando..." : "Guardar"}
-                        </button>
-                    </div>
+
                 </form>
             </motion.div>
 
+            {/* Fixed Mobile Action Bar */}
+            <div className="fixed inset-x-0 bottom-0 md:hidden bg-[#0a0a0b]/95 backdrop-blur-lg border-t border-white/10 p-4 z-40">
+                <div className="grid grid-cols-2 gap-3 max-w-5xl mx-auto">
+                    <button
+                        type="button"
+                        onClick={handleCancel}
+                        disabled={isLoading}
+                        className="px-4 py-3 border border-white/10 text-white font-bold rounded-xl hover:bg-white/5 transition-all active:scale-95"
+                    >
+                        Cancelar
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleSubmit}
+                        disabled={isLoading}
+                        className="flex items-center justify-center gap-2 px-4 py-3 bg-accent hover:bg-accent/80 disabled:bg-accent/50 text-white font-bold rounded-xl transition-all active:scale-95 shadow-lg shadow-accent/30"
+                    >
+                        <Save className="w-5 h-5" />
+                        {isLoading ? "Guardando..." : "Guardar"}
+                    </button>
+                </div>
+            </div>
         </div>
     );
 }

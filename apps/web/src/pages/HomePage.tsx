@@ -87,9 +87,6 @@ export default function HomePage() {
               transition={{ duration: 0.6 }}
               className="max-w-2xl relative z-10 text-center md:text-left"
             >
-              <span className="text-accent uppercase tracking-widest text-sm font-bold">
-                Wheels House
-              </span>
               <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-white mt-3 md:mt-4 leading-tight">
                 Organizá.
                 <br />

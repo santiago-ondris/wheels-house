@@ -559,9 +559,17 @@ export default function CollectionSection({
                             <h3 className="text-lg font-mono font-bold text-white uppercase tracking-tight mb-2">
                                 Agregar Auto
                             </h3>
-                            <p className="text-sm text-white/50 mb-6">
+                            <p className="text-sm text-white/50 mb-4">
                                 ¿Cómo querés cargar tu auto?
                             </p>
+
+                            {/* Photo tip */}
+                            <div className="flex items-center gap-2 px-3 py-2 bg-amber-500/10 border border-amber-500/20 rounded-lg mb-5">
+                                <span className="text-amber-400 text-sm">💡</span>
+                                <p className="text-xs text-amber-200/80">
+                                    Tip: Tené las fotos listas en tu dispositivo para una carga más fluida
+                                </p>
+                            </div>
 
                             <div className="space-y-3">
                                 <button

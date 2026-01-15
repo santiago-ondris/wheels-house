@@ -152,8 +152,8 @@ export async function listCarsPaginated(username: string, params: CollectionQuer
 
     if (params.page) queryParts.push(`page=${params.page}`);
     if (params.limit) queryParts.push(`limit=${params.limit}`);
-    if (params.sortBy) queryParts.push(`sortBy=${params.sortBy}`);
-    if (params.sortOrder) queryParts.push(`sortOrder=${params.sortOrder}`);
+    queryParts.push(`sortBy=${params.sortBy || 'id'}`);
+    queryParts.push(`sortOrder=${params.sortOrder || 'desc'}`);
     if (params.brands?.length) queryParts.push(`brands=${params.brands.join(',')}`);
     if (params.colors?.length) queryParts.push(`colors=${params.colors.join(',')}`);
     if (params.manufacturers?.length) queryParts.push(`manufacturers=${params.manufacturers.join(',')}`);
