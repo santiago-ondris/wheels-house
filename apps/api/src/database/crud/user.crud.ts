@@ -1,7 +1,7 @@
 import { db } from '../index'
 import { UpdateUserProfileDTO, UserToDB } from 'src/dto/user.dto'
-import { searchHistory, user } from 'src/database/schema'
-import { eq, gt, ilike, and } from 'drizzle-orm';
+import { car, searchHistory, user } from 'src/database/schema'
+import { eq, gt, ilike, and, sql, asc } from 'drizzle-orm';
 import { PASSWORE_RESET_TIME_LIMIT } from 'src/utils/user.utils';
 
 // Create
@@ -87,6 +87,38 @@ export async function getUserFromRequestTokenSelector(selector: string) {
     }
 }
 
+export async function getFounders(limit = 100) {
+    // Get first N users who have at least 1 car in their collection (not wishlist)
+    // Ordered by userId (first registered = first founder)
+    const carCountSubquery = db
+        .select({
+            userId: car.userId,
+            carCount: sql<number>`count(*)`.as('carCount')
+        })
+        .from(car)
+        .where(eq(car.wished, false))
+        .groupBy(car.userId)
+        .as('carCounts');
+
+    const founders = await db
+        .select({
+            founderNumber: sql<number>`row_number() over (order by ${user.userId} asc)`.as('founderNumber'),
+            userId: user.userId,
+            username: user.username,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            picture: user.picture,
+            createdDate: user.createdDate,
+            carCount: carCountSubquery.carCount
+        })
+        .from(user)
+        .innerJoin(carCountSubquery, eq(user.userId, carCountSubquery.userId))
+        .orderBy(asc(user.userId))
+        .limit(limit);
+
+    return founders;
+}
+
 // Update
 
 export async function updateUserFromUserId(userId: number, userChanges: UpdateUserProfileDTO) {
@@ -100,7 +132,7 @@ export async function updateUserFromUserId(userId: number, userChanges: UpdateUs
 
 export async function updatePasswordFromUserId(userId: number, newHashedPassword: string) {
     try {
-        await db.update(user).set({hashedPassword: newHashedPassword}).where(eq(user.userId, userId));
+        await db.update(user).set({ hashedPassword: newHashedPassword }).where(eq(user.userId, userId));
         return true;
     } catch {
         return false;
@@ -111,7 +143,7 @@ export async function updateResetPasswordToken(userId: number, selector: string,
     try {
         await db.update(user).set({
             resetPasswordRequestSelector: selector,
-            resetPasswordHashedValidator: hashedValidator, 
+            resetPasswordHashedValidator: hashedValidator,
             resetPasswordTokenExpires: new Date(Date.now() + PASSWORE_RESET_TIME_LIMIT)
         }).where(eq(user.userId, userId));
         return true;
@@ -125,7 +157,7 @@ export async function updatePasswordFromReset(userId: number, newHashedPassword:
         await db.update(user).set({
             hashedPassword: newHashedPassword,
             resetPasswordRequestSelector: '',
-            resetPasswordHashedValidator: '', 
+            resetPasswordHashedValidator: '',
             resetPasswordTokenExpires: new Date(Date.now())
         }).where(eq(user.userId, userId));
         return true;

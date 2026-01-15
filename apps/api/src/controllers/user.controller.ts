@@ -39,6 +39,11 @@ export class UserController {
         return await this.userService.searchUsersService(query);
     }
 
+    @Get('/founders')
+    async getFounders() {
+        return await this.userService.getFoundersService();
+    }
+
     @UseGuards(JwtAuthGuard)
     @Put('user/update-info')
     async updateUser(@Request() req, @Body() userChanges: UpdateUserProfileDTO) {

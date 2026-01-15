@@ -39,12 +39,27 @@ export interface BasicUser {
     picture?: string;
 }
 
+export interface Founder {
+    founderNumber: number;
+    userId: number;
+    username: string;
+    firstName: string;
+    lastName: string;
+    picture?: string;
+    createdDate: string;
+    carCount: number;
+}
+
 export async function getPublicProfile(username: string): Promise<PublicProfile> {
     return apiRequest<PublicProfile>(`/profile/${username}`);
 }
 
 export async function searchUsers(query: string): Promise<BasicUser[]> {
     return apiRequest<BasicUser[]>(`/search?q=${encodeURIComponent(query)}`);
+}
+
+export async function getFounders(): Promise<Founder[]> {
+    return apiRequest<Founder[]>('/founders');
 }
 
 export async function getSearchHistory(): Promise<BasicUser[]> {
