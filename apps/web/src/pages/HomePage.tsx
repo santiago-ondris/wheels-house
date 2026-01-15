@@ -5,6 +5,7 @@ import { useState } from "react";
 import LoginModal from "../components/auth/LoginModal";
 import { useAuth } from "../contexts/AuthContext";
 import FeaturedCar from "../components/home/FeaturedCar";
+import FeaturedCollections from "../components/home/FeaturedCollections";
 
 const features = [
   {
@@ -57,22 +58,27 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col">
-      <section className="relative min-h-[auto] md:min-h-[80vh] flex items-center overflow-hidden">
+      <section className="relative min-h-[auto] md:min-h-[70vh] flex items-center overflow-hidden">
         {/* Background Gradients */}
         <div className="absolute inset-0 bg-linear-to-br from-primary/20 via-background to-secondary/20" />
+        
+        {/* Fade-out gradient at the bottom */}
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background to-transparent" />
 
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
             backgroundImage: `linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)`,
-            backgroundSize: '40px 40px'
+            backgroundSize: '40px 40px',
+            maskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)'
           }}
         />
 
         <div className="absolute top-20 right-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
         <div className="absolute bottom-20 left-20 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
 
-        <div className="relative z-10 container mx-auto px-6 py-12 md:py-20">
+        <div className="relative z-10 container mx-auto px-6 py-10 md:py-16">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8 lg:gap-16">
             <motion.div
               variants={fadeInUp}
@@ -82,14 +88,16 @@ export default function HomePage() {
               className="max-w-2xl relative z-10 text-center md:text-left"
             >
               <span className="text-accent uppercase tracking-widest text-sm font-bold">
-                Collection Manager
+                Wheels House
               </span>
-              <h1 className="text-5xl md:text-6xl lg:text-8xl font-bold text-white mt-3 md:mt-4 leading-tight">
-                WHEELS
+              <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-white mt-3 md:mt-4 leading-tight">
+                Organizá.
                 <br />
-                HOUSE
+                <span className="text-accent">Compartí.</span>
+                <br />
+                Coleccioná.
               </h1>
-              <p className="text-white/60 text-base md:text-lg mt-4 md:mt-6 max-w-md mx-auto md:mx-0">
+              <p className="hidden md:block text-white/60 text-base md:text-lg mt-4 md:mt-6 max-w-md mx-auto md:mx-0">
                 Tu colección de vehículos a escala organizada, accesible desde cualquier lugar, con imágenes, grupos personalizados y lista para compartir.
               </p>
 
@@ -157,6 +165,8 @@ export default function HomePage() {
       </section>
 
       <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+
+      <FeaturedCollections />
 
       <section className="container mx-auto px-6 py-6">
         <motion.div

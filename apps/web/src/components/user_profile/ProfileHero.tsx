@@ -132,12 +132,12 @@ export default function ProfileHero({
                     </div>
 
                     <div className="flex-1 min-w-0 text-left">
-                        <div className="flex items-baseline gap-2 overflow-hidden">
-                            <h1 className="text-lg font-bold text-white truncate">
-                                {firstName} {lastName}
-                            </h1>
-                            <span className="text-white/30 text-xs font-mono truncate lowercase">@{username}</span>
-                        </div>
+                        <h1 className="text-lg font-bold text-white truncate">
+                            {firstName} {lastName}
+                        </h1>
+                        <p className="text-white/40 text-xs font-mono truncate mt-0.5">
+                            <span className="text-accent">@</span>{username}
+                        </p>
 
                         <div className="flex items-center gap-3 mt-1.5 font-mono text-[11px] tracking-wider uppercase text-white/50">
                             <span className="flex items-center gap-1.5">

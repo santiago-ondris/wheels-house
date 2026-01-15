@@ -9,7 +9,8 @@ import {
     updateResetPasswordToken,
     getUserFromRequestTokenSelector,
     updatePasswordFromReset,
-    deleteSearchHistoryFromUserId
+    deleteSearchHistoryFromUserId,
+    getFounders
 } from 'src/database/crud/user.crud';
 import { deleteAllCarPictures, deleteCarsFromUserId, getCarsFromUserId, getPicturesFromCar } from 'src/database/crud/car.crud';
 import { deleteGroupedCarsFromCarId, deleteGroupedCarsFromGroupId, deleteGroupsFromUserId, getGroupsFromUserId } from 'src/database/crud/group.crud';
@@ -158,6 +159,10 @@ export class UserService {
             // Orden alfabético
             return aUsername.localeCompare(bUsername);
         }).slice(0, 10); // Return top 10
+    }
+
+    async getFoundersService() {
+        return await getFounders();
     }
 
     async updateUserService(userData: TokenData, userChanges: UpdateUserProfileDTO) {
