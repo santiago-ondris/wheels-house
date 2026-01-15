@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Put, Delete, Param, Query, UseGuards, Requ
 import { UserService } from '../services/user.service';
 import { RegisterDTO, LoginDTO, UpdateUserProfileDTO, UpdatePasswordDTO, ResetPasswordDTO, ForgotPasswordDTO } from '../dto/user.dto';
 import { loginValidator, registerValidator, forgotPasswordValidator, resetPasswordValidator, updatePasswordValidator, updateUserValidator } from '../validators/user.validator'
-import { JwtAuthGuard } from 'src/validators/auth.validator';
+import { JwtAuthGuard, JwtRefreshGuard } from 'src/validators/auth.validator';
 import { ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller()
@@ -21,6 +21,12 @@ export class UserController {
         await loginValidator(loginData);
 
         return await this.userService.loginService(loginData);
+    }
+
+    @UseGuards(JwtRefreshGuard)
+    @Post('/refresh')
+    async refresh(@Request() req) {
+        return await this.userService.refreshTokenService(req.user.username);
     }
 
     @Get('/profile/:username')

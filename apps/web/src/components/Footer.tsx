@@ -31,9 +31,9 @@ export default function Footer() {
               <h4 className="text-[14px] font-mono font-black uppercase tracking-[0.2em]">Información</h4>
             </div>
             <ul className="space-y-3">
-              <li><button className="group flex items-center gap-2 text-white/40 hover:text-white font-mono text-[12px] uppercase transition-all tracking-widest">
+              <li><Link to="/about" className="group flex items-center gap-2 text-white/40 hover:text-white font-mono text-[12px] uppercase transition-all tracking-widest">
                 <span className="opacity-0 group-hover:opacity-100 text-accent transition-opacity">//</span> Sobre_nosotros
-              </button></li>
+              </Link></li>
               <li><Link to="/roadmap" className="group flex items-center gap-2 text-white/40 hover:text-white font-mono text-[12px] uppercase transition-all tracking-widest">
                 <span className="opacity-0 group-hover:opacity-100 text-accent transition-opacity">//</span> Roadmap
               </Link></li>

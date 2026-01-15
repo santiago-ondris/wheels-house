@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../../contexts/AuthContext";
 import { getPublicProfile, PublicProfile } from "../../services/profile.service";
@@ -11,7 +11,6 @@ import UserNotFoundPage from "../user/UserNotFoundPage";
 export default function ProfilePage() {
     const { username } = useParams<{ username: string }>();
     const { user } = useAuth();
-    const navigate = useNavigate();
 
     const [profile, setProfile] = useState<PublicProfile | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -82,8 +81,6 @@ export default function ProfilePage() {
                 createdDate={profile.createdDate}
                 totalCars={profile.totalCars}
                 totalGroups={profile.totalGroups}
-                isOwner={isOwner}
-                onEditClick={() => navigate("/settings")}
             />
 
             <GroupsSection

@@ -1,6 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { v2 as cloudinary } from 'cloudinary';
+import * as crypto from 'crypto';
+
+export interface CloudinarySignature {
+  signature: string;
+  timestamp: number;
+  cloudName: string;
+  apiKey: string;
+  folder: string;
+  eager: string;
+}
 
 @Injectable()
 export class UploadService {
@@ -10,6 +20,35 @@ export class UploadService {
       api_key: this.configService.get<string>('CLOUDINARY_API_KEY')!,
       api_secret: this.configService.get<string>('CLOUDINARY_API_SECRET')!,
     });
+  }
+
+  /**
+   * Generates a signature for direct frontend uploads to Cloudinary.
+   * The signature is valid for ~1 hour (based on timestamp).
+   */
+  generateSignature(): CloudinarySignature {
+    const timestamp = Math.round(Date.now() / 1000);
+    const folder = 'wheels-house/cars';
+    const eager = 'w_1200,c_limit/q_auto/f_auto';
+    const apiSecret = this.configService.get<string>('CLOUDINARY_API_SECRET')!;
+
+    // Build the string to sign (alphabetical order of params)
+    const paramsToSign = `eager=${eager}&folder=${folder}&timestamp=${timestamp}`;
+
+    // Generate SHA-1 signature
+    const signature = crypto
+      .createHash('sha1')
+      .update(paramsToSign + apiSecret)
+      .digest('hex');
+
+    return {
+      signature,
+      timestamp,
+      cloudName: this.configService.get<string>('CLOUDINARY_CLOUD_NAME')!,
+      apiKey: this.configService.get<string>('CLOUDINARY_API_KEY')!,
+      folder,
+      eager,
+    };
   }
 
   async uploadImage(

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -18,9 +18,11 @@ import { quickAddCarSchema, QuickAddCarFormData, QuickAddCarPayload } from "../.
 import { createCar } from "../../services/car.service";
 import { scales, manufacturers, brands, colors } from "../../data/carOptions";
 import FieldSelector from "../../components/cars/addcar/FieldSelector";
+import SuggestionInput from "../../components/ui/SuggestionInput";
 import toast from "react-hot-toast";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigateBack } from "../../hooks/useNavigateBack";
+import { useCarSuggestions } from "../../hooks/useCarSuggestions";
 
 const initialFormData: QuickAddCarFormData = {
     name: "",
@@ -33,16 +35,12 @@ const initialFormData: QuickAddCarFormData = {
 export default function QuickAddPage() {
     const navigate = useNavigate();
     const { user } = useAuth();
-    const nameInputRef = useRef<HTMLInputElement>(null);
 
     const [formData, setFormData] = useState<QuickAddCarFormData>(initialFormData);
     const [errors, setErrors] = useState<Partial<Record<keyof QuickAddCarFormData, string>>>({});
     const [isLoading, setIsLoading] = useState(false);
-
-    // Focus on name input on mount
-    useEffect(() => {
-        nameInputRef.current?.focus();
-    }, []);
+    const [formKey, setFormKey] = useState(0);
+    const { suggestions, addLocalSuggestion } = useCarSuggestions();
 
     const handleCancel = useNavigateBack(`/collection/${user?.username || ''}`);
 
@@ -84,10 +82,8 @@ export default function QuickAddPage() {
     const resetFormAndFocus = () => {
         setFormData(initialFormData);
         setErrors({});
-        // Small delay to ensure DOM updates before focus
-        setTimeout(() => {
-            nameInputRef.current?.focus();
-        }, 100);
+        // Increment formKey to force FieldSelector and SuggestionInput components to remount and reset their internal state
+        setFormKey((prev) => prev + 1);
     };
 
     // Primary save: clear form, show toast with link
@@ -99,9 +95,12 @@ export default function QuickAddPage() {
         setIsLoading(true);
         try {
             const carId = await createCar(payload);
-            
+
+            // Add the name to local suggestions so it appears immediately for the next entry
+            addLocalSuggestion(payload.name);
+
             resetFormAndFocus();
-            
+
             toast.success(
                 (t) => (
                     <div className="flex items-center gap-3">
@@ -200,22 +199,21 @@ export default function QuickAddPage() {
                             <label className="block text-accent uppercase tracking-widest text-[10px] font-bold mb-1.5 ml-1">
                                 Nombre del Modelo <span className="text-danger">*</span>
                             </label>
-                            <div className="relative">
-                                <Car className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
-                                <input
-                                    ref={nameInputRef}
-                                    type="text"
-                                    placeholder="Ej: '71 Datsun 510"
-                                    value={formData.name}
-                                    onChange={(e) => updateField("name", e.target.value)}
-                                    className={`w-full bg-input-bg border ${errors.name ? "border-danger" : "border-white/5"} pl-12 pr-4 py-3.5 rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-base`}
-                                />
-                            </div>
+                            <SuggestionInput
+                                key={`name-${formKey}`}
+                                options={suggestions.names}
+                                value={formData.name}
+                                onChange={(value) => updateField("name", value)}
+                                placeholder="Ej: '71 Datsun 510"
+                                icon={<Car className="w-5 h-5" />}
+                                error={errors.name}
+                                autoFocus
+                            />
                             {errors.name && <p className="text-danger text-[10px] mt-1 ml-1">{errors.name}</p>}
                         </div>
 
                         {/* 2x2 grid for selectors on mobile, 4 cols on desktop */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div key={formKey} className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <FieldSelector
                                 label="Marca"
                                 options={brands}

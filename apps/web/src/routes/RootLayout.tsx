@@ -1,4 +1,5 @@
-import { Outlet, ScrollRestoration } from "react-router-dom";
+import { useEffect } from "react";
+import { Outlet, ScrollRestoration, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "../contexts/AuthContext";
 import Navbar from "../components/Navbar";
@@ -12,6 +13,28 @@ import Footer from "../components/Footer";
  * - Toast notifications
  */
 export default function RootLayout() {
+    const { pathname } = useLocation();
+
+    // Force scroll to top for specific pages that should always start at the beginning
+    useEffect(() => {
+        const resetScrollPaths = [
+            '/',
+            '/collection/add',
+            '/collection/quick-add',
+            '/wishlist/add',
+            '/collection/group/new',
+            '/onboarding',
+            '/settings',
+            '/import'
+        ];
+
+        const isActionPath = pathname.includes('/edit/') || pathname.includes('/manage/');
+
+        if (resetScrollPaths.includes(pathname) || isActionPath) {
+            window.scrollTo(0, 0);
+        }
+    }, [pathname]);
+
     return (
         <AuthProvider>
             <div className="min-h-screen bg-background font-arvo flex flex-col">
@@ -27,13 +50,26 @@ export default function RootLayout() {
             {/* after async content loads via useCollectionScrollRestore hook */}
             <ScrollRestoration
                 getKey={(location) => {
-                    // For collection pages, return a constant key to prevent React Router
-                    // from auto-restoring scroll (we handle it manually after content loads)
-                    if (location.pathname.startsWith('/collection/')) {
+                    const { pathname } = location;
+
+                    // Manual restoration only for ProfilePage and GroupDetailPage list views.
+                    // These pages handle their own scroll via useCollectionScrollRestore hook.
+                    // We exclude action sub-paths to avoid "scroll inheritance".
+
+                    const isManualProfile = /^\/collection\/[^/]+$/.test(pathname) &&
+                        pathname !== '/collection/add' &&
+                        pathname !== '/collection/quick-add';
+
+                    const isManualGroup = /^\/collection\/[^/]+\/group\/[^/]+$/.test(pathname) &&
+                        !pathname.includes('/edit') &&
+                        !pathname.includes('/manage');
+
+                    if (isManualProfile || isManualGroup) {
                         return 'collection-manual';
                     }
+
                     // For other pages, use pathname + search for proper restoration
-                    return location.pathname + location.search;
+                    return pathname + location.search;
                 }}
             />
 

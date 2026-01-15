@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -8,10 +8,10 @@ import {
     Sparkles,
     Star,
     Check,
+    Car,
 } from "lucide-react";
 import PageHeader from "../../components/ui/PageHeader";
 import { createGroup, CreateGroupData } from "../../services/group.service";
-import { listCars, CarData } from "../../services/car.service";
 import toast from "react-hot-toast";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigateBack } from "../../hooks/useNavigateBack";
@@ -33,29 +33,9 @@ export default function CreateGroupPage() {
         cars: [],
     });
 
-    const [userCars, setUserCars] = useState<CarData[]>([]);
     const [errors, setErrors] = useState<Partial<Record<keyof GroupFormData, string>>>({});
     const [isLoading, setIsLoading] = useState(false);
-    const [isFetchingCars, setIsFetchingCars] = useState(true);
 
-    // ScrollRestoration handles scroll automatically
-    useEffect(() => {
-        if (user?.username) {
-            fetchUserCars();
-        }
-    }, [user?.username]);
-
-    const fetchUserCars = async () => {
-        try {
-            const cars = await listCars(user!.username);
-            setUserCars(cars);
-        } catch (error) {
-            console.error("Error fetching cars:", error);
-            toast.error("Error al cargar tus autos");
-        } finally {
-            setIsFetchingCars(false);
-        }
-    };
 
     const handleSubmit = async (e?: React.FormEvent) => {
         e?.preventDefault();
@@ -101,14 +81,6 @@ export default function CreateGroupPage() {
     // Safe back navigation with fallback
     const handleCancel = useNavigateBack(`/collection/${user?.username}/groups`);
 
-    const toggleCar = (carId: number) => {
-        setFormData((prev) => ({
-            ...prev,
-            cars: prev.cars.includes(carId)
-                ? prev.cars.filter((id) => id !== carId)
-                : [...prev.cars, carId],
-        }));
-    };
 
     return (
         <div className="min-h-screen pb-32 md:pb-8">
@@ -202,64 +174,14 @@ export default function CreateGroupPage() {
                     </div>
 
                     <div className="mb-8">
-                        <div className="flex items-center gap-2 mb-4">
-                            <Folder className="w-4 h-4 text-white/40" />
-                            <h2 className="text-sm font-bold text-white/40 uppercase tracking-widest">
-                                Seleccionar Autos
-                            </h2>
-                            <span className="text-[10px] text-white/20 ml-2">({formData.cars.length} seleccionados)</span>
-                        </div>
-
-                        <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 md:p-6">
-                            {isFetchingCars ? (
-                                <div className="flex items-center justify-center py-8 text-white/40">
-                                    Cargando tus autos...
-                                </div>
-                            ) : userCars.length === 0 ? (
-                                <div className="text-center py-8 text-white/40">
-                                    <p>No tenés autos en tu colección aún</p>
-                                    <button
-                                        type="button"
-                                        onClick={() => navigate("/collection/add")}
-                                        className="mt-3 px-4 py-2 text-sm bg-accent/20 text-accent rounded-lg hover:bg-accent/30 transition-colors"
-                                    >
-                                        Agregar tu primer auto
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                                    {userCars.map((car) => (
-                                        <div
-                                            key={car.carId}
-                                            onClick={() => toggleCar(car.carId!)}
-                                            className={`relative cursor-pointer rounded-xl overflow-hidden border-2 transition-all ${formData.cars.includes(car.carId!) ? "border-accent ring-2 ring-accent/30" : "border-transparent hover:border-white/10"}`}
-                                        >
-                                            <div className="aspect-4/3 bg-white/5">
-                                                {car.pictures && car.pictures[0] ? (
-                                                    <img
-                                                        src={car.pictures[0]}
-                                                        alt={car.name}
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-white/20">
-                                                        <Folder className="w-8 h-8" />
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className="p-2 bg-dark/80">
-                                                <p className="text-white text-sm font-medium truncate">{car.name}</p>
-                                                <p className="text-white/40 text-xs">{car.brand}</p>
-                                            </div>
-                                            {formData.cars.includes(car.carId!) && (
-                                                <div className="absolute top-2 right-2 w-6 h-6 bg-accent rounded-full flex items-center justify-center">
-                                                    <Check className="w-4 h-4 text-white" />
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+                        <div className="bg-white/[0.02] border border-white/10 border-dashed rounded-2xl p-8 text-center">
+                            <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Car className="w-8 h-8 text-white/20" />
+                            </div>
+                            <h3 className="text-white font-bold mb-2">¿Cómo añado vehículos?</h3>
+                            <p className="text-white/40 text-sm max-w-sm mx-auto leading-relaxed">
+                                Crea tu grupo ahora y luego podrás añadir o quitar vehículos fácilmente desde la sección de gestión del grupo.
+                            </p>
                         </div>
                     </div>
 

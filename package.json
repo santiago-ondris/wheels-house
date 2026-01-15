@@ -24,6 +24,7 @@
     "drizzle-orm": "0.45.1",
     "nodemailer": "^7.0.12",
     "passport": "^0.7.0",
-    "passport-jwt": "^4.0.1"
+    "passport-jwt": "^4.0.1",
+    "resend": "^6.7.0"
   }
 }

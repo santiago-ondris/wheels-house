@@ -93,8 +93,10 @@ export default function EditGroupPage() {
             };
             await updateGroup(Number(groupId), data);
             toast.success("¡Grupo actualizado!");
-            // Navigate back to the previous page (likely group detail)
-            navigate(-1);
+
+            // Navigate to the updated group detail URL
+            const encodedName = encodeURIComponent(formData.name);
+            navigate(`/collection/${user?.username}/group/${encodedName}`, { replace: true });
         } catch (error: any) {
             if (error?.error?.includes("more than 4")) {
                 toast.error("No podés tener más de 4 grupos destacados");

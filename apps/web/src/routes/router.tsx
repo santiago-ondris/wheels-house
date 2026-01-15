@@ -32,6 +32,7 @@ import MoveToCollectionPage from "../pages/wishlist/MoveToCollectionPage";
 import EditWishlistPage from "../pages/wishlist/EditWishlistPage";
 import OnboardingPage from "../pages/onboarding/OnboardingPage";
 import ImportCarsPage from "../pages/import/ImportCarsPage";
+import AboutUsPage from "../pages/AboutUsPage";
 
 // Components
 import ProtectedRoute from "../components/auth/ProtectedRoute";
@@ -115,6 +116,7 @@ export const router = createBrowserRouter([
             { path: "hall-of-fame/legends", element: <LegendsPage /> },
 
             // Other routes
+            { path: "about", element: <AboutUsPage /> },
             { path: "contact", element: <ContactPage /> },
             { path: "roadmap", element: <RoadmapPage /> },
 
