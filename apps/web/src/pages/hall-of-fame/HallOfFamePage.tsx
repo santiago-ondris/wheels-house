@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Users, Code, Trophy, Star, ArrowRight } from "lucide-react";
+import { Users, Code, Trophy, Star, ArrowRight, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
 
@@ -65,6 +65,14 @@ export default function HallOfFamePage() {
     return (
         <div className="min-h-[80vh] py-12 px-6">
             <div className="container mx-auto max-w-8xl relative">
+                <Link
+                    to="/"
+                    className="inline-flex items-center gap-2 text-white/50 hover:text-white mb-8 transition-colors group"
+                >
+                    <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+                    Volver al inicio
+                </Link>
+
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}

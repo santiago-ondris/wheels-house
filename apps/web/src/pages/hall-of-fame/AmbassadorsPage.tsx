@@ -38,10 +38,13 @@ export default function AmbassadorsPage() {
                         </p>
                     </div>
 
-                    <button className="inline-flex items-center gap-2 px-8 py-4 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-2xl transition-all hover:scale-105 active:scale-95 mb-8">
+                    <Link
+                        to="/contact"
+                        className="inline-flex items-center gap-2 px-8 py-4 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-2xl transition-all hover:scale-105 active:scale-95 mb-8"
+                    >
                         <MessageSquare size={20} />
                         Contactar ahora
-                    </button>
+                    </Link>
 
                     <p className="text-white/40 text-lg">
                         ¿Tenes ganas de promocionar la App? Cualquier acción por mas minima que parezca es bienvenida. Hablanos!
