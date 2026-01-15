@@ -64,7 +64,7 @@ export default function FeaturedCollections() {
     const allCards = [...userCards, foundersCard];
 
     return (
-        <section className="container mx-auto px-6 py-10">
+        <section className="container mx-auto px-6 pt-4 pb-10">
             {/* Section Header */}
             <div className="flex items-center justify-between mb-8">
                 <div>
