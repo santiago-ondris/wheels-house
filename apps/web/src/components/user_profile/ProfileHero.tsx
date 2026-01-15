@@ -11,8 +11,6 @@ interface ProfileHeroProps {
     createdDate?: string;
     totalCars: number;
     totalGroups: number;
-    isOwner: boolean;
-    onEditClick?: () => void;
 }
 
 export default function ProfileHero({
@@ -24,8 +22,6 @@ export default function ProfileHero({
     createdDate,
     totalCars,
     totalGroups,
-    isOwner,
-    onEditClick
 }: ProfileHeroProps) {
     const memberSince = createdDate
         ? new Date(createdDate).getFullYear()
@@ -65,15 +61,6 @@ export default function ProfileHero({
                         <p className="text-white/40 font-mono text-sm tracking-widest uppercase flex items-center gap-2">
                             <span className="text-accent">@</span>{username}
                             <div className="flex items-center gap-4 ml-4">
-                                {isOwner && (
-                                    <button
-                                        id="edit-profile-desktop"
-                                        onClick={onEditClick}
-                                        className="text-[14px] text-accent/60 hover:text-accent font-bold transition-colors border-b border-accent/20 hover:border-accent"
-                                    >
-                                        EDITAR_PERFIL
-                                    </button>
-                                )}
                                 <Link
                                     to={`/collection/${username}/stats`}
                                     className="flex items-center gap-2 text-[14px] text-emerald-400 font-bold transition-colors border-b border-emerald-400/20 hover:border-emerald-400"
@@ -163,15 +150,6 @@ export default function ProfileHero({
                         </div>
 
                         <div className="flex items-center gap-4 mt-3">
-                            {isOwner && (
-                                <button
-                                    id="edit-profile-mobile"
-                                    onClick={onEditClick}
-                                    className="text-[10px] text-accent/60 font-mono tracking-tighter uppercase hover:text-accent transition-colors underline underline-offset-4"
-                                >
-                                    [ EDITAR_PERFIL ]
-                                </button>
-                            )}
                             <Link
                                 to={`/collection/${username}/stats`}
                                 className="text-[10px] text-emerald-400 font-mono tracking-tighter uppercase hover:text-white transition-colors"
