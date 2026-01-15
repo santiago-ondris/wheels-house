@@ -50,19 +50,19 @@ export default function MultiImageUploadWidget({
 
         if (validFiles.length === 0) return;
 
-        // Subimos de a 2 imágenes en paralelo para balancear velocidad vs rate limiting (errores 429 en producción).
-        // Si Railway sigue bloqueando, bajar CHUNK_SIZE a 1. Si funciona bien, se puede probar con 3.
-        const CHUNK_SIZE = 2;
+        // Subimos de a 1 imagen con delay entre cada una para evitar rate limiting de Railway (errores 429).
+        const DELAY_BETWEEN_UPLOADS_MS = 500;
         const successfulUrls: string[] = [];
         
-        for (let i = 0; i < validFiles.length; i += CHUNK_SIZE) {
-            const chunk = validFiles.slice(i, i + CHUNK_SIZE);
-            const results = await Promise.all(chunk.map(file => processAndUploadFile(file)));
+        for (let i = 0; i < validFiles.length; i++) {
+            // Delay entre uploads (excepto para el primero)
+            if (i > 0) {
+                await new Promise(resolve => setTimeout(resolve, DELAY_BETWEEN_UPLOADS_MS));
+            }
             
-            for (const result of results) {
-                if (result !== null) {
-                    successfulUrls.push(result);
-                }
+            const result = await processAndUploadFile(validFiles[i]);
+            if (result !== null) {
+                successfulUrls.push(result);
             }
         }
 
