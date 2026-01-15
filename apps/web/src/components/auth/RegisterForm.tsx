@@ -21,9 +21,9 @@ export default function RegisterForm() {
     picture: "",
   });
 
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [tempImage, setTempImage] = useState<string | null>(null);
   const [isCropping, setIsCropping] = useState(false);
+  const [pendingPictureBlob, setPendingPictureBlob] = useState<Blob | null>(null);
 
   const [errors, setErrors] = useState<Partial<Record<keyof RegisterFormData, string>>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -50,6 +50,16 @@ export default function RegisterForm() {
 
     setIsLoading(true);
     try {
+      let finalPictureUrl = formData.picture;
+
+      // If there's a pending blob, upload it now
+      if (pendingPictureBlob) {
+        const { uploadImage } = await import("../../services/upload.service");
+        const file = new File([pendingPictureBlob], "avatar.jpg", { type: "image/jpeg" });
+        finalPictureUrl = await uploadImage(file, true); // profile=true
+        setPendingPictureBlob(null);
+      }
+
       await register({
         username: result.data.username,
         email: result.data.email,
@@ -57,7 +67,7 @@ export default function RegisterForm() {
         lastName: result.data.lastName,
         password: result.data.password,
         biography: result.data.biography,
-        picture: result.data.picture,
+        picture: finalPictureUrl,
       });
 
       await login(result.data.username, result.data.password);
@@ -99,19 +109,12 @@ export default function RegisterForm() {
 
   const handleCropSave = async (croppedBlob: Blob) => {
     setIsCropping(false);
-    setIsUploadingImage(true);
-    try {
-      const { uploadImage } = await import("../../services/upload.service");
-      const file = new File([croppedBlob], "avatar.jpg", { type: "image/jpeg" });
-      const imageUrl = await uploadImage(file, true);
-      setFormData(prev => ({ ...prev, picture: imageUrl }));
-      toast.success("¡Avatar listo!");
-    } catch (error: any) {
-      toast.error(error.message || "Error al subir la imagen");
-    } finally {
-      setIsUploadingImage(false);
-      setTempImage(null);
-    }
+    // Create a local preview URL
+    const previewUrl = URL.createObjectURL(croppedBlob);
+    setFormData(prev => ({ ...prev, picture: previewUrl }));
+    setPendingPictureBlob(croppedBlob);
+    setTempImage(null);
+    toast.success("¡Avatar listo!");
   };
 
   const handleCropCancel = () => {
@@ -247,7 +250,7 @@ export default function RegisterForm() {
                   <UserCircle className="text-white/20 w-8 h-8" />
                 )}
               </div>
-              {isUploadingImage && (
+              {isLoading && pendingPictureBlob && (
                 <div className="absolute inset-0 bg-dark/60 rounded-full flex items-center justify-center">
                   <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
                 </div>
@@ -255,19 +258,22 @@ export default function RegisterForm() {
             </div>
             <div className="flex-1">
               <label className="cursor-pointer inline-flex items-center px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg font-mono text-[10px] uppercase tracking-widest transition-all border border-white/10">
-                {isUploadingImage ? "SUBIENDO..." : "SUBIR FOTO"}
+                {isLoading && pendingPictureBlob ? "SUBIENDO..." : "SUBIR FOTO"}
                 <input
                   type="file"
                   className="hidden"
                   accept="image/*"
                   onChange={handleImageUpload}
-                  disabled={isUploadingImage}
+                  disabled={isLoading}
                 />
               </label>
               {formData.picture && (
                 <button
                   type="button"
-                  onClick={() => setFormData({ ...formData, picture: "" })}
+                  onClick={() => {
+                    setFormData({ ...formData, picture: "" });
+                    setPendingPictureBlob(null);
+                  }}
                   className="ml-4 text-red-400/60 hover:text-red-400 font-mono text-[10px] uppercase tracking-widest"
                 >
                   Eliminar
