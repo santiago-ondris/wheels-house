@@ -1,4 +1,4 @@
-import { useState, Fragment } from "react";
+import { useState, Fragment, useRef, useEffect } from "react";
 import { Combobox, Transition } from "@headlessui/react";
 import { ChevronDown } from "lucide-react";
 
@@ -9,6 +9,7 @@ interface SuggestionInputProps {
     placeholder?: string;
     icon?: React.ReactNode;
     error?: string;
+    autoFocus?: boolean;
 }
 
 export default function SuggestionInput({
@@ -18,8 +19,20 @@ export default function SuggestionInput({
     placeholder = "Escribir...",
     icon,
     error,
+    autoFocus = false,
 }: SuggestionInputProps) {
     const [query, setQuery] = useState("");
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (autoFocus && inputRef.current) {
+            // Small delay to ensure DOM is ready after remount
+            const timer = setTimeout(() => {
+                inputRef.current?.focus();
+            }, 50);
+            return () => clearTimeout(timer);
+        }
+    }, [autoFocus]);
 
     const filteredOptions =
         query === ""
@@ -38,6 +51,7 @@ export default function SuggestionInput({
                         </span>
                     )}
                     <Combobox.Input
+                        ref={inputRef}
                         className={`w-full bg-input-bg border ${error ? "border-danger" : "border-white/5"
                             } ${icon ? "pl-10" : "pl-4"} pr-10 py-2.5 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-base`}
                         onChange={(e) => {

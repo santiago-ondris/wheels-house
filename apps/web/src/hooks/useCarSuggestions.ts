@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getSuggestions, CarSuggestions } from "../services/car.service";
 
 export function useCarSuggestions() {
@@ -23,5 +23,19 @@ export function useCarSuggestions() {
         loadSuggestions();
     }, []);
 
-    return { suggestions, isLoading };
+    // Add a name to local suggestions without refetching from API
+    // This is useful for quick-add flow where the same name might be entered multiple times
+    const addLocalSuggestion = useCallback((name: string) => {
+        if (!name.trim()) return;
+        setSuggestions((prev) => {
+            // Don't add duplicates
+            if (prev.names.includes(name)) return prev;
+            return {
+                ...prev,
+                names: [name, ...prev.names],
+            };
+        });
+    }, []);
+
+    return { suggestions, isLoading, addLocalSuggestion };
 }
