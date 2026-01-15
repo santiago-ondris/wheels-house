@@ -36,3 +36,34 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     return user;
   }
 }
+
+// Strategy for validating refresh tokens
+@Injectable()
+export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
+  constructor(configService: ConfigService) {
+    super({
+      jwtFromRequest: ExtractJwt.fromBodyField('refreshToken'),
+      ignoreExpiration: false,
+      secretOrKey: configService.get<string>('JWT_SECRET')!,
+    });
+  }
+
+  async validate(payload: TokenData & { tokenType?: string }) {
+    // Verify this is actually a refresh token
+    if (payload.tokenType !== 'refresh') {
+      throw new UnauthorizedException('Invalid token type');
+    }
+    return payload;
+  }
+}
+
+// Guard for refresh token endpoint
+@Injectable()
+export class JwtRefreshGuard extends AuthGuard('jwt-refresh') {
+  handleRequest(err, user, info) {
+    if (err || !user) {
+      throw err || new UnauthorizedException('Invalid or expired refresh token');
+    }
+    return user;
+  }
+}

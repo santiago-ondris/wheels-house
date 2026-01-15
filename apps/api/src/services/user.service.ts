@@ -53,16 +53,36 @@ export class UserService {
     async loginService(loginData: LoginDTO) {
         const user = await getUserFromUsernameOrEmail(loginData.usernameOrEmail);
 
-        // Add fields to store more data in the token.    
-        const payload = {
+        // Payload for access token (short-lived)
+        const accessPayload = {
             username: user.username,
+            tokenType: 'access',
         };
 
-        const accessToken: string = await this.jwtService.signAsync(payload);
+        // Payload for refresh token (long-lived)
+        const refreshPayload = {
+            username: user.username,
+            tokenType: 'refresh',
+        };
 
-        return new LoginResponse(
-            accessToken
-        );
+        const accessToken: string = await this.jwtService.signAsync(accessPayload, { expiresIn: '15m' });
+        const refreshToken: string = await this.jwtService.signAsync(refreshPayload, { expiresIn: '14d' });
+
+        return {
+            accessToken,
+            refreshToken,
+        };
+    }
+
+    async refreshTokenService(username: string) {
+        const accessPayload = {
+            username,
+            tokenType: 'access',
+        };
+
+        const accessToken: string = await this.jwtService.signAsync(accessPayload, { expiresIn: '15m' });
+
+        return { accessToken };
     }
 
     async getPublicProfileService(username: string): Promise<PublicProfileDTO> {
@@ -205,7 +225,7 @@ export class UserService {
         }
 
         const deletedSearchHistory = await deleteSearchHistoryFromUserId(user.userId);
-        if(!deletedSearchHistory) {
+        if (!deletedSearchHistory) {
             throw ERROR_DELETING_USER;
         }
 

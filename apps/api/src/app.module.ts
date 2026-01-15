@@ -8,7 +8,7 @@ import { UploadController } from './controllers/upload.controller';
 import { UserService } from './services/user.service';
 import { CarService } from './services/car.service';
 import { UploadService } from './services/upload.service';
-import { JwtStrategy } from './validators/auth.validator';
+import { JwtStrategy, JwtRefreshStrategy } from './validators/auth.validator';
 import { GroupController } from './controllers/group.controller';
 import { GroupService } from './services/group.service';
 import { ThrottlerModule } from '@nestjs/throttler';
@@ -47,10 +47,10 @@ import { HealthController } from './controllers/health.controller';
     }),
     JwtModule.register({
       secret: process.env.JWT_SECRET!,
-      signOptions: { expiresIn: '7d' },
+      // Expiration set per token type in UserService
     }),
   ],
   controllers: [UserController, CarController, UploadController, GroupController, StatsController, SearchHistoryController, ImportController, HealthController],
-  providers: [JwtStrategy, UserService, CarService, UploadService, GroupService, StatsService, SearchHistoryService, ImportService],
+  providers: [JwtStrategy, JwtRefreshStrategy, UserService, CarService, UploadService, GroupService, StatsService, SearchHistoryService, ImportService],
 })
 export class AppModule { }

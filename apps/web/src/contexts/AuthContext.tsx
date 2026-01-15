@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { login as loginService } from "../services/auth.service";
 
@@ -31,9 +31,52 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
+  const logout = useCallback(() => {
+    navigate("/", { replace: true });
+    setTimeout(() => {
+      setUser(null);
+      localStorage.removeItem("auth_token");
+      localStorage.removeItem("refresh_token");
+    }, 50);
+  }, [navigate]);
+
+  // Listen for session-expired events from API interceptor
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      logout();
+    };
+
+    window.addEventListener('session-expired', handleSessionExpired);
+    return () => window.removeEventListener('session-expired', handleSessionExpired);
+  }, [logout]);
+
   useEffect(() => {
     const initAuth = async () => {
-      const token = localStorage.getItem("auth_token");
+      let token = localStorage.getItem("auth_token");
+      const refreshToken = localStorage.getItem("refresh_token");
+
+      // If no access token but refresh token exists, try to refresh
+      if (!token && refreshToken) {
+        try {
+          const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/refresh`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refreshToken }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem('auth_token', data.accessToken);
+            token = data.accessToken;
+          } else {
+            // Refresh failed, clear everything
+            localStorage.removeItem("refresh_token");
+          }
+        } catch {
+          localStorage.removeItem("refresh_token");
+        }
+      }
+
       if (token) {
         try {
           const decoded = decodeToken(token);
@@ -45,6 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         } catch {
           localStorage.removeItem("auth_token");
+          localStorage.removeItem("refresh_token");
         }
       }
       setIsLoading(false);
@@ -55,11 +99,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (usernameOrEmail: string, password: string) => {
     const response = await loginService({ usernameOrEmail, password });
-    const token = response.authorization;
 
-    localStorage.setItem("auth_token", token);
+    // Store both tokens
+    localStorage.setItem("auth_token", response.accessToken);
+    localStorage.setItem("refresh_token", response.refreshToken);
 
-    const decoded = decodeToken(token);
+    const decoded = decodeToken(response.accessToken);
 
     // Fetch user picture from profile
     try {
@@ -68,14 +113,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       setUser({ username: decoded.username });
     }
-  };
-
-  const logout = () => {
-    navigate("/", { replace: true });
-    setTimeout(() => {
-      setUser(null);
-      localStorage.removeItem("auth_token");
-    }, 50);
   };
 
   const updatePicture = (newPicture: string) => {

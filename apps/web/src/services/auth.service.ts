@@ -16,7 +16,12 @@ interface LoginData {
 }
 
 interface LoginResponse {
-    authorization: string;
+    accessToken: string;
+    refreshToken: string;
+}
+
+interface RefreshResponse {
+    accessToken: string;
 }
 
 export async function register(data: RegisterData): Promise<boolean> {
@@ -30,5 +35,12 @@ export async function login(data: LoginData): Promise<LoginResponse> {
     return apiRequest<LoginResponse>('/login', {
         method: 'POST',
         body: JSON.stringify(data),
+    });
+}
+
+export async function refreshAccessToken(refreshToken: string): Promise<RefreshResponse> {
+    return apiRequest<RefreshResponse>('/refresh', {
+        method: 'POST',
+        body: JSON.stringify({ refreshToken }),
     });
 }
