@@ -223,21 +223,13 @@ export interface WishedCarToCollectionDTO {
 
 export async function wishedCarToCollection(carId: number, data: WishedCarToCollectionDTO): Promise<void> {
     const token = localStorage.getItem("auth_token");
-    const API_URL = `http://${window.location.hostname}:3000`;
-
-    const response = await fetch(`${API_URL}/car/wishedCarToCollection/${carId}`, {
+    return apiRequest<void>(`/car/wishedCarToCollection/${carId}`, {
         method: 'PUT',
         headers: {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(data),
     });
-
-    if (!response.ok) {
-        const error = await response.json();
-        throw error;
-    }
 }
 
 export async function createWishedCar(data: CarData & { wished: true }): Promise<number> {

@@ -1,4 +1,4 @@
-const API_URL = `http://${window.location.hostname}:3000`;
+import { API_URL } from './api';
 
 export async function uploadImage(file: File, isPublic = false): Promise<string> {
     const formData = new FormData();
