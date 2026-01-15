@@ -20,6 +20,7 @@ export default function MultiImageUploadWidget({
     const [isDragging, setIsDragging] = useState(false);
     const [croppingIndex, setCroppingIndex] = useState<number | null>(null);
     const [isSavingCrop, setIsSavingCrop] = useState(false);
+    const [uploadBatch, setUploadBatch] = useState<{ current: number; total: number } | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Normalize values to strings (redundant but safe)
@@ -50,21 +51,21 @@ export default function MultiImageUploadWidget({
 
         if (validFiles.length === 0) return;
 
-        // Subimos de a 1 imagen con delay entre cada una para evitar rate limiting de Railway (errores 429).
-        const DELAY_BETWEEN_UPLOADS_MS = 500;
+        // Se suben archivos directamente a Cloudinary  
         const successfulUrls: string[] = [];
-        
+        const total = validFiles.length;
+
+        setUploadBatch({ current: 0, total });
+
         for (let i = 0; i < validFiles.length; i++) {
-            // Delay entre uploads (excepto para el primero)
-            if (i > 0) {
-                await new Promise(resolve => setTimeout(resolve, DELAY_BETWEEN_UPLOADS_MS));
-            }
-            
+            setUploadBatch({ current: i + 1, total });
             const result = await processAndUploadFile(validFiles[i]);
             if (result !== null) {
                 successfulUrls.push(result);
             }
         }
+
+        setUploadBatch(null);
 
         if (successfulUrls.length > 0) {
             onChange([...values, ...successfulUrls]);
@@ -303,6 +304,11 @@ export default function MultiImageUploadWidget({
                             <div className="w-full h-full rounded-xl border border-white/10 bg-white/5 flex flex-col items-center justify-center gap-2 p-4">
                                 <Loader2 className={`w-8 h-8 ${state.status === 'processing' ? 'text-blue-400' : 'text-accent'} animate-spin`} />
                                 <div className="w-full text-center">
+                                    {uploadBatch && uploadBatch.total > 1 && (
+                                        <p className="text-xs text-accent font-bold mb-1">
+                                            {uploadBatch.current}/{uploadBatch.total}
+                                        </p>
+                                    )}
                                     <p className="text-[10px] text-white/50 mb-1 font-medium uppercase tracking-wider">
                                         {state.status === 'processing' ? 'Procesando...' : 'Subiendo...'}
                                     </p>

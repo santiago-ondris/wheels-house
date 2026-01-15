@@ -1,6 +1,7 @@
 import {
     Controller,
     Post,
+    Get,
     UseGuards,
     UseInterceptors,
     UploadedFile,
@@ -12,6 +13,7 @@ import { JwtAuthGuard } from '../validators/auth.validator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { UploadService } from '../services/upload.service';
+import type { CloudinarySignature } from '../services/upload.service';
 import * as fs from 'fs';
 import * as path from 'path';
 import { ThrottlerGuard } from '@nestjs/throttler';
@@ -19,6 +21,13 @@ import { ThrottlerGuard } from '@nestjs/throttler';
 @Controller('upload')
 export class UploadController {
     constructor(private readonly uploadService: UploadService) { }
+
+    // Get a signature for direct frontend uploads to Cloudinary.
+    @UseGuards(JwtAuthGuard)
+    @Get('signature')
+    getSignature(): CloudinarySignature {
+        return this.uploadService.generateSignature();
+    }
 
     @UseGuards(JwtAuthGuard)
     @UseGuards(ThrottlerGuard)
