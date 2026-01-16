@@ -44,14 +44,28 @@ function serializeArray(arr: string[]): string | undefined {
     return arr.join(',');
 }
 
-export function useCollectionParams() {
+interface UseCollectionParamsOptions {
+    defaultSort?: string; // Format: "sortBy:sortOrder", e.g., "id:desc", "name:asc"
+}
+
+function parseDefaultSort(defaultSort?: string): { sortBy: SortBy; sortOrder: SortOrder } {
+    if (!defaultSort) return { sortBy: DEFAULTS.sortBy, sortOrder: DEFAULTS.sortOrder };
+    const [sortBy, sortOrder] = defaultSort.split(':');
+    return {
+        sortBy: (sortBy as SortBy) || DEFAULTS.sortBy,
+        sortOrder: (sortOrder as SortOrder) || DEFAULTS.sortOrder,
+    };
+}
+
+export function useCollectionParams(options?: UseCollectionParamsOptions) {
     const [searchParams, setSearchParams] = useSearchParams();
+    const { sortBy: defaultSortBy, sortOrder: defaultSortOrder } = parseDefaultSort(options?.defaultSort);
 
     const params: CollectionParams = useMemo(() => ({
         page: parseInt(searchParams.get('page') || '') || DEFAULTS.page,
         limit: parseInt(searchParams.get('limit') || '') || DEFAULTS.limit,
-        sortBy: (searchParams.get('sortBy') as SortBy) || DEFAULTS.sortBy,
-        sortOrder: (searchParams.get('sortOrder') as SortOrder) || DEFAULTS.sortOrder,
+        sortBy: (searchParams.get('sortBy') as SortBy) || defaultSortBy,
+        sortOrder: (searchParams.get('sortOrder') as SortOrder) || defaultSortOrder,
         brands: parseArray(searchParams.get('brands')),
         colors: parseArray(searchParams.get('colors')),
         manufacturers: parseArray(searchParams.get('manufacturers')),
@@ -60,7 +74,7 @@ export function useCollectionParams() {
         countries: parseArray(searchParams.get('countries')),
         hasPicture: parseArray(searchParams.get('hasPicture')),
         search: searchParams.get('search') || DEFAULTS.search,
-    }), [searchParams]);
+    }), [searchParams, defaultSortBy, defaultSortOrder]);
 
     const setParams = useCallback((updates: Partial<CollectionParams>, options?: { replace?: boolean }) => {
         const isOnlyPageChange = Object.keys(updates).length === 1 && 'page' in updates;

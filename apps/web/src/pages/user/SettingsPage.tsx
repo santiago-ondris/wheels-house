@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, Lock, AlertTriangle, ChevronLeft, Save } from "lucide-react";
+import { User, Lock, AlertTriangle, ChevronLeft, Save, ArrowUpDown } from "lucide-react";
 import { useNavigate, useBlocker } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { getPublicProfile, updateProfile, updatePassword, deleteUser } from "../../services/profile.service";
@@ -12,7 +12,7 @@ import toast from "react-hot-toast";
 type SettingsTab = "profile" | "security";
 
 export default function SettingsPage() {
-    const { user, logout, updatePicture } = useAuth();
+    const { user, logout, updatePicture, updateDefaultSort } = useAuth();
     const navigate = useNavigate();
 
     const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
@@ -27,6 +27,19 @@ export default function SettingsPage() {
     const [tempImage, setTempImage] = useState<string | null>(null);
     const [isCropping, setIsCropping] = useState(false);
     const [pendingPictureBlob, setPendingPictureBlob] = useState<Blob | null>(null);
+    const [defaultSortPreference, setDefaultSortPreference] = useState("id:desc");
+
+    // Sort options for the selector
+    const SORT_OPTIONS = [
+        { value: "id:desc", label: "Más nuevo primero" },
+        { value: "id:asc", label: "Más viejo primero" },
+        { value: "name:asc", label: "Nombre A-Z" },
+        { value: "name:desc", label: "Nombre Z-A" },
+        { value: "brand:asc", label: "Marca A-Z" },
+        { value: "brand:desc", label: "Marca Z-A" },
+        { value: "country:asc", label: "País A-Z" },
+        { value: "country:desc", label: "País Z-A" },
+    ];
 
     // Password States
     const [oldPassword, setOldPassword] = useState("");
@@ -44,6 +57,7 @@ export default function SettingsPage() {
     const [originalLastName, setOriginalLastName] = useState("");
     const [originalBiography, setOriginalBiography] = useState("");
     const [originalPicture, setOriginalPicture] = useState("");
+    const [originalDefaultSortPreference, setOriginalDefaultSortPreference] = useState("id:desc");
 
     // Unsaved changes modal
     const [showUnsavedModal, setShowUnsavedModal] = useState(false);
@@ -53,7 +67,8 @@ export default function SettingsPage() {
         return firstName !== originalFirstName ||
             lastName !== originalLastName ||
             biography !== originalBiography ||
-            picture !== originalPicture;
+            picture !== originalPicture ||
+            defaultSortPreference !== originalDefaultSortPreference;
     };
 
     // Block navigation when there are unsaved changes
@@ -84,6 +99,8 @@ export default function SettingsPage() {
                 setOriginalLastName(data.lastName);
                 setOriginalBiography(data.biography || "");
                 setOriginalPicture(data.picture || "");
+                setDefaultSortPreference(data.defaultSortPreference || "id:desc");
+                setOriginalDefaultSortPreference(data.defaultSortPreference || "id:desc");
             } catch (error) {
                 console.error("Error fetching profile:", error);
                 toast.error("No se pudo cargar el perfil");
@@ -150,14 +167,16 @@ export default function SettingsPage() {
                 setPicture(finalPictureUrl);
             }
 
-            await updateProfile({ firstName, lastName, biography, picture: finalPictureUrl });
+            await updateProfile({ firstName, lastName, biography, picture: finalPictureUrl, defaultSortPreference });
             // Update original values after successful save
             setOriginalFirstName(firstName);
             setOriginalLastName(lastName);
             setOriginalBiography(biography);
             setOriginalPicture(finalPictureUrl);
-            // Update navbar avatar
+            setOriginalDefaultSortPreference(defaultSortPreference);
+            // Update navbar avatar and sort preference in context
             updatePicture(finalPictureUrl);
+            updateDefaultSort(defaultSortPreference);
             toast.success("Perfil actualizado");
         } catch (error: any) {
             toast.error(error.message || "Error al actualizar perfil");
@@ -398,6 +417,30 @@ export default function SettingsPage() {
                                                 />
                                             </div>
 
+                                            <div className="space-y-2 pt-4 border-t border-white/5">
+                                                <div className="flex items-center gap-2 px-1">
+                                                    <ArrowUpDown size={14} className="text-white/40" />
+                                                    <label className="text-[10px] font-mono text-white/40 uppercase tracking-widest">
+                                                        Orden Predeterminado de Colección
+                                                    </label>
+                                                </div>
+                                                <p className="text-[10px] text-white/30 font-mono px-1 mb-2">
+                                                    Este será el orden inicial cuando visites tu colección
+                                                </p>
+                                                <select
+                                                    value={defaultSortPreference}
+                                                    onChange={(e) => setDefaultSortPreference(e.target.value)}
+                                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent/40 font-mono transition-colors appearance-none cursor-pointer"
+                                                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23ffffff40'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.25rem' }}
+                                                >
+                                                    {SORT_OPTIONS.map((option) => (
+                                                        <option key={option.value} value={option.value} className="bg-[#0a0a0b]">
+                                                            {option.label}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+
                                             <div className="flex justify-end pt-4">
                                                 <button
                                                     type="submit"
@@ -520,6 +563,7 @@ export default function SettingsPage() {
                                 setLastName(originalLastName);
                                 setBiography(originalBiography);
                                 setPicture(originalPicture);
+                                setDefaultSortPreference(originalDefaultSortPreference);
                                 setShowUnsavedModal(false);
                                 if (pendingAction) {
                                     pendingAction();

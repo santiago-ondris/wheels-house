@@ -1,0 +1,1 @@
+ALTER TABLE "user" ADD COLUMN "defaultSortPreference" text DEFAULT 'id:desc';

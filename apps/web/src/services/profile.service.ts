@@ -11,6 +11,7 @@ export interface PublicProfile {
     totalCars: number;
     totalGroups: number;
     cars: CarData[];
+    defaultSortPreference?: string;
 }
 
 export interface DistributionItem {

@@ -97,6 +97,7 @@ export default function GroupManageCarsPage() {
                     mode="manage_group"
                     initialSelection={currentCarIds}
                     onSaveSelection={handleSaveSelection}
+                    defaultSortPreference={user?.defaultSortPreference}
                 />
             </div>
         </div>
