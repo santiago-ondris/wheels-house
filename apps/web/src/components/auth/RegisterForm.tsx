@@ -76,8 +76,10 @@ export default function RegisterForm() {
     } catch (error: any) {
       const errorMsg = error?.error || "";
 
-      if (errorMsg.includes("Username")) {
+      if (errorMsg.includes("Username") && errorMsg.includes("use")) {
         setErrors({ username: "Este usuario ya está en uso" });
+      } else if (errorMsg.includes("Username")) {
+        setErrors({ username: "Solo puede contener letras, números, puntos y guiones bajos" });
       } else if (errorMsg.includes("Email already")) {
         setErrors({ email: "Este email ya está registrado" });
       } else if (errorMsg.includes("Email address")) {

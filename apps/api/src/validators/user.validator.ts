@@ -15,7 +15,7 @@ export async function registerValidator(registerData: RegisterDTO) {
         throw userUtils.USER_PICTURE_FORMAT_NOT_VALID;
     }
 
-    if (registerData.username.includes('@')) {
+    if (!userUtils.isValidUsername(registerData.username)) {
         throw userUtils.INVALID_USERNAME;
     }
 

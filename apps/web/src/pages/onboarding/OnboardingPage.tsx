@@ -44,11 +44,11 @@ export default function OnboardingPage() {
     const { user } = useAuth();
 
     // Redirect if already completed
-    useEffect(() => {
-        if (hasCompletedOnboarding()) {
-            navigate(`/collection/${user?.username}`, { replace: true });
-        }
-    }, [hasCompletedOnboarding, navigate, user]);
+    // useEffect(() => {
+    //     if (hasCompletedOnboarding()) {
+    //         navigate(`/collection/${user?.username}`, { replace: true });
+    //     }
+    // }, [hasCompletedOnboarding, navigate, user]);
 
     const isLastStep = currentStep === STEPS.length - 1;
     const isFirstStep = currentStep === 0;
