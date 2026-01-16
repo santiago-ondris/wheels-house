@@ -3,6 +3,7 @@ import { brandNationalities, brands, carConditions, colors, manufacturers, scale
 import { getCarById, getCarIdsFromUserIdWithFilter } from "src/database/crud/car.crud";
 import { getGroupFromId } from "src/database/crud/group.crud";
 import { getUserFromUsername } from "src/database/crud/user.crud";
+import { car } from "src/database/schema";
 import { CarUpdateDTO, CreateCarDTO } from "src/dto/car.dto";
 import { BulkAddToGroupDTO } from "src/dto/collection-query.dto";
 import { TokenData } from "src/dto/user.dto";
@@ -12,6 +13,8 @@ import { INEXISTENT_USER } from "src/utils/user.utils";
 
 export async function createCarValidator(carData: CreateCarDTO, userData: TokenData) {
     // did not define a uniqueness constraint yet.
+
+    console.log(carData);
 
     if(carData.pictures!.length > 10) {
         throw MAX_CARS_PICTURES_LIMIT;
@@ -32,7 +35,7 @@ export async function createCarValidator(carData: CreateCarDTO, userData: TokenD
         manufacturers.findIndex((val) => val == carData.manufacturer) < 0 ||
         scales.findIndex((val) => val == carData.scale) < 0 || 
         colors.findIndex((val) => val == carData.color ) < 0 ||
-        carConditions.findIndex((val) => val == carData.condition)
+        carConditions.findIndex((val) => val == carData.condition) < 0
     ) {
         throw CAR_INFO_NOT_VALID;
     }
@@ -96,7 +99,7 @@ export async function updateCarValidator(requestUserData: TokenData, carChanges:
         manufacturers.findIndex((val) => val == carChanges.manufacturer) < 0 ||
         scales.findIndex((val) => val == carChanges.scale) < 0 || 
         colors.findIndex((val) => val == carChanges.color ) < 0 ||
-        carConditions.findIndex((val) => val == carChanges.condition)
+        carConditions.findIndex((val) => val == carChanges.condition) < 0
     ) {
         throw CAR_INFO_NOT_VALID;
     }
@@ -223,7 +226,7 @@ export async function wishedCarToCollectionValidator(userData: TokenData, carId:
         manufacturers.findIndex((val) => val == carChanges.manufacturer) < 0 ||
         scales.findIndex((val) => val == carChanges.scale) < 0 || 
         colors.findIndex((val) => val == carChanges.color ) < 0 ||
-        carConditions.findIndex((val) => val == carChanges.condition)
+        carConditions.findIndex((val) => val == carChanges.condition) < 0
     ) {
         throw CAR_INFO_NOT_VALID;
     }
