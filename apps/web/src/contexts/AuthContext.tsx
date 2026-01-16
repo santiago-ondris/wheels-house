@@ -7,6 +7,7 @@ import { getPublicProfile } from "../services/profile.service";
 interface User {
   username: string;
   picture?: string;
+  defaultSortPreference?: string;
 }
 
 interface AuthContextType {
@@ -16,6 +17,7 @@ interface AuthContextType {
   login: (usernameOrEmail: string, password: string) => Promise<void>;
   logout: () => void;
   updatePicture: (newPicture: string) => void;
+  updateDefaultSort: (newSort: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -82,9 +84,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const decoded = decodeToken(token);
           try {
             const profile = await getPublicProfile(decoded.username);
-            setUser({ username: decoded.username, picture: profile.picture });
+            setUser({ username: decoded.username, picture: profile.picture, defaultSortPreference: profile.defaultSortPreference });
           } catch {
-            setUser({ username: decoded.username });
+            setUser({ username: decoded.username, defaultSortPreference: 'id:desc' });
           }
         } catch {
           localStorage.removeItem("auth_token");
@@ -109,15 +111,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Fetch user picture from profile
     try {
       const profile = await getPublicProfile(decoded.username);
-      setUser({ username: decoded.username, picture: profile.picture });
+      setUser({ username: decoded.username, picture: profile.picture, defaultSortPreference: profile.defaultSortPreference });
     } catch {
-      setUser({ username: decoded.username });
+      setUser({ username: decoded.username, defaultSortPreference: 'id:desc' });
     }
   };
 
   const updatePicture = (newPicture: string) => {
     if (user) {
       setUser({ ...user, picture: newPicture || undefined });
+    }
+  };
+
+  const updateDefaultSort = (newSort: string) => {
+    if (user) {
+      setUser({ ...user, defaultSortPreference: newSort });
     }
   };
 
@@ -130,6 +138,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         logout,
         updatePicture,
+        updateDefaultSort,
       }}
     >
       {children}

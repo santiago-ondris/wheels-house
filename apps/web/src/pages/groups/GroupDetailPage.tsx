@@ -105,6 +105,7 @@ export default function GroupDetailPage() {
                         groupId={group.groupId}
                         mode="view"
                         enableMultiSelect={false}
+                        defaultSortPreference={user?.defaultSortPreference}
                     />
                 </div>
             )}

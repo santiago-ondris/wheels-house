@@ -12,7 +12,8 @@ export const user = pgTable("user", {
     biography: text("biography"),
     resetPasswordRequestSelector: text("resetPasswordRequestSelector"),
     resetPasswordHashedValidator: text("resetPasswordHashedValidator"),
-    resetPasswordTokenExpires: timestamp("resetPasswordTokenExpires", { withTimezone: true })
+    resetPasswordTokenExpires: timestamp("resetPasswordTokenExpires", { withTimezone: true }),
+    defaultSortPreference: text("defaultSortPreference").default("id:desc"),
     // for the future:
     // verificationCode: integer("verificationCode").notNull(),
     // verified: boolean("verified"),

@@ -105,6 +105,11 @@ export class UpdateUserProfileDTO {
     @IsString()
     @IsOptional()
     biography: string = '';
+
+    @Transform(({ value }) => value ?? 'id:desc')
+    @IsString()
+    @IsOptional()
+    defaultSortPreference: string = 'id:desc';
 }
 
 export class UpdatePasswordDTO {

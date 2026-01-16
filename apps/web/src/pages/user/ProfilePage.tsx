@@ -92,6 +92,7 @@ export default function ProfilePage() {
             <CollectionSection
                 username={profile.username}
                 isOwner={isOwner}
+                defaultSortPreference={isOwner ? user?.defaultSortPreference : profile.defaultSortPreference}
             />
         </motion.div>
     );

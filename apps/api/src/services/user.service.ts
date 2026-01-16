@@ -128,7 +128,8 @@ export class UserService {
             cars,
             userData.picture ?? undefined,
             userData.createdDate ?? undefined,
-            userData.biography ?? undefined
+            userData.biography ?? undefined,
+            userData.defaultSortPreference ?? 'id:desc'
         );
     }
 

@@ -27,6 +27,7 @@ interface CollectionSectionProps {
     initialSelection?: number[];
     onSaveSelection?: (selectedIds: number[]) => Promise<void>;
     enableMultiSelect?: boolean;
+    defaultSortPreference?: string;
 }
 
 interface Group {
@@ -41,11 +42,12 @@ export default function CollectionSection({
     mode = 'view',
     initialSelection = [],
     onSaveSelection,
-    enableMultiSelect = true
+    enableMultiSelect = true,
+    defaultSortPreference
 }: CollectionSectionProps) {
     const navigate = useNavigate();
     const location = useLocation();
-    const { params, setPage, setLimit, setSort, setSearch, toggleFilter, clearFilters, hasActiveFilters } = useCollectionParams();
+    const { params, setPage, setLimit, setSort, setSearch, toggleFilter, clearFilters, hasActiveFilters } = useCollectionParams({ defaultSort: defaultSortPreference });
 
     const prevGroupIdRef = useRef<number | undefined>(groupId);
     useEffect(() => {
