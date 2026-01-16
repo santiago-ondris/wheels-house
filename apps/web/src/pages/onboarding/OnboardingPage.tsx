@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Rocket,
@@ -39,16 +39,16 @@ const STEPS = [
 
 export default function OnboardingPage() {
     const [currentStep, setCurrentStep] = useState(0);
-    const { completeOnboarding, skipOnboarding, hasCompletedOnboarding } = useOnboarding();
-    const navigate = useNavigate();
-    const { user } = useAuth();
+    const { completeOnboarding, skipOnboarding } = useOnboarding();
+    useNavigate();
+    useAuth();
 
     // Redirect if already completed
-    useEffect(() => {
-        if (hasCompletedOnboarding()) {
-            navigate(`/collection/${user?.username}`, { replace: true });
-        }
-    }, [hasCompletedOnboarding, navigate, user]);
+    // useEffect(() => {
+    //     if (hasCompletedOnboarding()) {
+    //         navigate(`/collection/${user?.username}`, { replace: true });
+    //     }
+    // }, [hasCompletedOnboarding, navigate, user]);
 
     const isLastStep = currentStep === STEPS.length - 1;
     const isFirstStep = currentStep === 0;

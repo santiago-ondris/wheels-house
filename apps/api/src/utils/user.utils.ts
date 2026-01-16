@@ -25,7 +25,7 @@ export const INVALID_EMAIL_ADDRESS = new HttpException(
 export const INVALID_USERNAME = new HttpException(
     {
         status: HttpStatus.BAD_REQUEST,
-        error: 'Username can not contain @.'
+        error: 'Username can only contain letters, numbers, dots and underscores.'
     },
     HttpStatus.BAD_REQUEST
 );
@@ -113,6 +113,11 @@ export const EXPIRED_RESET_TOKEN = new HttpException(
 export function isValidEmail(email: string): boolean {
     const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return pattern.test(email);
+}
+
+export function isValidUsername(username: string) : boolean {
+    const pattern = /^[a-zA-Z0-9._]+$/;
+    return pattern.test(username);
 }
 
 export function validatePassword(password: string): boolean {

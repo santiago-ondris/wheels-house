@@ -1,16 +1,20 @@
 import { BadRequestException } from "@nestjs/common";
+import { brandNationalities, brands, carConditions, colors, manufacturers, scales } from "src/data/carOptions";
 import { getCarById, getCarIdsFromUserIdWithFilter } from "src/database/crud/car.crud";
 import { getGroupFromId } from "src/database/crud/group.crud";
 import { getUserFromUsername } from "src/database/crud/user.crud";
+import { car } from "src/database/schema";
 import { CarUpdateDTO, CreateCarDTO } from "src/dto/car.dto";
 import { BulkAddToGroupDTO } from "src/dto/collection-query.dto";
 import { TokenData } from "src/dto/user.dto";
-import { CAR_ALREADY_OWNED, CAR_DO_NOT_BELONG_TO_USER, CAR_PICTURE_FORMAT_NOT_VALID, INEXISTENT_CAR, MAX_CARS_PICTURES_LIMIT, validCarPicture, WISHED_CAR_CAN_NOT_BE_IN_GROUP } from "src/utils/car.utils";
+import { CAR_ALREADY_OWNED, CAR_DO_NOT_BELONG_TO_USER, CAR_INFO_NOT_VALID, CAR_PICTURE_FORMAT_NOT_VALID, INEXISTENT_CAR, MAX_CARS_PICTURES_LIMIT, validCarPicture, WISHED_CAR_CAN_NOT_BE_IN_GROUP } from "src/utils/car.utils";
 import { GROUP_DO_NOT_BELONG_TO_USER, INEXISTENT_GROUP } from "src/utils/group.utils";
 import { INEXISTENT_USER } from "src/utils/user.utils";
 
 export async function createCarValidator(carData: CreateCarDTO, userData: TokenData) {
     // did not define a uniqueness constraint yet.
+
+    console.log(carData);
 
     if(carData.pictures!.length > 10) {
         throw MAX_CARS_PICTURES_LIMIT;
@@ -24,6 +28,16 @@ export async function createCarValidator(carData: CreateCarDTO, userData: TokenD
 
     if (carData.wished && carData.groups!.length > 0) {
         throw WISHED_CAR_CAN_NOT_BE_IN_GROUP;
+    }
+
+    if (brands.findIndex((val) => val == carData.brand) < 0 ||
+        (brandNationalities[carData.brand] || "") != carData.country || 
+        manufacturers.findIndex((val) => val == carData.manufacturer) < 0 ||
+        scales.findIndex((val) => val == carData.scale) < 0 || 
+        colors.findIndex((val) => val == carData.color ) < 0 ||
+        carConditions.findIndex((val) => val == carData.condition) < 0
+    ) {
+        throw CAR_INFO_NOT_VALID;
     }
 }
 
@@ -78,6 +92,16 @@ export async function updateCarValidator(requestUserData: TokenData, carChanges:
         if(group.userId != user.userId) {
             throw GROUP_DO_NOT_BELONG_TO_USER;
         }
+    }
+
+    if (brands.findIndex((val) => val == carChanges.brand) < 0 ||
+        (brandNationalities[carChanges.brand] || "") != carChanges.country || 
+        manufacturers.findIndex((val) => val == carChanges.manufacturer) < 0 ||
+        scales.findIndex((val) => val == carChanges.scale) < 0 || 
+        colors.findIndex((val) => val == carChanges.color ) < 0 ||
+        carConditions.findIndex((val) => val == carChanges.condition) < 0
+    ) {
+        throw CAR_INFO_NOT_VALID;
     }
 }
 
@@ -195,6 +219,16 @@ export async function wishedCarToCollectionValidator(userData: TokenData, carId:
         if (group.userId != user.userId) {
             throw GROUP_DO_NOT_BELONG_TO_USER;
         }
+    }
+
+    if (brands.findIndex((val) => val == carChanges.brand) < 0 ||
+        (brandNationalities[carChanges.brand] || "") != carChanges.country || 
+        manufacturers.findIndex((val) => val == carChanges.manufacturer) < 0 ||
+        scales.findIndex((val) => val == carChanges.scale) < 0 || 
+        colors.findIndex((val) => val == carChanges.color ) < 0 ||
+        carConditions.findIndex((val) => val == carChanges.condition) < 0
+    ) {
+        throw CAR_INFO_NOT_VALID;
     }
 }
 

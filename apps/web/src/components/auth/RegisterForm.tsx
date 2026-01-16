@@ -76,8 +76,10 @@ export default function RegisterForm() {
     } catch (error: any) {
       const errorMsg = error?.error || "";
 
-      if (errorMsg.includes("Username")) {
+      if (errorMsg.includes("Username") && errorMsg.includes("use")) {
         setErrors({ username: "Este usuario ya está en uso" });
+      } else if (errorMsg.includes("Username")) {
+        setErrors({ username: "Solo puede contener letras, números, puntos y guiones bajos" });
       } else if (errorMsg.includes("Email already")) {
         setErrors({ email: "Este email ya está registrado" });
       } else if (errorMsg.includes("Email address")) {
@@ -156,7 +158,7 @@ export default function RegisterForm() {
           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
           <input
             id="email"
-            type="email"
+            type="text"
             placeholder="tu@email.com"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}

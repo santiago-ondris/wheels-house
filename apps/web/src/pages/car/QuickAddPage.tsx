@@ -16,7 +16,7 @@ import {
 import PageHeader from "../../components/ui/PageHeader";
 import { quickAddCarSchema, QuickAddCarFormData, QuickAddCarPayload } from "../../lib/validations/quickAddCar";
 import { createCar } from "../../services/car.service";
-import { scales, manufacturers, brands, colors } from "../../data/carOptions";
+import { scales, manufacturers, brands, colors, brandNationalities } from "../../data/carOptions";
 import FieldSelector from "../../components/cars/addcar/FieldSelector";
 import SuggestionInput from "../../components/ui/SuggestionInput";
 import toast from "react-hot-toast";
@@ -74,7 +74,7 @@ export default function QuickAddPage() {
             description: "",
             designer: "",
             series: "",
-            country: "",
+            country: brandNationalities[result.data.brand] || "",
             pictures: [],
         };
     };
