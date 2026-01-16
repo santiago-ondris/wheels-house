@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+// validacion para registro
 export const registerSchema = z
   .object({
     username: z
