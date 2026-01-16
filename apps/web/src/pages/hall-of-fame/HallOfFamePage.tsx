@@ -78,7 +78,7 @@ export default function HallOfFamePage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="text-center mb-16"
                 >
-                    <h1 className="text-4xl md:text-6xl font-black text-white mb-4 uppercase tracking-tighter italic">
+                    <h1 className="text-4xl md:text-5xl 2xl:text-6xl font-black text-white mb-4 uppercase tracking-tighter italic">
                         Salón de la <span className="text-accent underline decoration-accent/30 underline-offset-8">Fama</span>
                     </h1>
                     <p className="text-white/60 text-lg max-w-2xl mx-auto">
@@ -90,13 +90,13 @@ export default function HallOfFamePage() {
                     variants={container}
                     initial="hidden"
                     animate="show"
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 2xl:gap-6"
                 >
                     {categories.map((category) => (
                         <motion.div key={category.title} variants={item}>
                             <Link
                                 to={category.path}
-                                className="group relative block h-full p-8 rounded-[2.5rem] border border-white/10 bg-white/[0.02] backdrop-blur-2xl transition-all duration-500 hover:border-white/20 overflow-hidden shadow-2xl"
+                                className="group relative block h-full p-6 2xl:p-8 rounded-[2.5rem] border border-white/10 bg-white/[0.02] backdrop-blur-2xl transition-all duration-500 hover:border-white/20 overflow-hidden shadow-2xl"
                             >
                                 <div
                                     className="absolute -top-12 -right-12 w-64 h-64 rounded-full blur-[80px] opacity-20 group-hover:opacity-60 transition-opacity duration-700 pointer-events-none"
@@ -111,12 +111,12 @@ export default function HallOfFamePage() {
                                 <div className="absolute inset-0 bg-linear-to-br from-white/10 to-transparent pointer-events-none" />
 
                                 <div className="relative z-10 flex flex-col h-full">
-                                    <div className={`p-4 bg-white/5 rounded-2xl w-fit mb-6 border border-white/10 shadow-inner group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 ${category.iconColor}`}>
+                                    <div className={`p-3 2xl:p-4 bg-white/5 rounded-2xl w-fit mb-4 2xl:mb-6 border border-white/10 shadow-inner group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 ${category.iconColor}`}>
                                         <category.icon size={32} />
                                     </div>
 
-                                    <h3 className="text-3xl font-bold text-white mb-2 tracking-tight italic uppercase">{category.title}</h3>
-                                    <p className="text-white/50 mb-8 flex-grow leading-relaxed">
+                                    <h3 className="text-xl lg:text-xl xl:text-2xl 2xl:text-3xl font-bold text-white mb-2 tracking-tight italic uppercase break-words">{category.title}</h3>
+                                    <p className="text-white/50 mb-6 2xl:mb-8 flex-grow leading-relaxed text-sm 2xl:text-base">
                                         {category.description}
                                     </p>
 
@@ -133,8 +133,7 @@ export default function HallOfFamePage() {
 
                                 {/* Subtle Watermark Icon */}
                                 <category.icon
-                                    size={140}
-                                    className="absolute -right-8 -bottom-8 opacity-[0.02] group-hover:opacity-[0.05] transition-opacity duration-700 pointer-events-none"
+                                    className="absolute -right-8 -bottom-8 w-24 h-24 2xl:w-36 2xl:h-36 opacity-[0.02] group-hover:opacity-[0.05] transition-opacity duration-700 pointer-events-none"
                                     style={{ color: category.accentColor }}
                                 />
                             </Link>

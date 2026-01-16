@@ -15,7 +15,7 @@ import {
 import PageHeader from "../../components/ui/PageHeader";
 import { carSchema, CarFormData } from "../../lib/validations/car";
 import { getCar, updateCar } from "../../services/car.service";
-import { scales, manufacturers, brands, colors, carConditions, brandNationalities } from "../../data/carOptions";
+import { scales, manufacturers, brands, colors, carConditions, brandNationalities, conditionDisplayWishlist } from "../../data/carOptions";
 import FieldSelector from "../../components/cars/addcar/FieldSelector";
 import MultiImageUploadWidget from "../../components/ui/MultiImageUploadWidget";
 import toast from "react-hot-toast";
@@ -61,7 +61,7 @@ export default function EditWishlistPage() {
         try {
             setIsFetching(true);
             const car = await getCar(carId!);
-            
+
             setFormData({
                 name: car.name,
                 color: car.color,
@@ -260,7 +260,7 @@ export default function EditWishlistPage() {
                                 <label className="block text-amber-500 uppercase tracking-widest text-[10px] font-bold mb-1.5 ml-1">
                                     Estado Buscado <span className="text-danger">*</span>
                                 </label>
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-3 gap-3">
                                     {carConditions.map((condition) => (
                                         <button
                                             key={condition}
@@ -271,7 +271,7 @@ export default function EditWishlistPage() {
                                                 : "bg-white/[0.02] border-white/5 text-white/40 hover:border-white/20"
                                                 }`}
                                         >
-                                            {condition}
+                                            {conditionDisplayWishlist[condition] || condition}
                                         </button>
                                     ))}
                                 </div>

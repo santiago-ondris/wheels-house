@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
     Car,
@@ -14,12 +14,13 @@ import {
     Sparkles,
     Folder,
     Check,
+    Plus,
 } from "lucide-react";
 import PageHeader from "../../components/ui/PageHeader";
 import { carSchema, CarFormData } from "../../lib/validations/car";
 import { updateCar, getCar, getCarGroups, updateCarGroups } from "../../services/car.service";
 import { listGroups, GroupBasicInfo } from "../../services/group.service";
-import { scales, manufacturers, brands, colors, carConditions, brandNationalities } from "../../data/carOptions";
+import { scales, manufacturers, brands, colors, carConditions, brandNationalities, conditionDisplayCollection } from "../../data/carOptions";
 import FieldSelector from "../../components/cars/addcar/FieldSelector";
 import MultiImageUploadWidget from "../../components/ui/MultiImageUploadWidget";
 import toast from "react-hot-toast";
@@ -257,7 +258,7 @@ export default function EditCarPage() {
                                 <label className="block text-accent uppercase tracking-widest text-[10px] font-bold mb-1.5 ml-1">
                                     Estado del Auto <span className="text-danger">*</span>
                                 </label>
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-3 gap-3">
                                     {carConditions.map((condition) => (
                                         <button
                                             key={condition}
@@ -268,7 +269,7 @@ export default function EditCarPage() {
                                                 : "bg-white/[0.02] border-white/5 text-white/40 hover:border-white/20"
                                                 }`}
                                         >
-                                            {condition}
+                                            {conditionDisplayCollection[condition] || condition}
                                         </button>
                                     ))}
                                 </div>
@@ -344,17 +345,17 @@ export default function EditCarPage() {
                     </div>
 
                     {/* Group Selector Section */}
-                    {userGroups.length > 0 && (
-                        <div className="mb-8">
-                            <div className="flex items-center gap-2 mb-4">
-                                <Folder className="w-4 h-4 text-white/40" />
-                                <h2 className="text-sm font-bold text-white/40 uppercase tracking-widest">
-                                    Grupos
-                                </h2>
-                                <span className="text-[10px] text-white/20 ml-2">({selectedGroups.length} seleccionados)</span>
-                            </div>
+                    <div className="mb-8">
+                        <div className="flex items-center gap-2 mb-4">
+                            <Folder className="w-4 h-4 text-white/40" />
+                            <h2 className="text-sm font-bold text-white/40 uppercase tracking-widest">
+                                Grupos
+                            </h2>
+                            <span className="text-[10px] text-white/20 ml-2">({selectedGroups.length} seleccionados)</span>
+                        </div>
 
-                            <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 md:p-6">
+                        <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 md:p-6">
+                            {userGroups.length > 0 ? (
                                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                                     {userGroups.map((group) => (
                                         <div
@@ -385,9 +386,25 @@ export default function EditCarPage() {
                                         </div>
                                     ))}
                                 </div>
-                            </div>
+                            ) : (
+                                <div className="text-center py-6">
+                                    <p className="text-white/40 text-sm mb-3">
+                                        No tenés grupos donde agregarlo.
+                                    </p>
+                                    <Link
+                                        to="/collection/group/new"
+                                        className="inline-flex items-center gap-2 text-accent hover:text-accent/80 transition-colors text-sm font-bold uppercase tracking-wider"
+                                    >
+                                        <Plus className="w-4 h-4" />
+                                        Crear el primero ahora
+                                    </Link>
+                                    <p className="text-white/20 text-[10px] mt-2">
+                                        (Siempre podés hacerlo después)
+                                    </p>
+                                </div>
+                            )}
                         </div>
-                    )}
+                    </div>
                     <div className="hidden md:flex justify-end gap-4">
                         <button
                             type="button"

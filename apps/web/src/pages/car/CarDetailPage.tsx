@@ -9,6 +9,7 @@ import { useNavigateBack } from "../../hooks/useNavigateBack";
 import { CarMasonryGrid } from "../../components/cars/CarMasonryGrid";
 import Modal from "../../components/ui/Modal";
 import toast from "react-hot-toast";
+import RelatedCarsCarousel from "../../components/cars/RelatedCarsCarousel";
 
 export const CarDetailPage = () => {
     const { carId } = useParams<{ carId: string }>();
@@ -24,6 +25,7 @@ export const CarDetailPage = () => {
 
     // Refetch when carId changes OR when we navigate back (location.key changes)
     useEffect(() => {
+        window.scrollTo(0, 0);
         if (carId) {
             fetchCarData(carId);
         }
@@ -198,6 +200,13 @@ export const CarDetailPage = () => {
                     </div>
                 </div>
             </main>
+
+            {car.ownerUsername && (
+                <RelatedCarsCarousel
+                    ownerUsername={car.ownerUsername}
+                    currentCarId={car.carId}
+                />
+            )}
 
 
             <Modal

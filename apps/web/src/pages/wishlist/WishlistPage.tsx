@@ -7,6 +7,7 @@ import { getWishlist, deleteCar, WishlistCarData } from "../../services/car.serv
 import { useAuth } from "../../contexts/AuthContext";
 import toast from "react-hot-toast";
 import { useNavigateBack } from "../../hooks/useNavigateBack";
+import { getConditionLabel } from "../../data/carOptions";
 
 export default function WishlistPage() {
     const { username } = useParams<{ username: string }>();
@@ -29,7 +30,7 @@ export default function WishlistPage() {
 
     const fetchWishlist = async () => {
         if (!username) return;
-        
+
         try {
             setIsLoading(true);
             const data = await getWishlist(username);
@@ -132,7 +133,7 @@ export default function WishlistPage() {
                             {isOwner ? "Tu wishlist está vacía" : "Wishlist vacía"}
                         </h3>
                         <p className="text-white/40 text-sm mb-6">
-                            {isOwner 
+                            {isOwner
                                 ? "Agregá los vehículos que estás buscando"
                                 : `@${username} aún no tiene vehículos en su wishlist`
                             }
@@ -170,7 +171,7 @@ export default function WishlistPage() {
                                             <ImageOff className="w-12 h-12 text-white/10" />
                                         </div>
                                     )}
-                                    
+
                                     {/* Wishlist Badge */}
                                     <div className="absolute top-3 left-3 px-2 py-1 bg-amber-500/90 rounded-md flex items-center gap-1.5">
                                         <Star className="w-3 h-3 text-black fill-black" />
@@ -211,7 +212,7 @@ export default function WishlistPage() {
                                         </div>
                                         <div className="bg-white/[0.03] rounded-lg px-2 py-1.5 text-center">
                                             <span className="text-white/30 block">Estado</span>
-                                            <span className="text-white/70 truncate block">{car.condition}</span>
+                                            <span className="text-white/70 truncate block">{getConditionLabel(car.condition || "Abierto", true)}</span>
                                         </div>
                                     </div>
 
