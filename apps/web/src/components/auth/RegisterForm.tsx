@@ -158,7 +158,7 @@ export default function RegisterForm() {
           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
           <input
             id="email"
-            type="email"
+            type="text"
             placeholder="tu@email.com"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
