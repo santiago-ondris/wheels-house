@@ -72,6 +72,14 @@ export const CAR_PICTURE_FORMAT_NOT_VALID = new HttpException(
     HttpStatus.BAD_REQUEST
 );
 
+export const CAR_INFO_NOT_VALID = new HttpException(
+    {
+        status: HttpStatus.BAD_REQUEST,
+        error: 'Car info not valid.' 
+    },
+    HttpStatus.BAD_REQUEST
+);
+
 export const CAR_ALREADY_OWNED = new HttpException(
     {
         status: HttpStatus.CONFLICT,
