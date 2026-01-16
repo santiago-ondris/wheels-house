@@ -156,8 +156,29 @@ export const colorMap: Record<string, string> = {
 
 export const carConditions = [
     "Abierto",
-    "Cerrado / En blister"
+    "Cerrado / En blister",
+    "Ambos"
 ];
+
+// Display labels for collection (what you HAVE)
+export const conditionDisplayCollection: Record<string, string> = {
+    "Abierto": "Abierto",
+    "Cerrado / En blister": "Cerrado / En blister",
+    "Ambos": "Abierto y Cerrado"
+};
+
+// Display labels for wishlist (what you're LOOKING FOR)
+export const conditionDisplayWishlist: Record<string, string> = {
+    "Abierto": "Abierto",
+    "Cerrado / En blister": "Cerrado / En blister",
+    "Ambos": "Abierto o Cerrado"
+};
+
+// Helper function to get display label
+export const getConditionLabel = (condition: string, isWishlist: boolean): string => {
+    const map = isWishlist ? conditionDisplayWishlist : conditionDisplayCollection;
+    return map[condition] || condition;
+};
 
 export const brandNationalities: Record<string, string> = {
     "Acura": "Japón",

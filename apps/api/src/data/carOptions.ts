@@ -127,7 +127,8 @@ export const colors = [
 
 export const carConditions = [
     "Abierto",
-    "Cerrado / En blister"
+    "Cerrado / En blister",
+    "Ambos"
 ];
 
 export const brandNationalities: Record<string, string> = {
