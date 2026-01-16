@@ -27,7 +27,7 @@ export class EmailService {
 
       return data;
     } catch (error) {
-      throw new Error(`Failed to send email: ${error.message}`);
+      throw new Error(`Error while sending email: ${error.message}`);
     }
   }
 }
