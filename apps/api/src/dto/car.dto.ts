@@ -58,6 +58,22 @@ export class CreateCarDTO {
     @IsArray()
     @IsOptional()
     groups: number[] | null = []; // Groups Ids.
+
+    @IsString()
+    @IsOptional()
+    rarity: string | null = '';
+
+    @IsString()
+    @IsOptional()
+    quality: string | null = '';
+
+    @IsString()
+    @IsOptional()
+    variety: string | null = '';
+
+    @IsString()
+    @IsOptional()
+    finish: string | null = '';
 }
 
 export class CarToDB {
@@ -73,17 +89,25 @@ export class CarToDB {
     country: string | null;
     condition: string;
     wished: boolean = false;
+    rarity: string | null;
+    quality: string | null;
+    variety: string | null;
+    finish: string | null;
 
     constructor(
         userId: number, name: string, color: string, brand: string, scale: string,
         manufacturer: string, condition: string, wished: boolean = false, description: string | null = '', designer: string | null = '',
-        series: string | null = '', country: string | null = ''
+        series: string | null = '', country: string | null = '', rarity: string | null = '', quality: string | null = '', variety: string | null = '', finish: string | null = ''
     ) {
         this.userId = userId, this.name = name, this.color = color;
         this.brand = brand, this.scale = scale, this.manufacturer = manufacturer;
         this.condition = condition, this.wished = wished;
         this.description = description, this.designer = designer, this.series = series;
         this.country = country;
+        this.rarity = rarity;
+        this.quality = quality;
+        this.variety = variety;
+        this.finish = finish;
     }
 }
 
@@ -102,9 +126,9 @@ export class CarInfo extends CreateCarDTO {
     condition: string;
     constructor(
         carId: number, name: string, color: string, brand: string, scale: string,
-        manufacturer: string, condition: string, wished: boolean = false, description: string | null = '', 
-        designer: string | null = '', series: string | null = '', pictures: string[] | null = [], 
-        country: string | null = ''
+        manufacturer: string, condition: string, wished: boolean = false, description: string | null = '',
+        designer: string | null = '', series: string | null = '', pictures: string[] | null = [],
+        country: string | null = '', rarity: string | null = '', quality: string | null = '', variety: string | null = '', finish: string | null = ''
     ) {
         super();
         this.carId = carId, this.name = name, this.color = color;
@@ -112,6 +136,10 @@ export class CarInfo extends CreateCarDTO {
         this.condition = condition, this.wished = wished;
         this.description = description, this.designer = designer, this.series = series;
         this.pictures = pictures, this.country = country;
+        this.rarity = rarity;
+        this.quality = quality;
+        this.variety = variety;
+        this.finish = finish;
     }
 }
 
@@ -119,11 +147,11 @@ export class CarInfoWithOwner extends CarInfo {
     ownerUsername: string;
     constructor(
         carId: number, name: string, color: string, brand: string, scale: string,
-        manufacturer: string, condition: string, wished: boolean = false, ownerUsername: string, 
+        manufacturer: string, condition: string, wished: boolean = false, ownerUsername: string,
         description: string | null = '', designer: string | null = '', series: string | null = '',
-        pictures: string[] | null = [], country: string | null = ''
+        pictures: string[] | null = [], country: string | null = '', rarity: string | null = '', quality: string | null = '', variety: string | null = '', finish: string | null = ''
     ) {
-        super(carId, name, color, brand, scale, manufacturer, condition, wished, description, designer, series, pictures, country);
+        super(carId, name, color, brand, scale, manufacturer, condition, wished, description, designer, series, pictures, country, rarity, quality, variety, finish);
         this.ownerUsername = ownerUsername;
     }
 }
@@ -180,6 +208,22 @@ export class CarUpdateDTO {
     @IsArray()
     @IsOptional()
     groups: number[] | null = [];
+
+    @IsString()
+    @IsOptional()
+    rarity: string | null = '';
+
+    @IsString()
+    @IsOptional()
+    quality: string | null = '';
+
+    @IsString()
+    @IsOptional()
+    variety: string | null = '';
+
+    @IsString()
+    @IsOptional()
+    finish: string | null = '';
 }
 
 
@@ -196,17 +240,25 @@ export class CarInfoWoGroups {
     pictures?: string[] | null = [];
     country?: string | null = '';
     condition: string;
+    rarity: string | null = '';
+    quality: string | null = '';
+    variety: string | null = '';
+    finish: string | null = '';
 
     constructor(
         carId: number, name: string, color: string, brand: string, scale: string,
-        manufacturer: string, condition: string, description: string | null = '', 
-        designer: string | null = '', series: string | null = '', pictures: string[] | null = [], 
-        country: string | null = ''
+        manufacturer: string, condition: string, description: string | null = '',
+        designer: string | null = '', series: string | null = '', pictures: string[] | null = [],
+        country: string | null = '', rarity: string | null = '', quality: string | null = '', variety: string | null = '', finish: string | null = ''
     ) {
         this.carId = carId, this.name = name, this.color = color;
         this.brand = brand, this.scale = scale, this.manufacturer = manufacturer;
         this.condition = condition;
         this.description = description, this.designer = designer, this.series = series;
         this.pictures = pictures, this.country = country;
+        this.rarity = rarity;
+        this.quality = quality;
+        this.variety = variety;
+        this.finish = finish;
     }
 }

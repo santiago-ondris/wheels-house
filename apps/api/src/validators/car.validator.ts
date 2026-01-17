@@ -1,5 +1,5 @@
 import { BadRequestException } from "@nestjs/common";
-import { brandNationalities, brands, carConditions, colors, manufacturers, scales } from "src/data/carOptions";
+import { brandNationalities, brands, carConditions, colors, manufacturers, scales, rarities, qualities, varieties, finishes } from "src/data/carOptions";
 import { getCarById, getCarIdsFromUserIdWithFilter } from "src/database/crud/car.crud";
 import { getGroupFromId } from "src/database/crud/group.crud";
 import { getUserFromUsername } from "src/database/crud/user.crud";
@@ -16,12 +16,12 @@ export async function createCarValidator(carData: CreateCarDTO, userData: TokenD
 
     console.log(carData);
 
-    if(carData.pictures!.length > 10) {
+    if (carData.pictures!.length > 10) {
         throw MAX_CARS_PICTURES_LIMIT;
     }
 
     carData.pictures!.forEach(url => {
-        if(!validCarPicture(url)) {
+        if (!validCarPicture(url)) {
             throw CAR_PICTURE_FORMAT_NOT_VALID;
         }
     });
@@ -31,10 +31,10 @@ export async function createCarValidator(carData: CreateCarDTO, userData: TokenD
     }
 
     if (brands.findIndex((val) => val == carData.brand) < 0 ||
-        (brandNationalities[carData.brand] || "") != carData.country || 
+        (brandNationalities[carData.brand] || "") != carData.country ||
         manufacturers.findIndex((val) => val == carData.manufacturer) < 0 ||
-        scales.findIndex((val) => val == carData.scale) < 0 || 
-        colors.findIndex((val) => val == carData.color ) < 0 ||
+        scales.findIndex((val) => val == carData.scale) < 0 ||
+        colors.findIndex((val) => val == carData.color) < 0 ||
         carConditions.findIndex((val) => val == carData.condition) < 0
     ) {
         throw CAR_INFO_NOT_VALID;
@@ -46,7 +46,7 @@ export async function createCarValidator(carData: CreateCarDTO, userData: TokenD
 export async function listCarsValidator(requestUserData: TokenData, username: string) {
     const user = await getUserFromUsername(username);
 
-    if(user == null){
+    if (user == null) {
         throw INEXISTENT_USER;
     }
 }
@@ -54,7 +54,7 @@ export async function listCarsValidator(requestUserData: TokenData, username: st
 export async function getCarValidator(requestUserData: TokenData, carId: number) {
     const car = await getCarById(carId);
 
-    if(car == null) {
+    if (car == null) {
         throw INEXISTENT_CAR;
     }
 }
@@ -64,20 +64,20 @@ export async function updateCarValidator(requestUserData: TokenData, carChanges:
 
     const car = await getCarById(carId);
 
-    if(car == null) {
+    if (car == null) {
         throw INEXISTENT_CAR;
     }
 
-    if(car.userId != user.userId) {
+    if (car.userId != user.userId) {
         throw CAR_DO_NOT_BELONG_TO_USER;
     }
 
-    if(carChanges.pictures!.length > 10) {
+    if (carChanges.pictures!.length > 10) {
         throw MAX_CARS_PICTURES_LIMIT;
     }
 
     carChanges.pictures!.forEach(url => {
-        if(!validCarPicture(url)) {
+        if (!validCarPicture(url)) {
             throw CAR_PICTURE_FORMAT_NOT_VALID;
         }
     });
@@ -88,17 +88,17 @@ export async function updateCarValidator(requestUserData: TokenData, carChanges:
 
     for (const groupId of carChanges.groups!) {
         const group = await getGroupFromId(groupId);
-    
-        if(group.userId != user.userId) {
+
+        if (group.userId != user.userId) {
             throw GROUP_DO_NOT_BELONG_TO_USER;
         }
     }
 
     if (brands.findIndex((val) => val == carChanges.brand) < 0 ||
-        (brandNationalities[carChanges.brand] || "") != carChanges.country || 
+        (brandNationalities[carChanges.brand] || "") != carChanges.country ||
         manufacturers.findIndex((val) => val == carChanges.manufacturer) < 0 ||
-        scales.findIndex((val) => val == carChanges.scale) < 0 || 
-        colors.findIndex((val) => val == carChanges.color ) < 0 ||
+        scales.findIndex((val) => val == carChanges.scale) < 0 ||
+        colors.findIndex((val) => val == carChanges.color) < 0 ||
         carConditions.findIndex((val) => val == carChanges.condition) < 0
     ) {
         throw CAR_INFO_NOT_VALID;
@@ -110,11 +110,11 @@ export async function deleteCarValidator(requestUserData: TokenData, carId: numb
 
     const car = await getCarById(carId);
 
-    if(car == null) {
+    if (car == null) {
         throw INEXISTENT_CAR;
     }
 
-    if(car.userId != user.userId) {
+    if (car.userId != user.userId) {
         throw CAR_DO_NOT_BELONG_TO_USER;
     }
 }
@@ -124,18 +124,18 @@ export async function updateCarGroupsValidator(userData: TokenData, carId: numbe
 
     const car = await getCarById(carId);
 
-    if(car == null) {
+    if (car == null) {
         throw INEXISTENT_CAR;
     }
 
-    if(car.userId != user.userId) {
+    if (car.userId != user.userId) {
         throw CAR_DO_NOT_BELONG_TO_USER;
     }
 
-    for(const groupId of groupsId) {
+    for (const groupId of groupsId) {
         const group = await getGroupFromId(groupId);
-    
-        if(group.userId != user.userId) {
+
+        if (group.userId != user.userId) {
             throw GROUP_DO_NOT_BELONG_TO_USER;
         }
     }
@@ -147,7 +147,7 @@ export async function updateCarGroupsValidator(userData: TokenData, carId: numbe
 
 export async function bulkAddToGroupValidator(userData: TokenData, bulkAddData: BulkAddToGroupDTO) {
     const user = await getUserFromUsername(userData.username);
-    
+
     let targetCarIds: number[] = [];
 
     if (bulkAddData.carIds && bulkAddData.carIds.length > 0) {
@@ -158,7 +158,7 @@ export async function bulkAddToGroupValidator(userData: TokenData, bulkAddData: 
         targetCarIds = await getCarIdsFromUserIdWithFilter(user.userId, bulkAddData.filterQuery);
     }
 
-    for(const carId of targetCarIds) {
+    for (const carId of targetCarIds) {
         const car = await getCarById(carId);
 
         if (car.userId != user.userId) {
@@ -184,7 +184,7 @@ export async function bulkAddToGroupValidator(userData: TokenData, bulkAddData: 
 
 export async function wishedCarToCollectionValidator(userData: TokenData, carId: number, carChanges: CarUpdateDTO) {
     const car = await getCarById(carId);
-    
+
     if (car == null) {
         throw INEXISTENT_CAR;
     }
@@ -204,7 +204,7 @@ export async function wishedCarToCollectionValidator(userData: TokenData, carId:
     }
 
     carChanges.pictures!.forEach(url => {
-        if(!validCarPicture(url)) {
+        if (!validCarPicture(url)) {
             throw CAR_PICTURE_FORMAT_NOT_VALID;
         }
     });
@@ -215,18 +215,22 @@ export async function wishedCarToCollectionValidator(userData: TokenData, carId:
 
     for (const groupId of carChanges.groups!) {
         const group = await getGroupFromId(groupId);
-    
+
         if (group.userId != user.userId) {
             throw GROUP_DO_NOT_BELONG_TO_USER;
         }
     }
 
     if (brands.findIndex((val) => val == carChanges.brand) < 0 ||
-        (brandNationalities[carChanges.brand] || "") != carChanges.country || 
+        (brandNationalities[carChanges.brand] || "") != carChanges.country ||
         manufacturers.findIndex((val) => val == carChanges.manufacturer) < 0 ||
-        scales.findIndex((val) => val == carChanges.scale) < 0 || 
-        colors.findIndex((val) => val == carChanges.color ) < 0 ||
-        carConditions.findIndex((val) => val == carChanges.condition) < 0
+        scales.findIndex((val) => val == carChanges.scale) < 0 ||
+        colors.findIndex((val) => val == carChanges.color) < 0 ||
+        carConditions.findIndex((val) => val == carChanges.condition) < 0 ||
+        (carChanges.rarity && rarities.findIndex((val) => val == carChanges.rarity) < 0) ||
+        (carChanges.quality && qualities.findIndex((val) => val == carChanges.quality) < 0) ||
+        (carChanges.variety && varieties.findIndex((val) => val == carChanges.variety) < 0) ||
+        (carChanges.finish && finishes.findIndex((val) => val == carChanges.finish) < 0)
     ) {
         throw CAR_INFO_NOT_VALID;
     }

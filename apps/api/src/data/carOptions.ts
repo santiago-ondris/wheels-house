@@ -92,7 +92,19 @@ export const brands = [
     "Toyota",
     "Volkswagen",
     "Volvo",
-    "W Motors"
+    "Volvo",
+    "W Motors",
+    "Mercury",
+    "Hudson",
+    "Citroën",
+    "DMC",
+    "Gordon Murray",
+    "Czinger Vehicles",
+    "Range Rover",
+    "Lancia",
+    "AMC",
+    "Cupra",
+    "Fantasía"
 ];
 
 export const colors = [
@@ -122,13 +134,62 @@ export const colors = [
     "Cian",
     "Púrpura",
     "Bordo",
-    "Violeta"
+    "Violeta",
+    "Zamac",
+    "Sin pintar",
+    "Burdeos",
+    "Multicolor"
 ];
 
 export const carConditions = [
     "Abierto",
     "Cerrado / En blister",
     "Ambos"
+];
+
+export const rarities = [
+    "Básico",
+    "Treasure Hunt (TH)",
+    "Super Treasure Hunt (STH)",
+    "Chase"
+];
+
+export const qualities = [
+    "Básico",
+    "Silver Series",
+    "Premium",
+    "Elite 64",
+    "RLC (Red Line Club)"
+];
+
+export const varieties = [
+    "Team Transport",
+    "Boulevard",
+    "Car Culture",
+    "Classics",
+    "Collectors Convention",
+    "Garage",
+    "NFT",
+    "Mystery Models",
+    "Pop Culture",
+    "Speed Machines",
+    "Themed entertainment",
+    "Ultra Hots",
+    "Real Riders",
+    "Motorcycles",
+    "Legends",
+    "Red Line"
+];
+
+export const finishes = [
+    "Anodizado",
+    "Cromado",
+    "Brilloso",
+    "Mate (opaco)",
+    "Metalizado",
+    "Perlado",
+    "Spectraflame",
+    "Translúcido"
 ];
 
 export const brandNationalities: Record<string, string> = {
@@ -188,4 +249,14 @@ export const brandNationalities: Record<string, string> = {
     "Volkswagen": "Alemania",
     "Volvo": "Suecia",
     "W Motors": "UAE",
+    "Mercury": "USA",
+    "Hudson": "USA",
+    "Citroën": "Francia",
+    "DMC": "USA",
+    "Gordon Murray": "Reino Unido",
+    "Czinger Vehicles": "USA",
+    "Range Rover": "Reino Unido",
+    "Lancia": "Italia",
+    "AMC": "USA",
+    "Cupra": "España",
 };

@@ -11,11 +11,15 @@ import {
     Factory,
     Save,
     Sparkles,
+    Layers,
+    Gem,
+    Award,
+    PaintBucket,
 } from "lucide-react";
 import PageHeader from "../../components/ui/PageHeader";
 import { carSchema, CarFormData } from "../../lib/validations/car";
 import { createWishedCar } from "../../services/car.service";
-import { scales, manufacturers, brands, colors, carConditions, brandNationalities, conditionDisplayWishlist } from "../../data/carOptions";
+import { scales, manufacturers, brands, colors, carConditions, brandNationalities, conditionDisplayWishlist, rarities, qualities, varieties, finishes } from "../../data/carOptions";
 import FieldSelector from "../../components/cars/addcar/FieldSelector";
 import MultiImageUploadWidget from "../../components/ui/MultiImageUploadWidget";
 import toast from "react-hot-toast";
@@ -39,6 +43,10 @@ export default function AddToWishlistPage() {
         designer: "",
         series: "",
         pictures: [],
+        rarity: "",
+        quality: "",
+        variety: "",
+        finish: "",
     });
 
     // ScrollRestoration handles scroll automatically
@@ -247,6 +255,42 @@ export default function AddToWishlistPage() {
                         </div>
 
                         <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 md:p-6 space-y-5">
+                            {/* Características especiales */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                                <FieldSelector
+                                    label="Rareza"
+                                    options={rarities}
+                                    value={formData.rarity || ""}
+                                    onChange={(value) => updateField("rarity", value)}
+                                    placeholder="Seleccionar"
+                                    icon={<Gem className="w-5 h-5" />}
+                                />
+                                <FieldSelector
+                                    label="Calidad"
+                                    options={qualities}
+                                    value={formData.quality || ""}
+                                    onChange={(value) => updateField("quality", value)}
+                                    placeholder="Seleccionar"
+                                    icon={<Award className="w-5 h-5" />}
+                                />
+                                <FieldSelector
+                                    label="Variedad"
+                                    options={varieties}
+                                    value={formData.variety || ""}
+                                    onChange={(value) => updateField("variety", value)}
+                                    placeholder="Seleccionar"
+                                    icon={<Layers className="w-5 h-5" />}
+                                />
+                                <FieldSelector
+                                    label="Acabado"
+                                    options={finishes}
+                                    value={formData.finish || ""}
+                                    onChange={(value) => updateField("finish", value)}
+                                    placeholder="Seleccionar"
+                                    icon={<PaintBucket className="w-5 h-5" />}
+                                />
+                            </div>
+
                             <div>
                                 <label className="block text-white/50 uppercase tracking-widest text-[10px] font-bold mb-1.5 ml-1">
                                     Descripción / Notas

@@ -44,6 +44,10 @@ export default function MoveToCollectionPage() {
         designer: "",
         series: "",
         pictures: [],
+        rarity: "",
+        quality: "",
+        variety: "",
+        finish: "",
     });
 
     const [errors, setErrors] = useState<Partial<Record<keyof CarFormData, string>>>({});
@@ -83,6 +87,10 @@ export default function MoveToCollectionPage() {
                 designer: car.designer || "",
                 series: car.series || "",
                 pictures: car.pictures || [],
+                rarity: car.rarity || "",
+                quality: car.quality || "",
+                variety: car.variety || "",
+                finish: car.finish || "",
             });
         } catch (error) {
             console.error("Error fetching car:", error);

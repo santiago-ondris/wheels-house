@@ -214,6 +214,10 @@ export default function CollectionSection({
         conditions: [],
         countries: [],
         hasPicture: [],
+        rarities: [],
+        qualities: [],
+        varieties: [],
+        finishes: [],
     };
 
     const filters = data?.filters || defaultFilters;
@@ -295,6 +299,10 @@ export default function CollectionSection({
                             selectedConditions={params.conditions}
                             selectedCountries={params.countries}
                             selectedHasPicture={params.hasPicture}
+                            selectedRarities={params.rarities}
+                            selectedQualities={params.qualities}
+                            selectedVarieties={params.varieties}
+                            selectedFinishes={params.finishes}
                             onToggleFilter={toggleFilter}
                             onClearFilters={clearFilters}
                             hasActiveFilters={hasActiveFilters}
@@ -465,6 +473,10 @@ export default function CollectionSection({
                 selectedConditions={params.conditions}
                 selectedCountries={params.countries}
                 selectedHasPicture={params.hasPicture}
+                selectedRarities={params.rarities}
+                selectedQualities={params.qualities}
+                selectedVarieties={params.varieties}
+                selectedFinishes={params.finishes}
                 onToggleFilter={toggleFilter}
                 onClearFilters={clearFilters}
                 hasActiveFilters={hasActiveFilters}

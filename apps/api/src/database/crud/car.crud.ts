@@ -46,6 +46,10 @@ export async function getCarByIdWithOwner(carId: number) {
             country: car.country,
             condition: car.condition,
             wished: car.wished,
+            rarity: car.rarity,
+            quality: car.quality,
+            variety: car.variety,
+            finish: car.finish,
             ownerUsername: user.username,
         })
         .from(car)
@@ -103,6 +107,10 @@ export async function getCarByOffset(offset: number) {
             country: car.country,
             condition: car.condition,
             wished: car.wished,
+            rarity: car.rarity,
+            quality: car.quality,
+            variety: car.variety,
+            finish: car.finish,
             ownerUsername: user.username,
         })
         .from(car)
@@ -189,6 +197,10 @@ export async function getCarsFromUserIdPaginated(userId: number, query: Collecti
         scales,
         conditions,
         countries,
+        rarities,
+        qualities,
+        varieties,
+        finishes,
         hasPicture,
         search
     } = query;
@@ -209,16 +221,16 @@ export async function getCarsFromUserIdPaginated(userId: number, query: Collecti
     // To filter by cars with picture.
     if (hasPicture && hasPicture.length == 1 && hasPicture[0] == 'Con imagen') {
         const carsWithPicture = db
-        .select({ carId: car.carId})
-        .from(car)
-        .innerJoin(carPicture, eq(car.carId, carPicture.carId)). groupBy(car.carId);
+            .select({ carId: car.carId })
+            .from(car)
+            .innerJoin(carPicture, eq(car.carId, carPicture.carId)).groupBy(car.carId);
 
-        conditions_list.push(inArray(car.carId, carsWithPicture));        
-    } else if(hasPicture && hasPicture.length == 1 && hasPicture[0] == 'Sin imagen') {
+        conditions_list.push(inArray(car.carId, carsWithPicture));
+    } else if (hasPicture && hasPicture.length == 1 && hasPicture[0] == 'Sin imagen') {
         const carsWithPicture = db
-        .select({ carId: car.carId})
-        .from(car)
-        .innerJoin(carPicture, eq(car.carId, carPicture.carId)). groupBy(car.carId);
+            .select({ carId: car.carId })
+            .from(car)
+            .innerJoin(carPicture, eq(car.carId, carPicture.carId)).groupBy(car.carId);
 
         conditions_list.push(notInArray(car.carId, carsWithPicture));
     }
@@ -241,6 +253,18 @@ export async function getCarsFromUserIdPaginated(userId: number, query: Collecti
     }
     if (countries && countries.length > 0) {
         conditions_list.push(or(...countries.map(c => eq(car.country, c)))!);
+    }
+    if (rarities && rarities.length > 0) {
+        conditions_list.push(or(...rarities.map(r => eq(car.rarity, r)))!);
+    }
+    if (qualities && qualities.length > 0) {
+        conditions_list.push(or(...qualities.map(q => eq(car.quality, q)))!);
+    }
+    if (varieties && varieties.length > 0) {
+        conditions_list.push(or(...varieties.map(v => eq(car.variety, v)))!);
+    }
+    if (finishes && finishes.length > 0) {
+        conditions_list.push(or(...finishes.map(f => eq(car.finish, f)))!);
     }
 
     // Busqueda de texto
@@ -290,6 +314,10 @@ export async function getCarsFromUserIdPaginated(userId: number, query: Collecti
             country: car.country,
             condition: car.condition,
             wished: car.wished,
+            rarity: car.rarity,
+            quality: car.quality,
+            variety: car.variety,
+            finish: car.finish,
         })
         .from(car)
         .where(whereClause)
@@ -309,7 +337,7 @@ export async function getCarsFromUserIdPaginated(userId: number, query: Collecti
 }
 
 export async function getCarIdsFromUserIdWithFilter(userId: number, query: CollectionQueryDTO) {
-    const { brands, colors, manufacturers, scales, conditions, countries, hasPicture, search } = query;
+    const { brands, colors, manufacturers, scales, conditions, countries, rarities, qualities, varieties, finishes, hasPicture, search } = query;
 
     const conditions_list: SQL[] = [eq(car.userId, userId), eq(car.wished, false)];
 
@@ -331,20 +359,32 @@ export async function getCarIdsFromUserIdWithFilter(userId: number, query: Colle
     if (countries && countries.length > 0) {
         conditions_list.push(or(...countries.map(c => eq(car.country, c)))!);
     }
+    if (rarities && rarities.length > 0) {
+        conditions_list.push(or(...rarities.map(r => eq(car.rarity, r)))!);
+    }
+    if (qualities && qualities.length > 0) {
+        conditions_list.push(or(...qualities.map(q => eq(car.quality, q)))!);
+    }
+    if (varieties && varieties.length > 0) {
+        conditions_list.push(or(...varieties.map(v => eq(car.variety, v)))!);
+    }
+    if (finishes && finishes.length > 0) {
+        conditions_list.push(or(...finishes.map(f => eq(car.finish, f)))!);
+    }
 
     // To filter by cars with picture.
     if (hasPicture && hasPicture.length == 1 && hasPicture[0] == 'Con imagen') {
         const carsWithPicture = db
-        .select({ carId: car.carId})
-        .from(car)
-        .innerJoin(carPicture, eq(car.carId, carPicture.carId)). groupBy(car.carId);
+            .select({ carId: car.carId })
+            .from(car)
+            .innerJoin(carPicture, eq(car.carId, carPicture.carId)).groupBy(car.carId);
 
-        conditions_list.push(inArray(car.carId, carsWithPicture));        
-    } else if(hasPicture && hasPicture.length == 1 && hasPicture[0] == 'Sin imagen') {
+        conditions_list.push(inArray(car.carId, carsWithPicture));
+    } else if (hasPicture && hasPicture.length == 1 && hasPicture[0] == 'Sin imagen') {
         const carsWithPicture = db
-        .select({ carId: car.carId})
-        .from(car)
-        .innerJoin(carPicture, eq(car.carId, carPicture.carId)). groupBy(car.carId);
+            .select({ carId: car.carId })
+            .from(car)
+            .innerJoin(carPicture, eq(car.carId, carPicture.carId)).groupBy(car.carId);
 
         conditions_list.push(notInArray(car.carId, carsWithPicture));
     }
@@ -378,6 +418,10 @@ export async function getFilterOptionsForUser(userId: number, groupId: number | 
             scale: car.scale,
             condition: car.condition,
             country: car.country,
+            rarity: car.rarity,
+            quality: car.quality,
+            variety: car.variety,
+            finish: car.finish,
         }).from(car).where(and(eq(car.userId, userId), eq(car.wished, false)))
     ) : (
         // If groupId is defined
@@ -388,6 +432,10 @@ export async function getFilterOptionsForUser(userId: number, groupId: number | 
             scale: car.scale,
             condition: car.condition,
             country: car.country,
+            rarity: car.rarity,
+            quality: car.quality,
+            variety: car.variety,
+            finish: car.finish,
         }).from(car).innerJoin(groupedCar, eq(groupedCar.carId, car.carId)).where(and(
             eq(car.userId, userId), eq(car.wished, false), eq(groupedCar.groupId, groupId)))
     );
@@ -410,17 +458,17 @@ export async function getFilterOptionsForUser(userId: number, groupId: number | 
         await db.select({
             carId: car.carId,
         }).from(car).where(and(eq(car.userId, userId), eq(car.wished, false)))
-        .innerJoin(carPicture, eq(carPicture.carId, car.carId)).groupBy(car.carId)
+            .innerJoin(carPicture, eq(carPicture.carId, car.carId)).groupBy(car.carId)
     ) : (
         // If groupId is defined
         await db.select({
             carId: car.carId,
         }).from(car).innerJoin(groupedCar, eq(groupedCar.carId, car.carId)).where(and(
             eq(car.userId, userId), eq(car.wished, false), eq(groupedCar.groupId, groupId)))
-        .innerJoin(carPicture, eq(carPicture.carId, car.carId)).groupBy(car.carId)
+            .innerJoin(carPicture, eq(carPicture.carId, car.carId)).groupBy(car.carId)
     );
 
-    let hasPicture : { name: string; count: number }[] = []; 
+    let hasPicture: { name: string; count: number }[] = [];
 
     if (carsWithPicture.length > 0) {
         hasPicture.push({
@@ -429,7 +477,7 @@ export async function getFilterOptionsForUser(userId: number, groupId: number | 
         });
     }
 
-    if(cars.length - carsWithPicture.length > 0) {
+    if (cars.length - carsWithPicture.length > 0) {
         hasPicture.push({
             name: "Sin imagen",
             count: cars.length - carsWithPicture.length
@@ -443,6 +491,10 @@ export async function getFilterOptionsForUser(userId: number, groupId: number | 
         scales: countBy(cars.map(c => c.scale)),
         conditions: countBy(cars.map(c => c.condition)),
         countries: countBy(cars.map(c => c.country)),
+        rarities: countBy(cars.map(c => c.rarity)),
+        qualities: countBy(cars.map(c => c.quality)),
+        varieties: countBy(cars.map(c => c.variety)),
+        finishes: countBy(cars.map(c => c.finish)),
         hasPicture
     };
 }

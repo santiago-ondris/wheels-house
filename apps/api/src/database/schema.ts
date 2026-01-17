@@ -40,7 +40,11 @@ export const car = pgTable("car", {
     series: text("series"),
     country: text("country"),
     condition: text("condition").notNull().default("Abierto"),
-    wished: boolean("wished").notNull().default(false)
+    wished: boolean("wished").notNull().default(false),
+    rarity: text("rarity"),
+    quality: text("quality"),
+    variety: text("variety"),
+    finish: text("finish"),
 });
 
 export const carPicture = pgTable("carPicture", {

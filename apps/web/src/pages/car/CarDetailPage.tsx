@@ -196,6 +196,10 @@ export const CarDetailPage = () => {
                             <InfoRow label="Fabricante" value={car.manufacturer} />
                             <InfoRow label="Diseñador" value={car.designer || "-"} />
                             <InfoRow label="Escala" value={car.scale} />
+                            {car.rarity && <InfoRow label="Rareza" value={car.rarity} />}
+                            {car.quality && <InfoRow label="Calidad" value={car.quality} />}
+                            {car.variety && <InfoRow label="Variedad" value={car.variety} />}
+                            {car.finish && <InfoRow label="Acabado" value={car.finish} />}
                         </ul>
                     </div>
                 </div>
