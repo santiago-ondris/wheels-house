@@ -159,7 +159,7 @@ export default function WishlistPage() {
                                 className="bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden hover:border-amber-500/30 transition-all group"
                             >
                                 {/* Image */}
-                                <div className="aspect-[16/10] bg-white/[0.02] relative overflow-hidden">
+                                <Link to={`/car/${car.carId}`} className="block aspect-[16/10] bg-white/[0.02] relative overflow-hidden">
                                     {car.pictures && car.pictures.length > 0 ? (
                                         <img
                                             src={car.pictures[0]}
@@ -179,7 +179,7 @@ export default function WishlistPage() {
                                             Buscando
                                         </span>
                                     </div>
-                                </div>
+                                </Link>
 
                                 {/* Info */}
                                 <div className="p-4">

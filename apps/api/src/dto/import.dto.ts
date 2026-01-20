@@ -34,6 +34,22 @@ export class ImportCarRowDTO {
     @IsString()
     @IsOptional()
     description?: string | null;
+
+    @IsString()
+    @IsOptional()
+    rarity?: string | null;
+
+    @IsString()
+    @IsOptional()
+    quality?: string | null;
+
+    @IsString()
+    @IsOptional()
+    variety?: string | null;
+
+    @IsString()
+    @IsOptional()
+    finish?: string | null;
 }
 
 // Preview response for a single row

@@ -146,8 +146,8 @@ export class GroupService {
 
     async updateGroupService(groupId: number, groupChanges: UpdateGroupDTO) {
         // Validate max featured groups if trying to set as featured
+        const currentGroup = await getGroupFromId(groupId);
         if (groupChanges.featured) {
-            const currentGroup = await getGroupFromId(groupId);
             // Only validate if the group wasn't already featured
             if (!currentGroup.featured) {
                 const featuredCount = await countFeaturedGroupsFromUserId(currentGroup.userId);
@@ -161,6 +161,10 @@ export class GroupService {
 
         if (!updatedGroup) {
             throw ERROR_UPDATING_GROUP;
+        }
+
+        if(groupChanges.picture && groupChanges.picture != currentGroup.picture) {
+            await this.uploadService.deleteImage(getPublicIdFromURL(currentGroup.picture!));
         }
 
         const groupedCars = await getGroupedCarsFromGroupId(groupId);

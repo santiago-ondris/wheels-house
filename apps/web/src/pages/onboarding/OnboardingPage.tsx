@@ -70,9 +70,9 @@ export default function OnboardingPage() {
     const currentStepData = STEPS[currentStep];
 
     return (
-        <div className="min-h-screen bg-[#0a0a0b] flex flex-col">
+        <div className="h-[100dvh] bg-[#0a0a0b] flex flex-col overflow-hidden">
             {/* Header with Skip Button */}
-            <header className="sticky top-0 z-50 bg-[#0a0a0b]/80 backdrop-blur-xl border-b border-white/5">
+            <header className="shrink-0 z-50 bg-[#0a0a0b]/80 backdrop-blur-xl border-b border-white/5">
                 <div className="container mx-auto px-4 py-4 flex justify-between items-center">
                     <div className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -91,7 +91,7 @@ export default function OnboardingPage() {
             </header>
 
             {/* Main Content */}
-            <main className="flex-1 flex flex-col pt-1 md:pt-12">
+            <main className="flex-1 flex flex-col pt-1 md:pt-12 overflow-y-auto w-full">
                 <AnimatePresence mode="wait">
                     <OnboardingStep
                         key={currentStep}
@@ -105,7 +105,7 @@ export default function OnboardingPage() {
             </main>
 
             {/* Footer Navigation */}
-            <footer className="sticky bottom-0 bg-[#0a0a0b]/80 backdrop-blur-xl border-t border-white/5">
+            <footer className="shrink-0 bg-[#0a0a0b]/80 backdrop-blur-xl border-t border-white/5">
                 <div className="container mx-auto px-4 py-6">
                     {/* Progress Dots */}
                     <div className="flex justify-center gap-2 mb-6">

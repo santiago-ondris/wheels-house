@@ -16,6 +16,10 @@ export interface CollectionParams {
     conditions: string[];
     countries: string[];
     hasPicture: string[];
+    rarities: string[];
+    qualities: string[];
+    varieties: string[];
+    finishes: string[];
     search: string;
 }
 
@@ -31,6 +35,10 @@ const DEFAULTS: CollectionParams = {
     conditions: [],
     countries: [],
     hasPicture: [],
+    rarities: [],
+    qualities: [],
+    varieties: [],
+    finishes: [],
     search: '',
 };
 
@@ -73,6 +81,10 @@ export function useCollectionParams(options?: UseCollectionParamsOptions) {
         conditions: parseArray(searchParams.get('conditions')),
         countries: parseArray(searchParams.get('countries')),
         hasPicture: parseArray(searchParams.get('hasPicture')),
+        rarities: parseArray(searchParams.get('rarities')),
+        qualities: parseArray(searchParams.get('qualities')),
+        varieties: parseArray(searchParams.get('varieties')),
+        finishes: parseArray(searchParams.get('finishes')),
         search: searchParams.get('search') || DEFAULTS.search,
     }), [searchParams, defaultSortBy, defaultSortOrder]);
 
@@ -118,7 +130,7 @@ export function useCollectionParams(options?: UseCollectionParamsOptions) {
     const setSort = useCallback((sortBy: SortBy, sortOrder: SortOrder) => setParams({ sortBy, sortOrder }), [setParams]);
     const setSearch = useCallback((search: string) => setParams({ search }), [setParams]);
 
-    const toggleFilter = useCallback((field: keyof Pick<CollectionParams, 'brands' | 'colors' | 'manufacturers' | 'scales' | 'conditions' | 'countries' | 'hasPicture'>, value: string) => {
+    const toggleFilter = useCallback((field: keyof Pick<CollectionParams, 'brands' | 'colors' | 'manufacturers' | 'scales' | 'conditions' | 'countries' | 'hasPicture' | 'rarities' | 'qualities' | 'varieties' | 'finishes'>, value: string) => {
         const current = params[field];
         const newValues = current.includes(value)
             ? current.filter(v => v !== value)
@@ -135,6 +147,10 @@ export function useCollectionParams(options?: UseCollectionParamsOptions) {
             conditions: [],
             countries: [],
             hasPicture: [],
+            rarities: [],
+            qualities: [],
+            varieties: [],
+            finishes: [],
             search: '',
             page: 1,
         });
@@ -148,6 +164,10 @@ export function useCollectionParams(options?: UseCollectionParamsOptions) {
             params.conditions.length > 0 ||
             params.countries.length > 0 ||
             params.hasPicture.length > 0 ||
+            params.rarities.length > 0 ||
+            params.qualities.length > 0 ||
+            params.varieties.length > 0 ||
+            params.finishes.length > 0 ||
             params.search.length > 0;
     }, [params]);
 

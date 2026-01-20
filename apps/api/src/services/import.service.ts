@@ -1,18 +1,22 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import * as ExcelJS from 'exceljs';
-import { 
-    ImportCarRowDTO, 
-    ImportPreviewRowDTO, 
-    ImportPreviewResponseDTO, 
-    ImportResultDTO 
+import {
+    ImportCarRowDTO,
+    ImportPreviewRowDTO,
+    ImportPreviewResponseDTO,
+    ImportResultDTO
 } from '../dto/import.dto';
-import { 
-    manufacturers, 
-    brands, 
-    scales, 
-    colors, 
-    carConditions, 
-    brandNationalities 
+import {
+    manufacturers,
+    brands,
+    scales,
+    colors,
+    carConditions,
+    brandNationalities,
+    rarities,
+    qualities,
+    varieties,
+    finishes
 } from '../data/carOptions';
 import { CarToDB } from '../dto/car.dto';
 import { createCar } from '../database/crud/car.crud';
@@ -36,7 +40,7 @@ const MAX_DESCRIPTION_LENGTH = 500;
 
 @Injectable()
 export class ImportService {
-    
+
     async generateTemplate(): Promise<ArrayBuffer> {
         const workbook = new ExcelJS.Workbook();
         workbook.creator = 'Wheels House';
@@ -69,6 +73,10 @@ export class ImportService {
             { header: 'condición*', key: 'condicion', width: 22 },
             { header: 'serie', key: 'serie', width: 25 },
             { header: 'descripcion', key: 'descripcion', width: 40 },
+            { header: 'rareza', key: 'rareza', width: 25 },
+            { header: 'calidad', key: 'calidad', width: 20 },
+            { header: 'variedad', key: 'variedad', width: 25 },
+            { header: 'acabado', key: 'acabado', width: 18 },
         ];
         sheet.columns = columns;
 
@@ -98,7 +106,11 @@ export class ImportService {
             EXAMPLE_ROW.color,
             EXAMPLE_ROW.condition,
             EXAMPLE_ROW.series,
-            EXAMPLE_ROW.description
+            EXAMPLE_ROW.description,
+            '', // rarity
+            '', // quality
+            '', // variety
+            ''  // finish
         ]);
 
         // Style example row
@@ -117,9 +129,13 @@ export class ImportService {
         sheet.getColumn(3).width = 10;
         sheet.getColumn(4).width = 15;
         sheet.getColumn(5).width = 22;
+        sheet.getColumn(6).width = 25;
+        sheet.getColumn(7).width = 20;
+        sheet.getColumn(8).width = 25;
+        sheet.getColumn(9).width = 18;
 
         // Add header row
-        const headers = ['FABRICANTES', 'MARCAS', 'ESCALAS', 'COLORES', 'CONDICIÓN'];
+        const headers = ['FABRICANTES', 'MARCAS', 'ESCALAS', 'COLORES', 'CONDICIÓN', 'RAREZA', 'CALIDAD', 'VARIEDAD', 'ACABADO'];
         headers.forEach((header, index) => {
             const cell = sheet.getCell(1, index + 1);
             cell.value = header;
@@ -158,8 +174,28 @@ export class ImportService {
             sheet.getCell(`E${index + 2}`).value = value;
         });
 
+        // Column F: Rarities
+        rarities.forEach((value, index) => {
+            sheet.getCell(`F${index + 2}`).value = value;
+        });
+
+        // Column G: Qualities
+        qualities.forEach((value, index) => {
+            sheet.getCell(`G${index + 2}`).value = value;
+        });
+
+        // Column H: Varieties
+        varieties.forEach((value, index) => {
+            sheet.getCell(`H${index + 2}`).value = value;
+        });
+
+        // Column I: Finishes
+        finishes.forEach((value, index) => {
+            sheet.getCell(`I${index + 2}`).value = value;
+        });
+
         // Add helper text at bottom
-        const maxRows = Math.max(manufacturers.length, brands.length, colors.length) + 3;
+        const maxRows = Math.max(manufacturers.length, brands.length, colors.length, varieties.length) + 3;
         sheet.getCell(`A${maxRows}`).value = '💡 Usa los valores de acá para completar la hoja "Datos. Cuando uses un valor, luego ya te va a aparecer para autocompletar"';
         sheet.getCell(`A${maxRows}`).font = { italic: true, color: { argb: 'FF666666' } };
     }
@@ -194,7 +230,7 @@ export class ImportService {
         instructions.forEach((line, index) => {
             const cell = sheet.getCell(`A${index + 1}`);
             cell.value = line.text;
-            
+
             switch (line.style) {
                 case 'title':
                     cell.font = { bold: true, size: 16 };
@@ -212,11 +248,11 @@ export class ImportService {
     }
 
     async parseAndValidateExcel(
-        buffer: ArrayBuffer, 
+        buffer: ArrayBuffer,
         userId: number
     ): Promise<ImportPreviewResponseDTO> {
         const workbook = new ExcelJS.Workbook();
-        
+
         try {
             await workbook.xlsx.load(buffer as any);
         } catch {
@@ -241,13 +277,13 @@ export class ImportService {
         // Iterate rows starting from row 2 (skip header)
         for (let rowNum = 2; rowNum <= sheet.rowCount && dataRowCount < MAX_ROWS; rowNum++) {
             const row = sheet.getRow(rowNum);
-            
+
             // Skip completely empty rows
             if (this.isRowEmpty(row)) continue;
-            
+
             // Parse row data
             const rowData = this.parseRow(row);
-            
+
             // Skip if it's the example row
             if (this.isExampleRow(rowData)) continue;
 
@@ -300,6 +336,10 @@ export class ImportService {
             condition: this.getCellValue(row.getCell(6)),
             series: this.getCellValue(row.getCell(7)) || null,
             description: this.getCellValue(row.getCell(8)) || null,
+            rarity: this.getCellValue(row.getCell(9)) || null,
+            quality: this.getCellValue(row.getCell(10)) || null,
+            variety: this.getCellValue(row.getCell(11)) || null,
+            finish: this.getCellValue(row.getCell(12)) || null,
         };
     }
 
@@ -377,11 +417,28 @@ export class ImportService {
             errors.push(`description excede ${MAX_DESCRIPTION_LENGTH} caracteres`);
         }
 
+        // Validate new optional fields if provided
+        if (data.rarity && !rarities.includes(data.rarity)) {
+            errors.push(`rarity '${data.rarity}' no es válido`);
+        }
+
+        if (data.quality && !qualities.includes(data.quality)) {
+            errors.push(`quality '${data.quality}' no es válido`);
+        }
+
+        if (data.variety && !varieties.includes(data.variety)) {
+            errors.push(`variety '${data.variety}' no es válido`);
+        }
+
+        if (data.finish && !finishes.includes(data.finish)) {
+            errors.push(`finish '${data.finish}' no es válido`);
+        }
+
         return errors;
     }
 
     async bulkCreateCars(
-        cars: ImportCarRowDTO[], 
+        cars: ImportCarRowDTO[],
         userId: number
     ): Promise<ImportResultDTO> {
         if (cars.length > MAX_ROWS) {
@@ -394,7 +451,7 @@ export class ImportService {
         for (let i = 0; i < cars.length; i++) {
             const car = cars[i];
             const validationErrors = this.validateRowData(car);
-            
+
             if (validationErrors.length > 0) {
                 errors.push({
                     index: i,
@@ -419,7 +476,11 @@ export class ImportService {
                 car.description || '',
                 '', // designer
                 car.series || '',
-                country
+                country,
+                car.rarity || '',
+                car.quality || '',
+                car.variety || '',
+                car.finish || ''
             ));
         }
 

@@ -19,6 +19,10 @@ export class CollectionQueryDTO {
     conditions?: string[];
     countries?: string[];
     hasPicture?: string[];
+    rarities?: string[];
+    qualities?: string[];
+    varieties?: string[];
+    finishes?: string[];
 
     // Busqueda de texto
     search?: string;
@@ -42,6 +46,10 @@ export interface FilterOptions {
     conditions: { name: string; count: number }[];
     countries: { name: string; count: number }[];
     hasPicture: { name: string; count: number }[];
+    rarities: { name: string; count: number }[];
+    qualities: { name: string; count: number }[];
+    varieties: { name: string; count: number }[];
+    finishes: { name: string; count: number }[];
 }
 
 export interface PaginatedCarsResponse<T> {

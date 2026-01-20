@@ -15,6 +15,10 @@ export interface CarData {
     condition?: string;
     ownerUsername?: string;
     wished?: boolean;
+    rarity?: string;
+    quality?: string;
+    variety?: string;
+    finish?: string;
 }
 
 export interface CarSuggestions {
@@ -123,6 +127,10 @@ export interface FilterOptions {
     conditions: FilterOption[];
     countries: FilterOption[];
     hasPicture: FilterOption[];
+    rarities: FilterOption[];
+    qualities: FilterOption[];
+    varieties: FilterOption[];
+    finishes: FilterOption[];
 }
 
 export interface PaginatedCarsResponse {
@@ -143,6 +151,10 @@ export interface CollectionQueryParams {
     conditions?: string[];
     countries?: string[];
     hasPicture?: string[];
+    rarities?: string[];
+    qualities?: string[];
+    varieties?: string[];
+    finishes?: string[];
     search?: string;
     groupId?: number;
 }
@@ -161,6 +173,10 @@ export async function listCarsPaginated(username: string, params: CollectionQuer
     if (params.conditions?.length) queryParts.push(`conditions=${params.conditions.join(',')}`);
     if (params.countries?.length) queryParts.push(`countries=${params.countries.join(',')}`);
     if (params.hasPicture?.length) queryParts.push(`hasPicture=${params.hasPicture.join(',')}`);
+    if (params.rarities?.length) queryParts.push(`rarities=${params.rarities.join(',')}`);
+    if (params.qualities?.length) queryParts.push(`qualities=${params.qualities.join(',')}`);
+    if (params.varieties?.length) queryParts.push(`varieties=${params.varieties.join(',')}`);
+    if (params.finishes?.length) queryParts.push(`finishes=${params.finishes.join(',')}`);
     if (params.search) queryParts.push(`search=${encodeURIComponent(params.search)}`);
     if (params.groupId) queryParts.push(`groupId=${params.groupId}`);
 

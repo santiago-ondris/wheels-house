@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
     Star,
@@ -11,11 +11,16 @@ import {
     Factory,
     Save,
     Sparkles,
+    Layers,
+    Gem,
+    Award,
+    PaintBucket,
 } from "lucide-react";
 import PageHeader from "../../components/ui/PageHeader";
+import Modal from "../../components/ui/Modal";
 import { carSchema, CarFormData } from "../../lib/validations/car";
 import { createWishedCar } from "../../services/car.service";
-import { scales, manufacturers, brands, colors, carConditions, brandNationalities, conditionDisplayWishlist } from "../../data/carOptions";
+import { scales, manufacturers, brands, colors, carConditions, brandNationalities, conditionDisplayWishlist, rarities, qualities, varieties, finishes } from "../../data/carOptions";
 import FieldSelector from "../../components/cars/addcar/FieldSelector";
 import MultiImageUploadWidget from "../../components/ui/MultiImageUploadWidget";
 import toast from "react-hot-toast";
@@ -39,12 +44,17 @@ export default function AddToWishlistPage() {
         designer: "",
         series: "",
         pictures: [],
+        rarity: "",
+        quality: "",
+        variety: "",
+        finish: "",
     });
 
     // ScrollRestoration handles scroll automatically
 
     const [errors, setErrors] = useState<Partial<Record<keyof CarFormData, string>>>({});
     const [isLoading, setIsLoading] = useState(false);
+    const [isContactModalOpen, setIsContactModalOpen] = useState(false);
     const { suggestions } = useCarSuggestions();
 
     // Safe back navigation with fallback
@@ -99,6 +109,10 @@ export default function AddToWishlistPage() {
 
             return newData;
         });
+
+        if (value === "Otro") {
+            setIsContactModalOpen(true);
+        }
 
         if (errors[field]) {
             setErrors((prev) => ({ ...prev, [field]: undefined }));
@@ -171,7 +185,7 @@ export default function AddToWishlistPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                                 <FieldSelector
                                     label="Marca (Real)"
-                                    options={brands}
+                                    options={[...brands, "Otro"]}
                                     value={formData.brand}
                                     onChange={(value) => updateField("brand", value)}
                                     placeholder="Seleccionar marca"
@@ -247,6 +261,42 @@ export default function AddToWishlistPage() {
                         </div>
 
                         <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 md:p-6 space-y-5">
+                            {/* Características especiales */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                                <FieldSelector
+                                    label="Rareza"
+                                    options={rarities}
+                                    value={formData.rarity || ""}
+                                    onChange={(value) => updateField("rarity", value)}
+                                    placeholder="Seleccionar"
+                                    icon={<Gem className="w-5 h-5" />}
+                                />
+                                <FieldSelector
+                                    label="Calidad"
+                                    options={qualities}
+                                    value={formData.quality || ""}
+                                    onChange={(value) => updateField("quality", value)}
+                                    placeholder="Seleccionar"
+                                    icon={<Award className="w-5 h-5" />}
+                                />
+                                <FieldSelector
+                                    label="Variedad"
+                                    options={[...varieties, "Otro"]}
+                                    value={formData.variety || ""}
+                                    onChange={(value) => updateField("variety", value)}
+                                    placeholder="Seleccionar"
+                                    icon={<Layers className="w-5 h-5" />}
+                                />
+                                <FieldSelector
+                                    label="Acabado"
+                                    options={finishes}
+                                    value={formData.finish || ""}
+                                    onChange={(value) => updateField("finish", value)}
+                                    placeholder="Seleccionar"
+                                    icon={<PaintBucket className="w-5 h-5" />}
+                                />
+                            </div>
+
                             <div>
                                 <label className="block text-white/50 uppercase tracking-widest text-[10px] font-bold mb-1.5 ml-1">
                                     Descripción / Notas
@@ -308,6 +358,32 @@ export default function AddToWishlistPage() {
                     </div>
                 </form>
             </motion.div>
+
+            <Modal
+                isOpen={isContactModalOpen}
+                onClose={() => setIsContactModalOpen(false)}
+                title="¿Falta alguna opción?"
+            >
+                <div className="space-y-6">
+                    <p className="text-white/60">
+                        ¿No encontrás lo que buscás? ¡Escribinos y lo agregamos enseguida!
+                    </p>
+                    <div className="flex justify-end gap-3">
+                        <button
+                            onClick={() => setIsContactModalOpen(false)}
+                            className="px-4 py-2 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+                        >
+                            Cerrar
+                        </button>
+                        <Link
+                            to="/contact"
+                            className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-lg transition-colors"
+                        >
+                            Ir a Contacto
+                        </Link>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 }

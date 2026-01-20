@@ -11,14 +11,17 @@ import {
     Trash2,
 } from "lucide-react";
 import PageHeader from "../../components/ui/PageHeader";
-import { getGroup, updateGroup, deleteGroup, UpdateGroupData } from "../../services/group.service";
+import { getGroup, updateGroup, deleteGroup, listFeaturedGroups, UpdateGroupData } from "../../services/group.service";
 import toast from "react-hot-toast";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigateBack } from "../../hooks/useNavigateBack";
+import SingleImageUploadWidget from "../../components/ui/SingleImageUploadWidget";
+import { uploadImage, deleteRemoteImage } from "../../services/upload.service";
 
 interface GroupFormData {
     name: string;
     description: string;
+    picture: string;
     featured: boolean;
     cars: number[];
 }
@@ -30,6 +33,7 @@ export default function EditGroupPage() {
     const [formData, setFormData] = useState<GroupFormData>({
         name: "",
         description: "",
+        picture: "",
         featured: false,
         cars: [],
     });
@@ -38,6 +42,9 @@ export default function EditGroupPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [isFetching, setIsFetching] = useState(true);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [hasMaxFeatured, setHasMaxFeatured] = useState(false);
+    const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
+    const [originalPicture, setOriginalPicture] = useState("");
 
     // ScrollRestoration handles scroll automatically
     useEffect(() => {
@@ -48,16 +55,26 @@ export default function EditGroupPage() {
 
     const fetchData = async () => {
         try {
-            const [groupData] = await Promise.all([
+            const [groupData, featuredGroups] = await Promise.all([
                 getGroup(Number(groupId)),
+                listFeaturedGroups(user!.username)
             ]);
 
             setFormData({
                 name: groupData.name,
                 description: groupData.description || "",
+                picture: groupData.picture || "",
                 featured: groupData.featured || false,
                 cars: groupData.cars?.map((c) => c.carId!) || [],
             });
+
+            setOriginalPicture(groupData.picture || "");
+
+            // Check if limit is reached (excluding current group)
+            const othersCount = featuredGroups.filter(g => g.groupId !== Number(groupId)).length;
+            if (othersCount >= 4) {
+                setHasMaxFeatured(true);
+            }
         } catch (error) {
             console.error("Error fetching data:", error);
             toast.error("Error al cargar el grupo");
@@ -85,13 +102,34 @@ export default function EditGroupPage() {
 
         setIsLoading(true);
         try {
+            let pictureUrl = formData.picture;
+
+            if (pendingImageFile) {
+                pictureUrl = await uploadImage(pendingImageFile);
+            }
+
             const data: UpdateGroupData = {
                 name: formData.name,
                 description: formData.description || undefined,
+                picture: pictureUrl || undefined,
                 featured: formData.featured,
                 cars: formData.cars,
             };
             await updateGroup(Number(groupId), data);
+
+            // If we uploaded a new image and success, try to delete the old one
+            if (pendingImageFile && originalPicture && originalPicture.includes('wheels-house/') && originalPicture !== pictureUrl) {
+                try {
+                    const parts = originalPicture.split('/');
+                    const idWithExtension = parts[parts.length - 1];
+                    const publicId = idWithExtension.split('.')[0];
+                    const fullPublicId = `wheels-house/cars/${publicId}`;
+                    await deleteRemoteImage(fullPublicId);
+                } catch (e) {
+                    console.error("Error cleaning up old image", e);
+                }
+            }
+
             toast.success("¡Grupo actualizado!");
 
             // Navigate to the updated group detail URL
@@ -179,6 +217,15 @@ export default function EditGroupPage() {
                         </div>
 
                         <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 md:p-6 space-y-5">
+                            {/* Cover Image Upload */}
+                            <div className="pb-5 border-b border-white/5">
+                                <SingleImageUploadWidget
+                                    value={formData.picture}
+                                    onChange={(val) => setFormData(prev => ({ ...prev, picture: val || "" }))}
+                                    onFileChange={(file) => setPendingImageFile(file)}
+                                />
+                            </div>
+
                             <div>
                                 <label className="block text-accent uppercase tracking-widest text-[10px] font-bold mb-1.5 ml-1">
                                     Nombre del Grupo <span className="text-danger">*</span>
@@ -218,15 +265,29 @@ export default function EditGroupPage() {
                             </div>
 
                             <div
-                                onClick={() => setFormData((prev) => ({ ...prev, featured: !prev.featured }))}
-                                className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all ${formData.featured ? "bg-accent/10 border-accent/50" : "bg-white/[0.02] border-white/5 hover:border-white/10"}`}
+                                onClick={() => {
+                                    if (!hasMaxFeatured) {
+                                        setFormData((prev) => ({ ...prev, featured: !prev.featured }));
+                                    }
+                                }}
+                                className={`flex items-center gap-4 p-4 rounded-xl border transition-all ${hasMaxFeatured
+                                    ? "bg-white/[0.01] border-white/5 opacity-50 cursor-not-allowed"
+                                    : formData.featured
+                                        ? "bg-accent/10 border-accent/50 cursor-pointer"
+                                        : "bg-white/[0.02] border-white/5 hover:border-white/10 cursor-pointer"
+                                    }`}
                             >
                                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${formData.featured ? "bg-accent text-white" : "bg-white/5 text-white/40"}`}>
                                     <Star className="w-5 h-5" />
                                 </div>
                                 <div className="flex-1">
                                     <p className="text-white font-medium">Grupo Destacado</p>
-                                    <p className="text-white/40 text-sm">Se mostrará en tu perfil público (máx 4)</p>
+                                    <p className="text-white/40 text-sm">
+                                        {hasMaxFeatured
+                                            ? "Has alcanzado el límite de 4 grupos destacados."
+                                            : "Se mostrará en tu perfil público (máx 4)"
+                                        }
+                                    </p>
                                 </div>
                                 <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all ${formData.featured ? "bg-accent border-accent" : "border-white/20"}`}>
                                     {formData.featured && <Check className="w-4 h-4 text-white" />}

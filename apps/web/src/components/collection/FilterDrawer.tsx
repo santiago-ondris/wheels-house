@@ -14,7 +14,11 @@ interface FilterDrawerProps {
     selectedConditions: string[];
     selectedCountries: string[];
     selectedHasPicture: string[];
-    onToggleFilter: (field: 'brands' | 'colors' | 'manufacturers' | 'scales' | 'conditions' | 'countries' | 'hasPicture', value: string) => void;
+    selectedRarities: string[];
+    selectedQualities: string[];
+    selectedVarieties: string[];
+    selectedFinishes: string[];
+    onToggleFilter: (field: 'brands' | 'colors' | 'manufacturers' | 'scales' | 'conditions' | 'countries' | 'hasPicture' | 'rarities' | 'qualities' | 'varieties' | 'finishes', value: string) => void;
     onClearFilters: () => void;
     hasActiveFilters: boolean;
     totalResults: number;
@@ -31,6 +35,10 @@ export default function FilterDrawer({
     selectedConditions,
     selectedCountries,
     selectedHasPicture,
+    selectedRarities,
+    selectedQualities,
+    selectedVarieties,
+    selectedFinishes,
     onToggleFilter,
     onClearFilters,
     hasActiveFilters,
@@ -84,6 +92,10 @@ export default function FilterDrawer({
                                 selectedConditions={selectedConditions}
                                 selectedCountries={selectedCountries}
                                 selectedHasPicture={selectedHasPicture}
+                                selectedRarities={selectedRarities}
+                                selectedQualities={selectedQualities}
+                                selectedVarieties={selectedVarieties}
+                                selectedFinishes={selectedFinishes}
                                 onToggleFilter={onToggleFilter}
                                 onClearFilters={onClearFilters}
                                 hasActiveFilters={hasActiveFilters}

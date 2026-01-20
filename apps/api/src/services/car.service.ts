@@ -23,8 +23,9 @@ export class CarService {
 
         const newCar: CarToDB = new CarToDB(
             user.userId, carData.name, carData.color, carData.brand,
-            carData.scale, carData.manufacturer, carData.condition, carData.wished, 
-            carData.description, carData.designer, carData.series, carData.country
+            carData.scale, carData.manufacturer, carData.condition, carData.wished,
+            carData.description, carData.designer, carData.series, carData.country,
+            carData.rarity, carData.quality, carData.variety, carData.finish
         );
 
         const createdCar = await createCar(newCar);
@@ -64,8 +65,9 @@ export class CarService {
 
             listedCars.push(new CarInfo(
                 car.carId, car.name, car.color, car.brand,
-                car.scale, car.manufacturer, car.condition, car.wished, 
-                car.description, car.designer, car.series, carPictures, car.country
+                car.scale, car.manufacturer, car.condition, car.wished,
+                car.description, car.designer, car.series, carPictures, car.country,
+                car.rarity, car.quality, car.variety, car.finish
             ));
         }
 
@@ -81,9 +83,10 @@ export class CarService {
 
         const car: CarInfoWithOwner = new CarInfoWithOwner(
             carFromDB.carId, carFromDB.name, carFromDB.color, carFromDB.brand,
-            carFromDB.scale, carFromDB.manufacturer, carFromDB.condition, carFromDB.wished, 
+            carFromDB.scale, carFromDB.manufacturer, carFromDB.condition, carFromDB.wished,
             carFromDB.ownerUsername, carFromDB.description, carFromDB.designer, carFromDB.series,
-            carPicturesURLs, carFromDB.country
+            carPicturesURLs, carFromDB.country,
+            carFromDB.rarity, carFromDB.quality, carFromDB.variety, carFromDB.finish
         );
 
         return car;
@@ -202,9 +205,10 @@ export class CarService {
 
         return new CarInfoWithOwner(
             carFromDB.carId, carFromDB.name, carFromDB.color, carFromDB.brand,
-            carFromDB.scale, carFromDB.manufacturer, carFromDB.condition, carFromDB.wished, 
+            carFromDB.scale, carFromDB.manufacturer, carFromDB.condition, carFromDB.wished,
             carFromDB.ownerUsername, carFromDB.description, carFromDB.designer, carFromDB.series,
-            carPicturesURLs, carFromDB.country
+            carPicturesURLs, carFromDB.country,
+            carFromDB.rarity, carFromDB.quality, carFromDB.variety, carFromDB.finish
         );
     }
 
@@ -239,8 +243,9 @@ export class CarService {
 
             listedCars.push(new CarInfo(
                 carData.carId, carData.name, carData.color, carData.brand,
-                carData.scale, carData.manufacturer, carData.condition, carData.wished, 
-                carData.description, carData.designer, carData.series, carPictures, carData.country
+                carData.scale, carData.manufacturer, carData.condition, carData.wished,
+                carData.description, carData.designer, carData.series, carPictures, carData.country,
+                carData.rarity, carData.quality, carData.variety, carData.finish
             ));
         }
 
@@ -340,10 +345,10 @@ export class CarService {
             }
         }
 
-        for(const groupId of carChanges.groups!) {
-            const createdGroupedCar = await createGroupedCars({carId, groupId});
+        for (const groupId of carChanges.groups!) {
+            const createdGroupedCar = await createGroupedCars({ carId, groupId });
 
-            if(createdGroupedCar == null) {
+            if (createdGroupedCar == null) {
                 throw ERROR_UPDATING_CAR;
             }
         }
@@ -363,8 +368,9 @@ export class CarService {
 
             wishlist.push(new CarInfo(
                 car.carId, car.name, car.color, car.brand,
-                car.scale, car.manufacturer, car.condition, car.wished, 
-                car.description, car.designer, car.series, carPictures, car.country
+                car.scale, car.manufacturer, car.condition, car.wished,
+                car.description, car.designer, car.series, carPictures, car.country,
+                car.rarity, car.quality, car.variety, car.finish
             ));
         }
 

@@ -12,11 +12,12 @@ import {
     Eye,
     AlertTriangle,
     ExternalLink,
+    Box
 } from "lucide-react";
 import PageHeader from "../../components/ui/PageHeader";
 import { quickAddCarSchema, QuickAddCarFormData, QuickAddCarPayload } from "../../lib/validations/quickAddCar";
 import { createCar } from "../../services/car.service";
-import { scales, manufacturers, brands, colors, brandNationalities } from "../../data/carOptions";
+import { scales, manufacturers, brands, colors, brandNationalities, carConditions } from "../../data/carOptions";
 import FieldSelector from "../../components/cars/addcar/FieldSelector";
 import SuggestionInput from "../../components/ui/SuggestionInput";
 import toast from "react-hot-toast";
@@ -41,6 +42,16 @@ export default function QuickAddPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [formKey, setFormKey] = useState(0);
     const { suggestions, addLocalSuggestion } = useCarSuggestions();
+
+    // Condition state with localStorage persistence
+    const [condition, setCondition] = useState<string>(() => {
+        return localStorage.getItem("quickAddDefaultCondition") || "Abierto";
+    });
+
+    const handleConditionChange = (newCondition: string) => {
+        setCondition(newCondition);
+        localStorage.setItem("quickAddDefaultCondition", newCondition);
+    };
 
     const handleCancel = useNavigateBack(`/collection/${user?.username || ''}`);
 
@@ -67,10 +78,10 @@ export default function QuickAddPage() {
             return null;
         }
 
-        // Create full payload with defaults
+        // Create full payload with defaults and selected condition
         return {
             ...result.data,
-            condition: "Abierto",
+            condition: condition,
             description: "",
             designer: "",
             series: "",
@@ -194,6 +205,9 @@ export default function QuickAddPage() {
 
                 <form onSubmit={handleSave} className="max-w-6xl mx-auto">
                     <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 md:p-6 space-y-5">
+
+
+
                         {/* Name field */}
                         <div>
                             <label className="block text-accent uppercase tracking-widest text-[10px] font-bold mb-1.5 ml-1">
@@ -257,6 +271,30 @@ export default function QuickAddPage() {
                                 error={errors.manufacturer}
                                 required
                             />
+                        </div>
+
+                        <div className="h-px bg-white/5" />
+
+                        {/* Condition Selector */}
+                        <div>
+                            <label className="block text-white/50 uppercase tracking-widest text-[10px] font-bold mb-3 ml-1 flex items-center gap-2">
+                                <Box className="w-3 h-3" /> Estado del auto
+                            </label>
+                            <div className="flex flex-wrap gap-2">
+                                {carConditions.map((c) => (
+                                    <button
+                                        key={c}
+                                        type="button"
+                                        onClick={() => handleConditionChange(c)}
+                                        className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border ${condition === c
+                                            ? "bg-accent text-white border-accent"
+                                            : "bg-white/5 text-white/40 border-white/10 hover:bg-white/10 hover:text-white"
+                                            }`}
+                                    >
+                                        {c}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
 

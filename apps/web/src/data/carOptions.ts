@@ -36,6 +36,7 @@ export const manufacturers = [
 export const brands = [
     "Acura",
     "Alfa Romeo",
+    "AMC",
     "Aston Martin",
     "Audi",
     "Bentley",
@@ -45,22 +46,30 @@ export const brands = [
     "Cadillac",
     "Chevrolet",
     "Chrysler",
+    "Citroën",
+    "Cupra",
+    "Czinger Vehicles",
     "Datsun",
+    "DMC",
     "Dodge",
+    "Fantasía",
     "Ferrari",
     "Fiat",
     "Ford",
     "GMC",
+    "Gordon Murray",
     "Honda",
+    "Hot Wheels",
+    "Hudson",
     "Hummer",
     "Hyundai",
-    "Hot Wheels",
     "Infiniti",
     "Jaguar",
     "Jeep",
     "Kia",
     "Koenigsegg",
     "Lamborghini",
+    "Lancia",
     "Land Rover",
     "Lexus",
     "Lincoln",
@@ -69,6 +78,7 @@ export const brands = [
     "Mazda",
     "McLaren",
     "Mercedes-Benz",
+    "Mercury",
     "Mini",
     "Mitsubishi",
     "Nissan",
@@ -80,6 +90,7 @@ export const brands = [
     "Pontiac",
     "Porsche",
     "Ram",
+    "Range Rover",
     "Renault",
     "Rolls-Royce",
     "Saab",
@@ -90,11 +101,10 @@ export const brands = [
     "Toyota",
     "Volkswagen",
     "Volvo",
-    "W Motors"
+    "W Motors",
 ];
 
 export const colors = [
-    // Basic
     "Negro",
     "Blanco",
     "Gris",
@@ -121,7 +131,11 @@ export const colors = [
     "Cian",
     "Púrpura",
     "Bordo",
-    "Violeta"
+    "Violeta",
+    "Zamac",
+    "Sin pintar",
+    "Burdeos",
+    "Multicolor",
 ];
 
 export const colorMap: Record<string, string> = {
@@ -151,7 +165,11 @@ export const colorMap: Record<string, string> = {
     'Cian': '#06b6d4',
     'Púrpura': '#7e22ce',
     'Bordo': '#7f1d1d',
-    'Violeta': '#8b5cf6'
+    'Violeta': '#8b5cf6',
+    'Zamac': '#a1a1aa',
+    'Sin pintar': '#d4d4d8',
+    'Burdeos': '#881337',
+    'Multicolor': 'linear-gradient(90deg, #ef4444, #eab308, #22c55e, #3b82f6, #a855f7)',
 };
 
 export const carConditions = [
@@ -183,6 +201,7 @@ export const getConditionLabel = (condition: string, isWishlist: boolean): strin
 export const brandNationalities: Record<string, string> = {
     "Acura": "Japón",
     "Alfa Romeo": "Italia",
+    "AMC": "USA",
     "Aston Martin": "Reino Unido",
     "Audi": "Alemania",
     "Bentley": "Reino Unido",
@@ -192,13 +211,19 @@ export const brandNationalities: Record<string, string> = {
     "Cadillac": "USA",
     "Chevrolet": "USA",
     "Chrysler": "USA",
+    "Citroën": "Francia",
+    "Cupra": "España",
+    "Czinger Vehicles": "USA",
     "Datsun": "Japón",
+    "DMC": "USA",
     "Dodge": "USA",
     "Ferrari": "Italia",
     "Fiat": "Italia",
     "Ford": "USA",
     "GMC": "USA",
+    "Gordon Murray": "Reino Unido",
     "Honda": "Japón",
+    "Hudson": "USA",
     "Hummer": "USA",
     "Hyundai": "Corea del Sur",
     "Infiniti": "Japón",
@@ -207,6 +232,7 @@ export const brandNationalities: Record<string, string> = {
     "Kia": "Corea del Sur",
     "Koenigsegg": "Suecia",
     "Lamborghini": "Italia",
+    "Lancia": "Italia",
     "Land Rover": "Reino Unido",
     "Lexus": "Japón",
     "Lincoln": "USA",
@@ -215,6 +241,7 @@ export const brandNationalities: Record<string, string> = {
     "Mazda": "Japón",
     "McLaren": "Reino Unido",
     "Mercedes-Benz": "Alemania",
+    "Mercury": "USA",
     "Mini": "Reino Unido",
     "Mitsubishi": "Japón",
     "Nissan": "Japón",
@@ -226,6 +253,7 @@ export const brandNationalities: Record<string, string> = {
     "Pontiac": "USA",
     "Porsche": "Alemania",
     "Ram": "USA",
+    "Range Rover": "Reino Unido",
     "Renault": "Francia",
     "Rolls-Royce": "Reino Unido",
     "Saab": "Suecia",
@@ -238,3 +266,49 @@ export const brandNationalities: Record<string, string> = {
     "Volvo": "Suecia",
     "W Motors": "UAE",
 };
+
+// New car attributes
+export const rarities = [
+    "Básico",
+    "Treasure Hunt (TH)",
+    "Super Treasure Hunt (STH)",
+    "Chase",
+];
+
+export const qualities = [
+    "Básico",
+    "Silver Series",
+    "Premium",
+    "Elite 64",
+    "RLC (Red Line Club)",
+];
+
+export const varieties = [
+    "Team Transport",
+    "Boulevard",
+    "Car Culture",
+    "Classics",
+    "Collectors Convention",
+    "Garage",
+    "NFT",
+    "Mystery Models",
+    "Pop Culture",
+    "Speed Machines",
+    "Themed entertainment",
+    "Ultra Hots",
+    "Real Riders",
+    "Motorcycles",
+    "Legends",
+    "Red Line",
+];
+
+export const finishes = [
+    "Anodizado",
+    "Cromado",
+    "Brilloso",
+    "Mate (opaco)",
+    "Metalizado",
+    "Perlado",
+    "Spectraflame",
+    "Translúcido",
+];

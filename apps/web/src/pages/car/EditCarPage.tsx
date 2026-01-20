@@ -15,12 +15,15 @@ import {
     Folder,
     Check,
     Plus,
+    Gem,
+    Award,
+    PaintBucket,
 } from "lucide-react";
 import PageHeader from "../../components/ui/PageHeader";
 import { carSchema, CarFormData } from "../../lib/validations/car";
 import { updateCar, getCar, getCarGroups, updateCarGroups } from "../../services/car.service";
 import { listGroups, GroupBasicInfo } from "../../services/group.service";
-import { scales, manufacturers, brands, colors, carConditions, brandNationalities, conditionDisplayCollection } from "../../data/carOptions";
+import { scales, manufacturers, brands, colors, carConditions, brandNationalities, conditionDisplayCollection, rarities, qualities, varieties, finishes } from "../../data/carOptions";
 import FieldSelector from "../../components/cars/addcar/FieldSelector";
 import MultiImageUploadWidget from "../../components/ui/MultiImageUploadWidget";
 import toast from "react-hot-toast";
@@ -45,6 +48,10 @@ export default function EditCarPage() {
         designer: "",
         series: "",
         pictures: [],
+        rarity: "",
+        quality: "",
+        variety: "",
+        finish: "",
     });
 
     const [errors, setErrors] = useState<Partial<Record<keyof CarFormData, string>>>({});
@@ -80,6 +87,10 @@ export default function EditCarPage() {
                 designer: carData.designer || "",
                 series: carData.series || "",
                 pictures: carData.pictures || [],
+                rarity: carData.rarity || "",
+                quality: carData.quality || "",
+                variety: carData.variety || "",
+                finish: carData.finish || "",
             });
             setUserGroups(groups);
             setSelectedGroups(carGroups);
@@ -314,6 +325,42 @@ export default function EditCarPage() {
                                         icon={<User className="w-5 h-5" />}
                                     />
                                 </div>
+                            </div>
+
+                            {/* Características especiales */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                                <FieldSelector
+                                    label="Rareza"
+                                    options={rarities}
+                                    value={formData.rarity || ""}
+                                    onChange={(value) => updateField("rarity", value)}
+                                    placeholder="Seleccionar"
+                                    icon={<Gem className="w-5 h-5" />}
+                                />
+                                <FieldSelector
+                                    label="Calidad"
+                                    options={qualities}
+                                    value={formData.quality || ""}
+                                    onChange={(value) => updateField("quality", value)}
+                                    placeholder="Seleccionar"
+                                    icon={<Award className="w-5 h-5" />}
+                                />
+                                <FieldSelector
+                                    label="Variedad"
+                                    options={varieties}
+                                    value={formData.variety || ""}
+                                    onChange={(value) => updateField("variety", value)}
+                                    placeholder="Seleccionar"
+                                    icon={<Layers className="w-5 h-5" />}
+                                />
+                                <FieldSelector
+                                    label="Acabado"
+                                    options={finishes}
+                                    value={formData.finish || ""}
+                                    onChange={(value) => updateField("finish", value)}
+                                    placeholder="Seleccionar"
+                                    icon={<PaintBucket className="w-5 h-5" />}
+                                />
                             </div>
 
                             <div>

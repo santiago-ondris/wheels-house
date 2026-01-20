@@ -68,7 +68,11 @@ interface CollectionFiltersProps {
     selectedConditions: string[];
     selectedCountries: string[];
     selectedHasPicture: string[];
-    onToggleFilter: (field: 'brands' | 'colors' | 'manufacturers' | 'scales' | 'conditions' | 'countries' | 'hasPicture', value: string) => void;
+    selectedRarities: string[];
+    selectedQualities: string[];
+    selectedVarieties: string[];
+    selectedFinishes: string[];
+    onToggleFilter: (field: 'brands' | 'colors' | 'manufacturers' | 'scales' | 'conditions' | 'countries' | 'hasPicture' | 'rarities' | 'qualities' | 'varieties' | 'finishes', value: string) => void;
     onClearFilters: () => void;
     hasActiveFilters: boolean;
 }
@@ -82,6 +86,10 @@ export default function CollectionFilters({
     selectedConditions,
     selectedCountries,
     selectedHasPicture,
+    selectedRarities,
+    selectedQualities,
+    selectedVarieties,
+    selectedFinishes,
     onToggleFilter,
     onClearFilters,
     hasActiveFilters,
@@ -150,6 +158,30 @@ export default function CollectionFilters({
                 options={filters.hasPicture}
                 selected={selectedHasPicture}
                 onToggle={(v) => onToggleFilter('hasPicture', v)}
+            />
+            <FilterSection
+                title="Rareza"
+                options={filters.rarities || []}
+                selected={selectedRarities}
+                onToggle={(v) => onToggleFilter('rarities', v)}
+            />
+            <FilterSection
+                title="Calidad"
+                options={filters.qualities || []}
+                selected={selectedQualities}
+                onToggle={(v) => onToggleFilter('qualities', v)}
+            />
+            <FilterSection
+                title="Variedad"
+                options={filters.varieties || []}
+                selected={selectedVarieties}
+                onToggle={(v) => onToggleFilter('varieties', v)}
+            />
+            <FilterSection
+                title="Acabado"
+                options={filters.finishes || []}
+                selected={selectedFinishes}
+                onToggle={(v) => onToggleFilter('finishes', v)}
             />
         </div>
     );

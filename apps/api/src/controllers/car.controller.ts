@@ -40,6 +40,10 @@ export class CarController {
         @Query('conditions') conditions?: string,
         @Query('countries') countries?: string,
         @Query('hasPicture') hasPicture?: string,
+        @Query('rarities') rarities?: string,
+        @Query('qualities') qualities?: string,
+        @Query('varieties') varieties?: string,
+        @Query('finishes') finishes?: string,
         @Query('search') search?: string,
         @Query('groupId') groupId?: string,
     ) {
@@ -55,6 +59,10 @@ export class CarController {
             conditions: conditions ? conditions.split(',') : undefined,
             countries: countries ? countries.split(',') : undefined,
             hasPicture: hasPicture ? hasPicture.split(',') : undefined,
+            rarities: rarities ? rarities.split(',') : undefined,
+            qualities: qualities ? qualities.split(',') : undefined,
+            varieties: varieties ? varieties.split(',') : undefined,
+            finishes: finishes ? finishes.split(',') : undefined,
             search,
             groupId: groupId ? parseInt(groupId) : undefined,
         };

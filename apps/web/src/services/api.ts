@@ -88,7 +88,12 @@ export async function apiRequest<T>(
     throw error;
   }
 
-  return response.json();
+  if (response.status === 204) {
+    return {} as T;
+  }
+
+  const text = await response.text();
+  return text ? JSON.parse(text) : {} as T;
 }
 
 // Export para debugging (opcional)
