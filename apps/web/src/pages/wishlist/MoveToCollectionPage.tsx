@@ -14,12 +14,17 @@ import {
     Sparkles,
     Folder,
     PartyPopper,
+    Gem,
+    Award,
+    PaintBucket,
 } from "lucide-react";
 import PageHeader from "../../components/ui/PageHeader";
+import Modal from "../../components/ui/Modal";
+import { Link } from "react-router-dom";
 import { carSchema, CarFormData } from "../../lib/validations/car";
 import { getCar, wishedCarToCollection } from "../../services/car.service";
 import { listGroups, GroupBasicInfo } from "../../services/group.service";
-import { scales, manufacturers, brands, colors, carConditions, brandNationalities, conditionDisplayCollection } from "../../data/carOptions";
+import { scales, manufacturers, brands, colors, carConditions, brandNationalities, conditionDisplayCollection, rarities, qualities, varieties, finishes } from "../../data/carOptions";
 import FieldSelector from "../../components/cars/addcar/FieldSelector";
 import MultiImageUploadWidget from "../../components/ui/MultiImageUploadWidget";
 import toast from "react-hot-toast";
@@ -55,6 +60,7 @@ export default function MoveToCollectionPage() {
     const [isFetching, setIsFetching] = useState(true);
     const [userGroups, setUserGroups] = useState<GroupBasicInfo[]>([]);
     const [selectedGroups, setSelectedGroups] = useState<number[]>([]);
+    const [isContactModalOpen, setIsContactModalOpen] = useState(false);
     const { suggestions } = useCarSuggestions();
 
     // Safe back navigation with fallback
@@ -160,6 +166,10 @@ export default function MoveToCollectionPage() {
             return newData;
         });
 
+        if (value === "Otro") {
+            setIsContactModalOpen(true);
+        }
+
         if (errors[field]) {
             setErrors((prev) => ({ ...prev, [field]: undefined }));
         }
@@ -247,7 +257,7 @@ export default function MoveToCollectionPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                                 <FieldSelector
                                     label="Marca (Real)"
-                                    options={brands}
+                                    options={[...brands, "Otro"]}
                                     value={formData.brand}
                                     onChange={(value) => updateField("brand", value)}
                                     placeholder="Seleccionar marca"
@@ -323,6 +333,42 @@ export default function MoveToCollectionPage() {
                         </div>
 
                         <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 md:p-6 space-y-5">
+                            {/* Características especiales */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                                <FieldSelector
+                                    label="Rareza"
+                                    options={rarities}
+                                    value={formData.rarity || ""}
+                                    onChange={(value) => updateField("rarity", value)}
+                                    placeholder="Seleccionar"
+                                    icon={<Gem className="w-5 h-5" />}
+                                />
+                                <FieldSelector
+                                    label="Calidad"
+                                    options={qualities}
+                                    value={formData.quality || ""}
+                                    onChange={(value) => updateField("quality", value)}
+                                    placeholder="Seleccionar"
+                                    icon={<Award className="w-5 h-5" />}
+                                />
+                                <FieldSelector
+                                    label="Variedad"
+                                    options={[...varieties, "Otro"]}
+                                    value={formData.variety || ""}
+                                    onChange={(value) => updateField("variety", value)}
+                                    placeholder="Seleccionar"
+                                    icon={<Layers className="w-5 h-5" />}
+                                />
+                                <FieldSelector
+                                    label="Acabado"
+                                    options={finishes}
+                                    value={formData.finish || ""}
+                                    onChange={(value) => updateField("finish", value)}
+                                    placeholder="Seleccionar"
+                                    icon={<PaintBucket className="w-5 h-5" />}
+                                />
+                            </div>
+
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div>
                                     <label className="block text-white/50 uppercase tracking-widest text-[10px] font-bold mb-1.5 ml-1">
@@ -435,26 +481,57 @@ export default function MoveToCollectionPage() {
                         </button>
                     </div>
 
-                    <div className="md:hidden mt-8 grid grid-cols-2 gap-3">
-                        <button
-                            type="button"
-                            onClick={handleCancel}
-                            disabled={isLoading}
-                            className="px-6 py-4 border border-white/10 text-white font-bold rounded-xl hover:bg-white/5 transition-all active:scale-95"
-                        >
-                            Cancelar
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={isLoading}
-                            className="flex items-center justify-center gap-2 px-6 py-4 bg-emerald-500 hover:bg-emerald-400 disabled:bg-emerald-500/50 text-white font-bold rounded-xl transition-all active:scale-95 shadow-lg shadow-emerald-500/30"
-                        >
-                            <Check className="w-5 h-5" />
-                            {isLoading ? "Guardando..." : "A Colección"}
-                        </button>
-                    </div>
                 </form>
             </motion.div>
-        </div>
+
+            {/* Fixed Mobile Action Bar */}
+            <div className="fixed inset-x-0 bottom-0 md:hidden bg-[#0a0a0b]/95 backdrop-blur-lg border-t border-white/10 p-4 z-40">
+                <div className="grid grid-cols-2 gap-3 max-w-5xl mx-auto">
+                    <button
+                        type="button"
+                        onClick={handleCancel}
+                        disabled={isLoading}
+                        className="px-4 py-3 border border-white/10 text-white font-bold rounded-xl hover:bg-white/5 transition-all active:scale-95"
+                    >
+                        Cancelar
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleSubmit}
+                        disabled={isLoading}
+                        className="flex items-center justify-center gap-2 px-4 py-3 bg-emerald-500 hover:bg-emerald-400 disabled:bg-emerald-500/50 text-white font-bold rounded-xl transition-all active:scale-95 shadow-lg shadow-emerald-500/30"
+                    >
+                        <Check className="w-5 h-5" />
+                        {isLoading ? "Guardando..." : "A Colección"}
+                    </button>
+                </div>
+            </div>
+
+            <Modal
+                isOpen={isContactModalOpen}
+                onClose={() => setIsContactModalOpen(false)}
+                title="¿Falta alguna opción?"
+            >
+                <div className="space-y-6">
+                    <p className="text-white/60">
+                        ¿No encontrás la marca o variedad que buscás? ¡Escribinos y la agregamos enseguida!
+                    </p>
+                    <div className="flex justify-end gap-3">
+                        <button
+                            onClick={() => setIsContactModalOpen(false)}
+                            className="px-4 py-2 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+                        >
+                            Cerrar
+                        </button>
+                        <Link
+                            to="/contact"
+                            className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-lg transition-colors"
+                        >
+                            Ir a Contacto
+                        </Link>
+                    </div>
+                </div>
+            </Modal>
+        </div >
     );
 }

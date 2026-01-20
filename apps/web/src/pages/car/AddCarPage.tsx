@@ -20,6 +20,7 @@ import {
     PaintBucket,
 } from "lucide-react";
 import PageHeader from "../../components/ui/PageHeader";
+import Modal from "../../components/ui/Modal";
 import { carSchema, CarFormData } from "../../lib/validations/car";
 import { createCar, updateCarGroups } from "../../services/car.service";
 import { listGroups, GroupBasicInfo } from "../../services/group.service";
@@ -59,6 +60,7 @@ export default function AddCarPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [userGroups, setUserGroups] = useState<GroupBasicInfo[]>([]);
     const [selectedGroups, setSelectedGroups] = useState<number[]>([]);
+    const [isContactModalOpen, setIsContactModalOpen] = useState(false);
     const { suggestions } = useCarSuggestions();
 
     useEffect(() => {
@@ -129,6 +131,10 @@ export default function AddCarPage() {
             return newData;
         });
 
+        if (value === "Otro") {
+            setIsContactModalOpen(true);
+        }
+
         if (errors[field]) {
             setErrors((prev) => ({ ...prev, [field]: undefined }));
         }
@@ -195,7 +201,7 @@ export default function AddCarPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                                 <FieldSelector
                                     label="Marca (Real)"
-                                    options={brands}
+                                    options={[...brands, "Otro"]}
                                     value={formData.brand}
                                     onChange={(value) => updateField("brand", value)}
                                     placeholder="Seleccionar marca"
@@ -271,6 +277,42 @@ export default function AddCarPage() {
                         </div>
 
                         <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 md:p-6 space-y-5">
+                            {/* Características especiales */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                                <FieldSelector
+                                    label="Rareza"
+                                    options={rarities}
+                                    value={formData.rarity || ""}
+                                    onChange={(value) => updateField("rarity", value)}
+                                    placeholder="Seleccionar"
+                                    icon={<Gem className="w-5 h-5" />}
+                                />
+                                <FieldSelector
+                                    label="Calidad"
+                                    options={qualities}
+                                    value={formData.quality || ""}
+                                    onChange={(value) => updateField("quality", value)}
+                                    placeholder="Seleccionar"
+                                    icon={<Award className="w-5 h-5" />}
+                                />
+                                <FieldSelector
+                                    label="Variedad"
+                                    options={[...varieties, "Otro"]}
+                                    value={formData.variety || ""}
+                                    onChange={(value) => updateField("variety", value)}
+                                    placeholder="Seleccionar"
+                                    icon={<Layers className="w-5 h-5" />}
+                                />
+                                <FieldSelector
+                                    label="Acabado"
+                                    options={finishes}
+                                    value={formData.finish || ""}
+                                    onChange={(value) => updateField("finish", value)}
+                                    placeholder="Seleccionar"
+                                    icon={<PaintBucket className="w-5 h-5" />}
+                                />
+                            </div>
+
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 {/* Series */}
                                 <div>
@@ -298,42 +340,6 @@ export default function AddCarPage() {
                                         icon={<User className="w-5 h-5" />}
                                     />
                                 </div>
-                            </div>
-
-                            {/* Características especiales */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-                                <FieldSelector
-                                    label="Rareza"
-                                    options={rarities}
-                                    value={formData.rarity || ""}
-                                    onChange={(value) => updateField("rarity", value)}
-                                    placeholder="Seleccionar"
-                                    icon={<Gem className="w-5 h-5" />}
-                                />
-                                <FieldSelector
-                                    label="Calidad"
-                                    options={qualities}
-                                    value={formData.quality || ""}
-                                    onChange={(value) => updateField("quality", value)}
-                                    placeholder="Seleccionar"
-                                    icon={<Award className="w-5 h-5" />}
-                                />
-                                <FieldSelector
-                                    label="Variedad"
-                                    options={varieties}
-                                    value={formData.variety || ""}
-                                    onChange={(value) => updateField("variety", value)}
-                                    placeholder="Seleccionar"
-                                    icon={<Layers className="w-5 h-5" />}
-                                />
-                                <FieldSelector
-                                    label="Acabado"
-                                    options={finishes}
-                                    value={formData.finish || ""}
-                                    onChange={(value) => updateField("finish", value)}
-                                    placeholder="Seleccionar"
-                                    icon={<PaintBucket className="w-5 h-5" />}
-                                />
                             </div>
 
                             <div>
@@ -456,6 +462,32 @@ export default function AddCarPage() {
                     </div>
                 </form>
             </motion.div>
+
+            <Modal
+                isOpen={isContactModalOpen}
+                onClose={() => setIsContactModalOpen(false)}
+                title="¿Falta alguna opción?"
+            >
+                <div className="space-y-6">
+                    <p className="text-white/60">
+                        ¿No encontrás lo que buscás? ¡Escribinos y lo agregamos enseguida!
+                    </p>
+                    <div className="flex justify-end gap-3">
+                        <button
+                            onClick={() => setIsContactModalOpen(false)}
+                            className="px-4 py-2 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+                        >
+                            Cerrar
+                        </button>
+                        <Link
+                            to="/contact"
+                            className="px-4 py-2 bg-accent hover:bg-accent/80 text-white font-bold rounded-lg transition-colors"
+                        >
+                            Ir a Contacto
+                        </Link>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 }

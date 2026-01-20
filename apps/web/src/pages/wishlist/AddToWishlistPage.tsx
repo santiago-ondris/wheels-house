@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
     Star,
@@ -17,6 +17,7 @@ import {
     PaintBucket,
 } from "lucide-react";
 import PageHeader from "../../components/ui/PageHeader";
+import Modal from "../../components/ui/Modal";
 import { carSchema, CarFormData } from "../../lib/validations/car";
 import { createWishedCar } from "../../services/car.service";
 import { scales, manufacturers, brands, colors, carConditions, brandNationalities, conditionDisplayWishlist, rarities, qualities, varieties, finishes } from "../../data/carOptions";
@@ -53,6 +54,7 @@ export default function AddToWishlistPage() {
 
     const [errors, setErrors] = useState<Partial<Record<keyof CarFormData, string>>>({});
     const [isLoading, setIsLoading] = useState(false);
+    const [isContactModalOpen, setIsContactModalOpen] = useState(false);
     const { suggestions } = useCarSuggestions();
 
     // Safe back navigation with fallback
@@ -107,6 +109,10 @@ export default function AddToWishlistPage() {
 
             return newData;
         });
+
+        if (value === "Otro") {
+            setIsContactModalOpen(true);
+        }
 
         if (errors[field]) {
             setErrors((prev) => ({ ...prev, [field]: undefined }));
@@ -179,7 +185,7 @@ export default function AddToWishlistPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                                 <FieldSelector
                                     label="Marca (Real)"
-                                    options={brands}
+                                    options={[...brands, "Otro"]}
                                     value={formData.brand}
                                     onChange={(value) => updateField("brand", value)}
                                     placeholder="Seleccionar marca"
@@ -275,7 +281,7 @@ export default function AddToWishlistPage() {
                                 />
                                 <FieldSelector
                                     label="Variedad"
-                                    options={varieties}
+                                    options={[...varieties, "Otro"]}
                                     value={formData.variety || ""}
                                     onChange={(value) => updateField("variety", value)}
                                     placeholder="Seleccionar"
@@ -352,6 +358,32 @@ export default function AddToWishlistPage() {
                     </div>
                 </form>
             </motion.div>
+
+            <Modal
+                isOpen={isContactModalOpen}
+                onClose={() => setIsContactModalOpen(false)}
+                title="¿Falta alguna opción?"
+            >
+                <div className="space-y-6">
+                    <p className="text-white/60">
+                        ¿No encontrás lo que buscás? ¡Escribinos y lo agregamos enseguida!
+                    </p>
+                    <div className="flex justify-end gap-3">
+                        <button
+                            onClick={() => setIsContactModalOpen(false)}
+                            className="px-4 py-2 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+                        >
+                            Cerrar
+                        </button>
+                        <Link
+                            to="/contact"
+                            className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-lg transition-colors"
+                        >
+                            Ir a Contacto
+                        </Link>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 }
