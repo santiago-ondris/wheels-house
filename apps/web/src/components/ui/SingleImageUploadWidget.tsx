@@ -11,6 +11,7 @@ interface SingleImageUploadWidgetProps {
     label?: string;
     aspectRatio?: number;
     helperText?: string;
+    onFileChange?: (file: File | null) => void;
 }
 
 export default function SingleImageUploadWidget({
@@ -18,7 +19,8 @@ export default function SingleImageUploadWidget({
     onChange,
     label = "Imagen de Portada",
     aspectRatio = 3 / 1,
-    helperText = "Se recomienda una imagen horizontal de alta calidad."
+    helperText = "Se recomienda una imagen horizontal de alta calidad.",
+    onFileChange
 }: SingleImageUploadWidgetProps) {
     const [isUploading, setIsUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
@@ -56,20 +58,25 @@ export default function SingleImageUploadWidget({
             const resizedFile = await resizeImage(file);
             setUploadProgress(30);
 
-            // Simulate progress
+            if (onFileChange) {
+                const objectUrl = URL.createObjectURL(resizedFile);
+                onChange(objectUrl);
+                onFileChange(resizedFile);
+
+                setUploadProgress(100);
+                setTimeout(() => setIsUploading(false), 500);
+                return;
+            }
+
             const interval = setInterval(() => {
                 setUploadProgress(prev => Math.min(prev + 10, 90));
             }, 200);
-
-            // Upload
             const url = await uploadImage(resizedFile);
 
             clearInterval(interval);
             setUploadProgress(100);
 
-            // Delete old image if it exists and is ours
             if (value && value.includes('wheels-house/')) {
-                // Background delete, don't await
                 deleteOldImage(value);
             }
 
@@ -102,6 +109,9 @@ export default function SingleImageUploadWidget({
     };
 
     const handleRemove = () => {
+        if (onFileChange) {
+            onFileChange(null);
+        }
         onChange(null);
     };
 
@@ -110,6 +120,16 @@ export default function SingleImageUploadWidget({
         const toastId = toast.loading('Guardando recorte...');
         try {
             const file = new File([blob], `cropped_${Date.now()}.jpg`, { type: 'image/jpeg' });
+
+            if (onFileChange) {
+                const objectUrl = URL.createObjectURL(file);
+                onChange(objectUrl);
+                onFileChange(file);
+                toast.success('Recorte listo', { id: toastId });
+                setShowCropper(false);
+                return;
+            }
+
             const newUrl = await uploadImage(file);
 
             if (value) {

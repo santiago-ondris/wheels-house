@@ -16,6 +16,7 @@ import toast from "react-hot-toast";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigateBack } from "../../hooks/useNavigateBack";
 import SingleImageUploadWidget from "../../components/ui/SingleImageUploadWidget";
+import { uploadImage, deleteRemoteImage } from "../../services/upload.service";
 
 interface GroupFormData {
     name: string;
@@ -42,6 +43,8 @@ export default function EditGroupPage() {
     const [isFetching, setIsFetching] = useState(true);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [hasMaxFeatured, setHasMaxFeatured] = useState(false);
+    const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
+    const [originalPicture, setOriginalPicture] = useState("");
 
     // ScrollRestoration handles scroll automatically
     useEffect(() => {
@@ -64,6 +67,8 @@ export default function EditGroupPage() {
                 featured: groupData.featured || false,
                 cars: groupData.cars?.map((c) => c.carId!) || [],
             });
+
+            setOriginalPicture(groupData.picture || "");
 
             // Check if limit is reached (excluding current group)
             const othersCount = featuredGroups.filter(g => g.groupId !== Number(groupId)).length;
@@ -97,14 +102,34 @@ export default function EditGroupPage() {
 
         setIsLoading(true);
         try {
+            let pictureUrl = formData.picture;
+
+            if (pendingImageFile) {
+                pictureUrl = await uploadImage(pendingImageFile);
+            }
+
             const data: UpdateGroupData = {
                 name: formData.name,
                 description: formData.description || undefined,
-                picture: formData.picture || undefined,
+                picture: pictureUrl || undefined,
                 featured: formData.featured,
                 cars: formData.cars,
             };
             await updateGroup(Number(groupId), data);
+
+            // If we uploaded a new image and success, try to delete the old one
+            if (pendingImageFile && originalPicture && originalPicture.includes('wheels-house/') && originalPicture !== pictureUrl) {
+                try {
+                    const parts = originalPicture.split('/');
+                    const idWithExtension = parts[parts.length - 1];
+                    const publicId = idWithExtension.split('.')[0];
+                    const fullPublicId = `wheels-house/cars/${publicId}`;
+                    await deleteRemoteImage(fullPublicId);
+                } catch (e) {
+                    console.error("Error cleaning up old image", e);
+                }
+            }
+
             toast.success("¡Grupo actualizado!");
 
             // Navigate to the updated group detail URL
@@ -197,6 +222,7 @@ export default function EditGroupPage() {
                                 <SingleImageUploadWidget
                                     value={formData.picture}
                                     onChange={(val) => setFormData(prev => ({ ...prev, picture: val || "" }))}
+                                    onFileChange={(file) => setPendingImageFile(file)}
                                 />
                             </div>
 
@@ -245,10 +271,10 @@ export default function EditGroupPage() {
                                     }
                                 }}
                                 className={`flex items-center gap-4 p-4 rounded-xl border transition-all ${hasMaxFeatured
-                                        ? "bg-white/[0.01] border-white/5 opacity-50 cursor-not-allowed"
-                                        : formData.featured
-                                            ? "bg-accent/10 border-accent/50 cursor-pointer"
-                                            : "bg-white/[0.02] border-white/5 hover:border-white/10 cursor-pointer"
+                                    ? "bg-white/[0.01] border-white/5 opacity-50 cursor-not-allowed"
+                                    : formData.featured
+                                        ? "bg-accent/10 border-accent/50 cursor-pointer"
+                                        : "bg-white/[0.02] border-white/5 hover:border-white/10 cursor-pointer"
                                     }`}
                             >
                                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${formData.featured ? "bg-accent text-white" : "bg-white/5 text-white/40"}`}>

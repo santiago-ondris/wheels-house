@@ -16,6 +16,7 @@ import toast from "react-hot-toast";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigateBack } from "../../hooks/useNavigateBack";
 import SingleImageUploadWidget from "../../components/ui/SingleImageUploadWidget";
+import { uploadImage } from "../../services/upload.service";
 
 interface GroupFormData {
     name: string;
@@ -39,6 +40,7 @@ export default function CreateGroupPage() {
     const [errors, setErrors] = useState<Partial<Record<keyof GroupFormData, string>>>({});
     const [isLoading, setIsLoading] = useState(false);
     const [hasMaxFeatured, setHasMaxFeatured] = useState(false);
+    const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
 
     useEffect(() => {
         if (user?.username) {
@@ -76,10 +78,16 @@ export default function CreateGroupPage() {
 
         setIsLoading(true);
         try {
+            let pictureUrl = formData.picture;
+
+            if (pendingImageFile) {
+                pictureUrl = await uploadImage(pendingImageFile);
+            }
+
             const data: CreateGroupData = {
                 name: formData.name,
                 description: formData.description || undefined,
-                picture: formData.picture || undefined,
+                picture: pictureUrl || undefined,
                 featured: formData.featured,
                 cars: formData.cars,
             };
@@ -144,6 +152,7 @@ export default function CreateGroupPage() {
                                 <SingleImageUploadWidget
                                     value={formData.picture}
                                     onChange={(val) => setFormData(prev => ({ ...prev, picture: val || "" }))}
+                                    onFileChange={(file) => setPendingImageFile(file)}
                                 />
                             </div>
 
@@ -192,10 +201,10 @@ export default function CreateGroupPage() {
                                     }
                                 }}
                                 className={`flex items-center gap-4 p-4 rounded-xl border transition-all ${hasMaxFeatured
-                                        ? "bg-white/[0.01] border-white/5 opacity-50 cursor-not-allowed"
-                                        : formData.featured
-                                            ? "bg-accent/10 border-accent/50 cursor-pointer"
-                                            : "bg-white/[0.02] border-white/5 hover:border-white/10 cursor-pointer"
+                                    ? "bg-white/[0.01] border-white/5 opacity-50 cursor-not-allowed"
+                                    : formData.featured
+                                        ? "bg-accent/10 border-accent/50 cursor-pointer"
+                                        : "bg-white/[0.02] border-white/5 hover:border-white/10 cursor-pointer"
                                     }`}
                             >
                                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${formData.featured ? "bg-accent text-white" : "bg-white/5 text-white/40"}`}>

@@ -206,29 +206,7 @@ export default function QuickAddPage() {
                 <form onSubmit={handleSave} className="max-w-6xl mx-auto">
                     <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 md:p-6 space-y-5">
 
-                        {/* Condition Selector */}
-                        <div>
-                            <label className="block text-white/50 uppercase tracking-widest text-[10px] font-bold mb-3 ml-1 flex items-center gap-2">
-                                <Box className="w-3 h-3" /> Condición predeterminada
-                            </label>
-                            <div className="flex flex-wrap gap-2">
-                                {carConditions.map((c) => (
-                                    <button
-                                        key={c}
-                                        type="button"
-                                        onClick={() => handleConditionChange(c)}
-                                        className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border ${condition === c
-                                                ? "bg-accent text-white border-accent"
-                                                : "bg-white/5 text-white/40 border-white/10 hover:bg-white/10 hover:text-white"
-                                            }`}
-                                    >
-                                        {c}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
 
-                        <div className="h-px bg-white/5" />
 
                         {/* Name field */}
                         <div>
@@ -293,6 +271,30 @@ export default function QuickAddPage() {
                                 error={errors.manufacturer}
                                 required
                             />
+                        </div>
+
+                        <div className="h-px bg-white/5" />
+
+                        {/* Condition Selector */}
+                        <div>
+                            <label className="block text-white/50 uppercase tracking-widest text-[10px] font-bold mb-3 ml-1 flex items-center gap-2">
+                                <Box className="w-3 h-3" /> Estado del auto
+                            </label>
+                            <div className="flex flex-wrap gap-2">
+                                {carConditions.map((c) => (
+                                    <button
+                                        key={c}
+                                        type="button"
+                                        onClick={() => handleConditionChange(c)}
+                                        className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border ${condition === c
+                                            ? "bg-accent text-white border-accent"
+                                            : "bg-white/5 text-white/40 border-white/10 hover:bg-white/10 hover:text-white"
+                                            }`}
+                                    >
+                                        {c}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
 
