@@ -14,6 +14,7 @@ export default function GroupsSection({ username, totalGroups, isOwner }: Groups
     const navigate = useNavigate();
     const [featuredGroups, setFeaturedGroups] = useState<GroupBasicInfo[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isExpanded, setIsExpanded] = useState(true);
 
     useEffect(() => {
         if (username) {
@@ -49,8 +50,8 @@ export default function GroupsSection({ username, totalGroups, isOwner }: Groups
                     <Folder className="w-5 h-5 text-accent" />
                     <h2 className="text-lg md:text-xl font-bold text-white">Grupos Destacados</h2>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {[1, 2, 3].map((i) => (
+                <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
+                    {[1, 2, 3, 4].map((i) => (
                         <div key={i} className="h-24 bg-white/5 rounded-xl animate-pulse" />
                     ))}
                 </div>
@@ -65,12 +66,24 @@ export default function GroupsSection({ username, totalGroups, isOwner }: Groups
             transition={{ duration: 0.5, delay: 0.1 }}
             className="mt-8"
         >
-            <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg md:text-xl font-bold text-white flex items-center gap-2">
-                    <Folder className="w-5 h-5 text-accent" />
-                    Grupos Destacados
-                </h2>
+            <div
+                className="flex items-center justify-between mb-4 cursor-pointer group/header select-none"
+                onClick={() => setIsExpanded(!isExpanded)}
+            >
                 <div className="flex items-center gap-2">
+                    <h2 className="text-lg md:text-xl font-bold text-white flex items-center gap-2 group-hover/header:text-accent transition-colors">
+                        <Folder className="w-5 h-5 text-accent" />
+                        Grupos Destacados
+                    </h2>
+                    <motion.div
+                        animate={{ rotate: isExpanded ? 0 : -90 }}
+                        transition={{ duration: 0.2 }}
+                    >
+                        <ChevronRight className="w-5 h-5 text-white/50 group-hover/header:text-accent transition-colors" />
+                    </motion.div>
+                </div>
+
+                <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                     {isOwner && (
                         <button
                             onClick={() => navigate("/collection/group/new")}
@@ -92,63 +105,88 @@ export default function GroupsSection({ username, totalGroups, isOwner }: Groups
                 </div>
             </div>
 
-            {featuredGroups.length > 0 ? (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {featuredGroups.map((group) => (
-                        <Link
-                            key={group.groupId}
-                            to={`/collection/${username}/group/${encodeURIComponent(group.name)}`}
-                            className="blueprint-card block p-4 group"
-                        >
-                            {/* Technical Corner Detail */}
-                            <div className="blueprint-line top-0 right-6 w-[1px] h-2" />
-                            <div className="blueprint-line top-4 right-0 w-2 h-[1px]" />
+            <motion.div
+                initial={false}
+                animate={{ height: isExpanded ? "auto" : 0, opacity: isExpanded ? 1 : 0 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="overflow-hidden"
+            >
+                <div className="pb-2">
+                    {featuredGroups.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {featuredGroups.map((group) => (
+                                <Link
+                                    key={group.groupId}
+                                    to={`/collection/${username}/group/${encodeURIComponent(group.name)}`}
+                                    className="blueprint-card block relative overflow-hidden group aspect-[3/1] rounded-xl border border-white/5 bg-white/[0.02]"
+                                >
+                                    {/* Background Image - using crop-friendly aspect ratio */}
+                                    {group.picture && (
+                                        <div className="absolute inset-0 z-0">
+                                            <img
+                                                src={group.picture}
+                                                alt={group.name}
+                                                className="w-full h-full object-cover opacity-50 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out"
+                                            />
+                                            <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent group-hover:via-black/30 transition-all duration-500" />
+                                        </div>
+                                    )}
 
-                            <div className="flex flex-col gap-3">
-                                <div className="flex items-start justify-between">
-                                    <div className="w-8 h-8 border border-blueprint/20 flex items-center justify-center text-blueprint/30">
-                                        <Folder className="w-4 h-4 stroke-[1.5]" />
-                                    </div>
-                                    <span className="text-[14px] font-mono text-blueprint/40 uppercase tracking-tighter text-right">
-                                        GRP-{String(group.groupId).padStart(4, '0')}
-                                    </span>
-                                </div>
+                                    {/* Technical Details (Overlay) */}
+                                    <div className="absolute inset-0 z-10 p-5 flex flex-col justify-between">
+                                        <div className="flex justify-between items-start">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 border border-white/10 bg-black/40 backdrop-blur-md flex items-center justify-center text-white/60 rounded-md">
+                                                    <Folder className="w-4 h-4 stroke-[1.5]" />
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider">
+                                                        * Destacado *
+                                                    </span>
+                                                    <span className="text-[10px] font-mono text-white/40 uppercase tracking-tighter">
+                                                        GRP-{String(group.groupId).padStart(4, '0')}
+                                                    </span>
+                                                </div>
+                                            </div>
 
-                                <div className="space-y-1">
-                                    <h3 className="text-lg font-mono font-bold text-white truncate uppercase tracking-tight group-hover:text-blueprint transition-colors">
-                                        {group.name}
-                                    </h3>
-                                    <div className="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider">
-                                        * Destacado *
+                                            {/* Tech Lines Top Right */}
+                                            <div className="relative w-8 h-8">
+                                                <div className="absolute top-0 right-0 w-2 h-[1px] bg-white/30" />
+                                                <div className="absolute top-0 right-0 w-[1px] h-2 bg-white/30" />
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-1 max-w-[80%]">
+                                            <h3 className="text-xl md:text-2xl font-mono font-black text-white truncate uppercase tracking-tighter group-hover:text-accent transition-colors drop-shadow-lg">
+                                                {group.name}
+                                            </h3>
+                                            <div className="flex items-center gap-2 text-[11px] font-mono">
+                                                <span className="text-white/40 uppercase">Total Items:</span>
+                                                <span className="text-white/80 font-bold bg-white/10 px-1.5 py-0.5 rounded">
+                                                    {String(group.totalCars).padStart(3, '0')}
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center justify-between pt-1 border-t border-blueprint/10 text-[12px] font-mono">
-                                        <span className="text-blueprint/20 truncate mr-2 uppercase">Cantidad:</span>
-                                        <span className="text-blueprint/60 flex-shrink-0">
-                                            [{String(group.totalCars).padStart(3, '0')} AUTOS]
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </Link>
-                    ))}
-                </div>
-            ) : (
-                <div className="text-center py-8 text-white/40 border border-dashed border-blueprint/10 rounded-xl bg-blueprint/[0.01]">
-                    <Folder className="w-12 h-12 mx-auto mb-2 opacity-30 text-blueprint" />
-                    <p className="text-sm font-mono uppercase tracking-wider">No hay grupos destacados</p>
-                    {isOwner && (
-                        <button
-                            onClick={() => navigate("/collection/group/new")}
-                            className="mt-3 px-4 py-2 text-xs font-mono border border-blueprint/30 text-blueprint/60 hover:bg-blueprint/10 transition-colors uppercase tracking-widest"
-                        >
-                            Crear mi primer grupo
-                        </button>
+                                </Link>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-8 text-white/40 border border-dashed border-blueprint/10 rounded-xl bg-blueprint/[0.01]">
+                            <Folder className="w-12 h-12 mx-auto mb-2 opacity-30 text-blueprint" />
+                            <p className="text-sm font-mono uppercase tracking-wider">No hay grupos destacados</p>
+                            {isOwner && (
+                                <button
+                                    onClick={() => navigate("/collection/group/new")}
+                                    className="mt-3 px-4 py-2 text-xs font-mono border border-blueprint/30 text-blueprint/60 hover:bg-blueprint/10 transition-colors uppercase tracking-widest"
+                                >
+                                    Crear mi primer grupo
+                                </button>
+                            )}
+                        </div>
                     )}
                 </div>
-            )}
-
+            </motion.div>
         </motion.section>
     );
 }
-
-

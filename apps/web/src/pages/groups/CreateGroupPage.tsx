@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -11,15 +11,17 @@ import {
     Car,
 } from "lucide-react";
 import PageHeader from "../../components/ui/PageHeader";
-import { createGroup, CreateGroupData } from "../../services/group.service";
+import { createGroup, listFeaturedGroups, CreateGroupData } from "../../services/group.service";
 import toast from "react-hot-toast";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigateBack } from "../../hooks/useNavigateBack";
+import SingleImageUploadWidget from "../../components/ui/SingleImageUploadWidget";
 
 interface GroupFormData {
     name: string;
     description: string;
     featured: boolean;
+    picture: string;
     cars: number[];
 }
 
@@ -30,11 +32,30 @@ export default function CreateGroupPage() {
         name: "",
         description: "",
         featured: false,
+        picture: "",
         cars: [],
     });
 
     const [errors, setErrors] = useState<Partial<Record<keyof GroupFormData, string>>>({});
     const [isLoading, setIsLoading] = useState(false);
+    const [hasMaxFeatured, setHasMaxFeatured] = useState(false);
+
+    useEffect(() => {
+        if (user?.username) {
+            checkFeaturedStatus();
+        }
+    }, [user?.username]);
+
+    const checkFeaturedStatus = async () => {
+        try {
+            const groups = await listFeaturedGroups(user!.username);
+            if (groups.length >= 4) {
+                setHasMaxFeatured(true);
+            }
+        } catch (error) {
+            console.error("Error checking featured status", error);
+        }
+    };
 
 
     const handleSubmit = async (e?: React.FormEvent) => {
@@ -58,6 +79,7 @@ export default function CreateGroupPage() {
             const data: CreateGroupData = {
                 name: formData.name,
                 description: formData.description || undefined,
+                picture: formData.picture || undefined,
                 featured: formData.featured,
                 cars: formData.cars,
             };
@@ -117,6 +139,14 @@ export default function CreateGroupPage() {
                         </div>
 
                         <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 md:p-6 space-y-5">
+                            {/* Cover Image Upload */}
+                            <div className="pb-5 border-b border-white/5">
+                                <SingleImageUploadWidget
+                                    value={formData.picture}
+                                    onChange={(val) => setFormData(prev => ({ ...prev, picture: val || "" }))}
+                                />
+                            </div>
+
                             <div>
                                 <label className="block text-accent uppercase tracking-widest text-[10px] font-bold mb-1.5 ml-1">
                                     Nombre del Grupo <span className="text-danger">*</span>
@@ -156,15 +186,29 @@ export default function CreateGroupPage() {
                             </div>
 
                             <div
-                                onClick={() => setFormData((prev) => ({ ...prev, featured: !prev.featured }))}
-                                className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all ${formData.featured ? "bg-accent/10 border-accent/50" : "bg-white/[0.02] border-white/5 hover:border-white/10"}`}
+                                onClick={() => {
+                                    if (!hasMaxFeatured) {
+                                        setFormData((prev) => ({ ...prev, featured: !prev.featured }));
+                                    }
+                                }}
+                                className={`flex items-center gap-4 p-4 rounded-xl border transition-all ${hasMaxFeatured
+                                        ? "bg-white/[0.01] border-white/5 opacity-50 cursor-not-allowed"
+                                        : formData.featured
+                                            ? "bg-accent/10 border-accent/50 cursor-pointer"
+                                            : "bg-white/[0.02] border-white/5 hover:border-white/10 cursor-pointer"
+                                    }`}
                             >
                                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${formData.featured ? "bg-accent text-white" : "bg-white/5 text-white/40"}`}>
                                     <Star className="w-5 h-5" />
                                 </div>
                                 <div className="flex-1">
                                     <p className="text-white font-medium">Grupo Destacado</p>
-                                    <p className="text-white/40 text-sm">Se mostrará en tu perfil público (máx 4)</p>
+                                    <p className="text-white/40 text-sm">
+                                        {hasMaxFeatured
+                                            ? "Has alcanzado el límite de 4 grupos destacados."
+                                            : "Se mostrará en tu perfil público (máx 4)"
+                                        }
+                                    </p>
                                 </div>
                                 <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all ${formData.featured ? "bg-accent border-accent" : "border-white/20"}`}>
                                     {formData.featured && <Check className="w-4 h-4 text-white" />}

@@ -75,7 +75,7 @@ export default function GroupsListPage() {
                 className="container mx-auto px-4 py-6"
             >
                 {groups.length > 0 ? (
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {groups.map((group, index) => (
                             <motion.div
                                 key={group.groupId}
@@ -85,67 +85,63 @@ export default function GroupsListPage() {
                             >
                                 <Link
                                     to={`/collection/${username}/group/${encodeURIComponent(group.name)}`}
-                                    className="blueprint-card block h-full group"
+                                    className="blueprint-card block relative overflow-hidden group aspect-[3/1] rounded-xl border border-white/5 bg-white/[0.02]"
                                 >
-                                    {/* Decorative Technical Lines */}
-                                    <div className="blueprint-line top-0 left-10 w-[1px] h-4" />
-                                    <div className="blueprint-line top-10 left-0 w-4 h-[1px]" />
-                                    <div className="blueprint-line bottom-0 right-10 w-[1px] h-4" />
-                                    <div className="blueprint-line bottom-10 right-0 w-4 h-[1px]" />
-
-                                    {/* Blueprint Stamp */}
-                                    {group.featured && (
-                                        <div className="blueprint-stamp">
-                                            SPEC: APPROVED
+                                    {/* Background Image - using crop-friendly aspect ratio */}
+                                    {group.picture && (
+                                        <div className="absolute inset-0 z-0">
+                                            <img
+                                                src={group.picture}
+                                                alt={group.name}
+                                                className="w-full h-full object-cover opacity-20 grayscale group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out"
+                                            />
+                                            <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent group-hover:via-black/30 transition-all duration-500" />
                                         </div>
                                     )}
 
-                                    <div className="p-6 flex flex-col h-full gap-6">
-                                        {/* Header Part */}
-                                        <div className="flex items-start justify-between">
-                                            <div className="relative">
-                                                <div className="w-12 h-12 border border-blueprint/30 flex items-center justify-center text-blueprint/40 relative">
-                                                    <Folder className="w-6 h-6 stroke-[1.5]" />
-                                                    {/* Dimension lines for icon */}
-                                                    <div className="absolute -left-2 top-0 bottom-0 w-[1px] bg-blueprint/20" />
-                                                    <div className="absolute -left-3 top-1/2 -translate-y-1/2 text-[8px] font-mono -rotate-90 origin-center text-blueprint/20">48mm</div>
+                                    {/* Technical Details (Overlay) */}
+                                    <div className="absolute inset-0 z-10 p-6 flex flex-col justify-between">
+                                        <div className="flex justify-between items-start">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-10 h-10 border border-white/10 bg-black/40 backdrop-blur-md flex items-center justify-center text-white/60 rounded-md relative group/icon">
+                                                    <Folder className="w-5 h-5 stroke-[1.5]" />
+                                                    <div className="absolute -inset-1 border border-white/5 scale-110 opacity-0 group-hover/icon:opacity-100 transition-opacity" />
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className={group.featured ? "text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider" : "text-[10px] font-mono text-white/30 uppercase tracking-wider"}>
+                                                        {group.featured ? "* DESTACADO *" : "STATUS: OK"}
+                                                    </span>
+                                                    <span className="text-[10px] font-mono text-white/40 uppercase tracking-tighter">
+                                                        REF: GRP-{String(group.groupId).padStart(4, '0')}
+                                                    </span>
                                                 </div>
                                             </div>
-                                            <div className="text-right font-mono">
-                                                <p className="text-[9px] text-blueprint/30 uppercase">Ref. Code</p>
-                                                <p className="text-[10px] text-blueprint/60 font-bold">GRP-{String(group.groupId).padStart(4, '0')}</p>
+
+                                            {/* Tech Lines Top Right */}
+                                            <div className="relative w-8 h-8 opacity-50">
+                                                <div className="absolute top-0 right-0 w-3 h-[1px] bg-white/50" />
+                                                <div className="absolute top-0 right-0 w-[1px] h-3 bg-white/50" />
                                             </div>
                                         </div>
 
-                                        {/* Main Content */}
-                                        <div className="flex-1 space-y-4">
-                                            <h3 className="text-xl md:text-2xl font-mono font-black text-white leading-tight break-words uppercase tracking-tighter group-hover:text-blueprint transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+                                        <div className="max-w-[85%]">
+                                            <h3 className="text-2xl md:text-3xl font-mono font-black text-white truncate uppercase tracking-tighter group-hover:text-accent transition-colors drop-shadow-lg mb-2">
                                                 {group.name}
                                             </h3>
 
-                                            <div className="space-y-1.5 pt-3 border-t border-blueprint/10">
-                                                <div className="flex justify-between items-center text-[10px] font-mono">
-                                                    <span className="text-blueprint/30">STATUS:</span>
-                                                    <span className={group.featured ? "text-sm text-emerald-400 font-bold" : "text-blueprint/60"}>
-                                                        {group.featured ? "DESTACADO" : "FUNCIONANDO"}
+                                            <div className="flex items-center gap-4 text-[11px] font-mono border-t border-white/10 pt-2 w-fit">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-white/40 uppercase">Total Items:</span>
+                                                    <span className="text-white/90 font-bold bg-white/10 px-2 py-0.5 rounded">
+                                                        {String(group.totalCars).padStart(3, '0')}
                                                     </span>
                                                 </div>
-                                                <div className="flex justify-between items-center text-[10px] font-mono">
-                                                    <span className="text-blueprint/30">CANTIDAD:</span>
-                                                    <span className="text-white/80 p-0.5 border border-blueprint/20 bg-blueprint/5">
-                                                        [ {String(group.totalCars).padStart(3, '0')} AUTOS ]
-                                                    </span>
+                                                <div className="w-[1px] h-3 bg-white/20" />
+                                                <div className="flex items-center gap-1 text-white/40 group-hover:text-accent/80 transition-colors">
+                                                    <span>VER DETALLES</span>
+                                                    <ChevronRight className="w-3 h-3" />
                                                 </div>
                                             </div>
-                                        </div>
-
-                                        {/* Footer Decorative */}
-                                        <div className="flex items-center justify-between pt-2 border-t border-blueprint/10 opacity-40 group-hover:opacity-100 transition-opacity">
-                                            <div className="flex gap-2">
-                                                <div className="w-10 h-[2px] bg-blueprint/20" />
-                                                <div className="w-3 h-[2px] bg-blueprint/20" />
-                                            </div>
-                                            <ChevronRight className="w-4 h-4 text-blueprint group-hover:translate-x-1 transition-transform" />
                                         </div>
                                     </div>
                                 </Link>
