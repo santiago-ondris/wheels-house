@@ -190,12 +190,15 @@ export const CarDetailPage = () => {
                         <h3 className="text-lg font-bold text-white mb-6 pb-2 border-b border-white/10">Especificaciones</h3>
 
                         <ul className="space-y-6">
-                            <InfoRow label="Marca" value={car.brand} />
-                            <InfoRow label="Color" value={car.color} />
-                            <InfoRow label="Series" value={car.series || "-"} />
-                            <InfoRow label="Fabricante" value={car.manufacturer} />
-                            <InfoRow label="Diseñador" value={car.designer || "-"} />
-                            <InfoRow label="Escala" value={car.scale} />
+                            {car.brand && <InfoRow label="Marca" value={car.brand} />}
+                            {car.name && <InfoRow label="Modelo" value={car.name} />}
+                            {car.color && <InfoRow label="Color" value={car.color} />}
+                            {car.series && <InfoRow label="Series" value={car.series} />}
+                            {car.manufacturer && <InfoRow label="Fabricante" value={car.manufacturer} />}
+                            {car.designer && <InfoRow label="Diseñador" value={car.designer} />}
+                            {car.scale && <InfoRow label="Escala" value={car.scale} />}
+                            {car.condition && <InfoRow label="Condición" value={car.condition} />}
+                            {car.country && <InfoRow label="País" value={car.country} />}
                             {car.rarity && <InfoRow label="Rareza" value={car.rarity} />}
                             {car.quality && <InfoRow label="Calidad" value={car.quality} />}
                             {car.variety && <InfoRow label="Variedad" value={car.variety} />}
