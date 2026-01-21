@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ExecutionContext } from '@nestjs/common';
 import { PassportStrategy, AuthGuard } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
@@ -57,7 +57,7 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
   }
 }
 
-// Guard for refresh token endpoint
+// Guard para el endpoint de refresh token
 @Injectable()
 export class JwtRefreshGuard extends AuthGuard('jwt-refresh') {
   handleRequest(err, user, info) {
@@ -65,5 +65,28 @@ export class JwtRefreshGuard extends AuthGuard('jwt-refresh') {
       throw err || new UnauthorizedException('Invalid or expired refresh token');
     }
     return user;
+  }
+}
+
+// Permite que la peticion sea anonima
+// Si el token es valido, req.user sera poblado; de lo contrario req.user sera undefined
+@Injectable()
+export class OptionalJwtAuthGuard extends AuthGuard('jwt') {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    try {
+      // Intentar autenticar
+      const result = await super.canActivate(context);
+      return result as boolean;
+    } catch (err) {
+      // Si falla la autenticación, permitir continuar sin usuario
+      console.log('OptionalJwtAuthGuard: no auth (allowing anonymous access)');
+      return true;
+    }
+  }
+
+  handleRequest(err, user, info) {
+    // No lanza error si el usuario no esta autenticado
+    // Solo retorna el usuario (que sera null si no esta autenticado)
+    return user || null;
   }
 }

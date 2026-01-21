@@ -20,6 +20,8 @@ import { ImportController } from './controllers/import.controller';
 import { ImportService } from './services/import.service';
 import { HealthController } from './controllers/health.controller';
 import { EmailService } from './services/email.service';
+import { WheelwordController } from './controllers/wheelword.controller';
+import { WheelwordService } from './services/wheelword.service';
 
 
 @Module({
@@ -37,7 +39,7 @@ import { EmailService } from './services/email.service';
       // Expiration set per token type in UserService
     }),
   ],
-  controllers: [UserController, CarController, UploadController, GroupController, StatsController, SearchHistoryController, ImportController, HealthController],
-  providers: [JwtStrategy, JwtRefreshStrategy, UserService, CarService, UploadService, GroupService, StatsService, SearchHistoryService, ImportService, EmailService],
+  controllers: [UserController, CarController, UploadController, GroupController, StatsController, SearchHistoryController, ImportController, HealthController, WheelwordController],
+  providers: [JwtStrategy, JwtRefreshStrategy, UserService, CarService, UploadService, GroupService, StatsService, SearchHistoryService, ImportService, EmailService, WheelwordService],
 })
 export class AppModule { }

@@ -27,6 +27,9 @@ export default function Navbar() {
             {isAuthenticated ? (
               <>
                 <div className="hidden md:flex items-center gap-6 mr-4">
+                  <Link to="/wheelword" className="text-white/70 hover:text-accent transition-colors">
+                    WheelWord
+                  </Link>
                   <Link to="/hall-of-fame" className="text-white/70 hover:text-white transition-colors">
                     Salón de la Fama
                   </Link>
@@ -55,6 +58,9 @@ export default function Navbar() {
             ) : (
               <>
                 <div className="hidden md:flex items-center gap-6">
+                  <Link to="/wheelword" className="text-white/70 hover:text-accent transition-colors mr-2">
+                    WheelWord
+                  </Link>
                   <Link to="/hall-of-fame" className="text-white/70 hover:text-white transition-colors mr-2">
                     Salón de la Fama
                   </Link>
