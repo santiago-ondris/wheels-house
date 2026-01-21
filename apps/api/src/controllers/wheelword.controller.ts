@@ -31,6 +31,7 @@ export class WheelwordController {
         @Body('sessionAttempts') sessionAttempts?: string[]
     ) {
         const userId = req.user?.userId || null;
+
         return await this.wheelwordService.submitGuess(
             guessData.guess,
             userId,

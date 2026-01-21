@@ -5,11 +5,11 @@ export class BaseUser {
     @IsNotEmpty()
     @IsString()
     username: string;
-    
+
     @IsNotEmpty()
     @IsString()
     email: string;
-    
+
     @Transform(({ value }) => value ?? '')
     @IsString()
     @IsOptional()
@@ -39,8 +39,8 @@ export class RegisterDTO extends BaseUser {
     @IsString()
     password: string;
 
-    constructor(username: string, email: string, firstName: string, lastName: string, 
-                password: string, picture: string = "", biography: string = "") {
+    constructor(username: string, email: string, firstName: string, lastName: string,
+        password: string, picture: string = "", biography: string = "") {
         super(username, email, firstName, lastName, picture, biography);
         this.password = password;
     }
@@ -49,8 +49,8 @@ export class RegisterDTO extends BaseUser {
 export class UserToDB extends BaseUser {
     hashedPassword: string;
 
-    constructor(username: string, email: string, firstName: string, lastName: string, 
-                hashedPassword: string, picture: string = "", biography: string = "") {
+    constructor(username: string, email: string, firstName: string, lastName: string,
+        hashedPassword: string, picture: string = "", biography: string = "") {
         super(username, email, firstName, lastName, picture, biography);
         this.hashedPassword = hashedPassword;
     }
@@ -81,9 +81,11 @@ export class LoginResponse {
 
 export class TokenData {
     username: string;
+    userId: number;
 
-    constructor(username: string) {
+    constructor(username: string, userId: number) {
         this.username = username;
+        this.userId = userId;
     }
 }
 
@@ -116,7 +118,7 @@ export class UpdatePasswordDTO {
     @IsNotEmpty()
     @IsString()
     oldPassword: string;
-    
+
     @IsNotEmpty()
     @IsString()
     newPassword: string;

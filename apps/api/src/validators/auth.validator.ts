@@ -18,6 +18,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   // After the token is validated, this method is called
   async validate(payload: TokenData) {
+    if (!payload.userId) {
+      throw new UnauthorizedException('Invalid token payload: missing userId');
+    }
     // Whatever you return here becomes available in req.user
     return payload;
   }
@@ -53,6 +56,9 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
     if (payload.tokenType !== 'refresh') {
       throw new UnauthorizedException('Invalid token type');
     }
+    if (!payload.userId) {
+      throw new UnauthorizedException('Invalid token payload: missing userId');
+    }
     return payload;
   }
 }
@@ -73,20 +79,25 @@ export class JwtRefreshGuard extends AuthGuard('jwt-refresh') {
 @Injectable()
 export class OptionalJwtAuthGuard extends AuthGuard('jwt') {
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    try {
-      // Intentar autenticar
-      const result = await super.canActivate(context);
-      return result as boolean;
-    } catch (err) {
-      // Si falla la autenticación, permitir continuar sin usuario
-      console.log('OptionalJwtAuthGuard: no auth (allowing anonymous access)');
+    const request = context.switchToHttp().getRequest();
+    const token = request.headers.authorization;
+
+    // Si no hay token en el header, permitir acceso anónimo directo
+    if (!token) {
       return true;
     }
+
+    // Si hay token, dejar que Passport lo valide
+    // Si es inválido/expirado, lanzará excepción (401), lo cual es correcto
+    // para que el frontend sepa que tiene que refrescar
+    return super.canActivate(context) as Promise<boolean>;
   }
 
   handleRequest(err, user, info) {
-    // No lanza error si el usuario no esta autenticado
-    // Solo retorna el usuario (que sera null si no esta autenticado)
-    return user || null;
+    // Si hay error (token inválido/expirado) y llegamos acá, lanzamos excepción
+    if (err || !user) {
+      throw err || new UnauthorizedException();
+    }
+    return user;
   }
 }
