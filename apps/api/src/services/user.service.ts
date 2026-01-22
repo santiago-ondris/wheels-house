@@ -57,12 +57,14 @@ export class UserService {
         // Payload for access token (short-lived)
         const accessPayload = {
             username: user.username,
+            userId: user.userId,
             tokenType: 'access',
         };
 
         // Payload for refresh token (long-lived)
         const refreshPayload = {
             username: user.username,
+            userId: user.userId,
             tokenType: 'refresh',
         };
 
@@ -76,8 +78,12 @@ export class UserService {
     }
 
     async refreshTokenService(username: string) {
+        // Necesitamos obtener el userId también
+        const user = await getUserFromUsername(username);
+
         const accessPayload = {
             username,
+            userId: user.userId,
             tokenType: 'access',
         };
 
