@@ -10,12 +10,13 @@ export class DailyGameResponseDTO {
 
 export class GuessFeedbackDTO {
     guess: string;
-    feedback: string[]; 
+    feedback: string[];
     isCorrect: boolean;
     attemptsUsed: number;
     gameOver: boolean;
     won: boolean;
     correctWord?: string; // Solo se envía si gameOver es true
+    stats?: WheelwordStatsDTO; 
 }
 
 export class GameStateDTO {

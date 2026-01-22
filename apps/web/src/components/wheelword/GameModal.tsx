@@ -115,10 +115,18 @@ function WinContent({
             {isAuthenticated && stats && <StatsSummary stats={stats} />}
 
             {!isAuthenticated && (
-                <div className="p-4 bg-accent/10 border border-accent/20 rounded-xl">
-                    <p className="text-accent text-sm font-mono">
-                        🏎️ Registrate para guardar tus rachas y estadísticas
-                    </p>
+                <div className="space-y-3">
+                    <div className="p-4 bg-accent/10 border border-accent/20 rounded-xl">
+                        <p className="text-accent text-sm font-mono">
+                            🏎️ Registrate para guardar tus rachas y estadísticas
+                        </p>
+                    </div>
+                    <Link
+                        to="/register"
+                        className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-accent hover:bg-accent/80 text-white font-bold rounded-xl transition-colors"
+                    >
+                        Registrarse
+                    </Link>
                 </div>
             )}
 
@@ -134,7 +142,7 @@ function WinContent({
             )}
 
             <p className="text-white/40 text-xs font-mono uppercase">
-                Volvé mañana para un nuevo desafío
+                Volve mañana para no perder tu racha!
             </p>
         </div>
     );
@@ -178,10 +186,18 @@ function LoseContent({
             {isAuthenticated && stats && <StatsSummary stats={stats} />}
 
             {!isAuthenticated && (
-                <div className="p-4 bg-accent/10 border border-accent/20 rounded-xl">
-                    <p className="text-accent text-sm font-mono">
-                        🏎️ Registrate para guardar tus rachas y estadísticas
-                    </p>
+                <div className="space-y-3">
+                    <div className="p-4 bg-accent/10 border border-accent/20 rounded-xl">
+                        <p className="text-accent text-sm font-mono">
+                            🏎️ Registrate para guardar tus rachas y estadísticas
+                        </p>
+                    </div>
+                    <Link
+                        to="/register"
+                        className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-accent hover:bg-accent/80 text-white font-bold rounded-xl transition-colors"
+                    >
+                        Registrarse
+                    </Link>
                 </div>
             )}
 
@@ -237,9 +253,9 @@ function StatsContent({
 function StatsSummary({ stats }: { stats: WheelwordStats }) {
     return (
         <div className="grid grid-cols-4 gap-2">
-            <StatBox label="Jugadas" value={stats.gamesPlayed} />
-            <StatBox label="% Victorias" value={`${stats.winPercentage}%`} />
-            <StatBox label="Racha" value={stats.currentStreak} icon={<Flame className="w-3 h-3 text-orange-400" />} />
+            <StatBox label="Jugados" value={stats.gamesPlayed} />
+            <StatBox label="Victorias" value={`${stats.winPercentage}%`} />
+            <StatBox label="Victorias" value={stats.currentStreak} icon={<Flame className="w-3 h-3 text-orange-400" />} />
             <StatBox label="Máx" value={stats.maxStreak} />
         </div>
     );

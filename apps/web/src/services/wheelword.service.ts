@@ -15,6 +15,7 @@ export interface GuessFeedback {
     gameOver: boolean;
     won: boolean;
     correctWord?: string;
+    stats?: WheelwordStats;
 }
 
 export interface GameState {

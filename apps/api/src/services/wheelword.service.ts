@@ -322,6 +322,12 @@ export class WheelwordService implements OnModuleInit {
             }
         }
 
+        // Si terminó el juego y hay usuario, obtener stats actualizados para incluir en respuesta
+        let updatedStats: WheelwordStatsDTO | undefined = undefined;
+        if (gameOver && userId) {
+            updatedStats = await this.getUserStats(userId);
+        }
+
         return {
             guess: normalizedGuess,
             feedback,
@@ -330,6 +336,7 @@ export class WheelwordService implements OnModuleInit {
             gameOver,
             won: isCorrect,
             correctWord: gameOver ? correctWord : undefined,
+            stats: updatedStats,
         };
     }
 
@@ -385,22 +392,27 @@ export class WheelwordService implements OnModuleInit {
         const stats = userData[0];
         const todayUTC = this.getUTCDateString();
 
-        // Calcular nueva racha
+        // Calcular nueva racha (victorias seguidas por día)
         let newStreak = stats.currentStreak || 0;
         if (won) {
             const daysSinceLast = stats.lastPlayedDate
                 ? this.daysBetween(stats.lastPlayedDate, todayUTC)
                 : null;
 
-            if (daysSinceLast === null || daysSinceLast <= 2) {
-                // Día consecutivo o 1 día de gracia
+            if (daysSinceLast === null) {
+                // Primera vez jugando
+                newStreak = 1;
+            } else if (daysSinceLast <= 1) {
+                // Día consecutivo (hoy o ayer)
                 newStreak = newStreak + 1;
             } else {
-                // Pasaron 3+ días: resetear
+                // Pasó más de 1 día sin jugar: resetear
                 newStreak = 1;
             }
+        } else {
+            // Perdió: resetear racha a 0
+            newStreak = 0;
         }
-        // Si perdió: mantener racha (no suma pero no resetea)
 
         const newMaxStreak = Math.max(stats.maxStreak || 0, newStreak);
 

@@ -162,8 +162,11 @@ export default function WheelWordPage() {
 
             // Si terminó el juego
             if (result.gameOver) {
-                // Cargar stats si está autenticado
-                if (isAuthenticated) {
+                // Usar stats de la respuesta (ya actualizados por el backend)
+                if (result.stats) {
+                    setStats(result.stats);
+                } else if (isAuthenticated) {
+                    // Fallback: cargar stats si no vinieron en respuesta
                     const userStats = await getUserStats();
                     setStats(userStats);
                 }
