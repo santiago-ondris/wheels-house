@@ -33,6 +33,7 @@ import EditWishlistPage from "../pages/wishlist/EditWishlistPage";
 import OnboardingPage from "../pages/onboarding/OnboardingPage";
 import ImportCarsPage from "../pages/import/ImportCarsPage";
 import AboutUsPage from "../pages/AboutUsPage";
+import WheelWordPage from "../pages/wheelword/WheelWordPage";
 
 // Components
 import ProtectedRoute from "../components/auth/ProtectedRoute";
@@ -119,6 +120,7 @@ export const router = createBrowserRouter([
             { path: "about", element: <AboutUsPage /> },
             { path: "contact", element: <ContactPage /> },
             { path: "roadmap", element: <RoadmapPage /> },
+            { path: "wheelword", element: <WheelWordPage /> },
 
             // Catch-all
             { path: "*", element: <NotFoundPage /> },
