@@ -255,8 +255,8 @@ function StatsSummary({ stats }: { stats: WheelwordStats }) {
         <div className="grid grid-cols-4 gap-2">
             <StatBox label="Jugados" value={stats.gamesPlayed} />
             <StatBox label="Victorias" value={`${stats.winPercentage}%`} />
-            <StatBox label="Victorias" value={stats.currentStreak} icon={<Flame className="w-3 h-3 text-orange-400" />} />
-            <StatBox label="Máx" value={stats.maxStreak} />
+            <StatBox label="Racha Actual" value={stats.currentStreak} icon={<Flame className="w-3 h-3 text-orange-400" />} />
+            <StatBox label="Máx. Racha" value={stats.maxStreak} />
         </div>
     );
 }
