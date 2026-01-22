@@ -146,11 +146,23 @@ export class WheelwordService implements OnModuleInit {
             .limit(WORDS_COOLDOWN);
         const recentWordIds = new Set(recentGames.map(g => g.gameWordId));
 
-        // Encontrar primera palabra no usada recientemente
-        let selectedWord = candidates.find(c => !recentWordIds.has(c.gameWordId));
-        if (!selectedWord) {
-            // Si todas fueron usadas recientemente, tomar la menos usada
-            selectedWord = candidates[0];
+        // Filtrar palabras no usadas recientemente
+        const eligibleWords = candidates.filter(c => !recentWordIds.has(c.gameWordId));
+
+        // Si hay palabras elegibles, seleccionar aleatoriamente entre las de menor uso
+        let selectedWord;
+        if (eligibleWords.length > 0) {
+            // Encontrar el mínimo timesUsed entre las elegibles
+            const minUsed = Math.min(...eligibleWords.map(w => w.timesUsed || 0));
+            // Filtrar solo las que tienen ese mínimo
+            const leastUsed = eligibleWords.filter(w => (w.timesUsed || 0) === minUsed);
+            // Seleccionar aleatoriamente
+            selectedWord = leastUsed[Math.floor(Math.random() * leastUsed.length)];
+        } else {
+            // Si todas fueron usadas recientemente, seleccionar aleatoriamente entre las de menor uso
+            const minUsed = Math.min(...candidates.map(w => w.timesUsed || 0));
+            const leastUsed = candidates.filter(w => (w.timesUsed || 0) === minUsed);
+            selectedWord = leastUsed[Math.floor(Math.random() * leastUsed.length)];
         }
 
         // Crear juego

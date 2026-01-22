@@ -7,6 +7,7 @@ interface GameGridProps {
     wordLength: number;
     maxAttempts?: number;
     gameOver: boolean;
+    shake?: boolean;
 }
 
 export default function GameGrid({
@@ -16,6 +17,7 @@ export default function GameGrid({
     wordLength,
     maxAttempts = 6,
     gameOver,
+    shake = false,
 }: GameGridProps) {
     const rows = [];
 
@@ -38,6 +40,7 @@ export default function GameGrid({
                 key="current"
                 currentGuess={currentGuess}
                 wordLength={wordLength}
+                shake={shake}
             />
         );
     }
@@ -100,13 +103,18 @@ function CompletedRow({ word, feedback, wordLength }: CompletedRowProps) {
 interface CurrentRowProps {
     currentGuess: string;
     wordLength: number;
+    shake?: boolean;
 }
 
-function CurrentRow({ currentGuess, wordLength }: CurrentRowProps) {
+function CurrentRow({ currentGuess, wordLength, shake }: CurrentRowProps) {
     const letters = currentGuess.split('');
 
     return (
-        <div className="flex gap-1.5 sm:gap-2 justify-center">
+        <motion.div
+            className="flex gap-1.5 sm:gap-2 justify-center"
+            animate={shake ? { x: [-10, 10, -10, 10, 0] } : {}}
+            transition={{ type: 'tween', duration: 0.4 }}
+        >
             {Array.from({ length: wordLength }).map((_, i) => {
                 const letter = letters[i] || '';
                 const hasLetter = letter !== '';
@@ -131,7 +139,7 @@ function CurrentRow({ currentGuess, wordLength }: CurrentRowProps) {
                     </motion.div>
                 );
             })}
-        </div>
+        </motion.div>
     );
 }
 

@@ -31,6 +31,7 @@ export default function WheelWordPage() {
     const [error, setError] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
     const [stats, setStats] = useState<WheelwordStats | null>(null);
+    const [shakeRow, setShakeRow] = useState(false);
 
     // Modal state
     const [modalType, setModalType] = useState<'win' | 'lose' | 'stats' | null>(null);
@@ -110,16 +111,38 @@ export default function WheelWordPage() {
         setCurrentGuess(prev => prev.slice(0, -1));
     }, []);
 
+    // Clear error after timeout
+    useEffect(() => {
+        if (error || shakeRow) {
+            const timer = setTimeout(() => {
+                setError(null);
+                setShakeRow(false);
+            }, 2000);
+            return () => clearTimeout(timer);
+        }
+    }, [error, shakeRow]);
+
     const handleSubmit = useCallback(async () => {
         if (!game || gameOver || submitting) return;
+
+        setError(null);
+        setShakeRow(false);
+
         if (currentGuess.length !== game.wordLength) {
-            // Shake animation podría ir acá
+            setShakeRow(true);
+            return;
+        }
+
+        // Validación local de duplicados
+        if (attempts.includes(currentGuess)) {
+            setShakeRow(true);
+            setError('Ya intentaste esta palabra');
+            setCurrentGuess(''); // Limpiar para que pueda escribir de nuevo
             return;
         }
 
         try {
             setSubmitting(true);
-            setError(null);
 
             const result = await submitGuess(currentGuess, attempts);
 
@@ -150,6 +173,8 @@ export default function WheelWordPage() {
                 }, 1500);
             }
         } catch (err: any) {
+            // Error de la API (ej: palabra inválida)
+            setShakeRow(true);
             setError(err.message || 'Error al enviar');
         } finally {
             setSubmitting(false);
@@ -247,32 +272,36 @@ export default function WheelWordPage() {
                     </div>
                 </motion.header>
 
-                {/* Error message */}
-                {error && (
+                <div className="relative">
+                    {error && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            className="absolute top-4 left-1/2 -translate-x-1/2 z-50
+                                       px-4 py-2 bg-white text-black font-bold text-sm
+                                       rounded-md shadow-lg"
+                        >
+                            {error}
+                        </motion.div>
+                    )}
+
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="p-3 bg-danger/20 border border-danger/30 rounded-lg text-center"
+                        transition={{ delay: 0.1 }}
+                        className="py-2 sm:py-4"
                     >
-                        <p className="text-danger text-sm font-mono">{error}</p>
+                        <GameGrid
+                            attempts={attempts}
+                            feedbacks={feedbacks}
+                            currentGuess={currentGuess}
+                            wordLength={game?.wordLength || 5}
+                            gameOver={gameOver}
+                            shake={shakeRow}
+                        />
                     </motion.div>
-                )}
-
-                {/* Game Grid */}
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.1 }}
-                    className="py-2 sm:py-4"
-                >
-                    <GameGrid
-                        attempts={attempts}
-                        feedbacks={feedbacks}
-                        currentGuess={currentGuess}
-                        wordLength={game?.wordLength || 5}
-                        gameOver={gameOver}
-                    />
-                </motion.div>
+                </div>
 
                 {/* Virtual Keyboard */}
                 <motion.div
