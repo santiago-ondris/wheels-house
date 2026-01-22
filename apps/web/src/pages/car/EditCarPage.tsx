@@ -336,6 +336,7 @@ export default function EditCarPage() {
                                     onChange={(value) => updateField("rarity", value)}
                                     placeholder="Seleccionar"
                                     icon={<Gem className="w-5 h-5" />}
+                                    clearable
                                 />
                                 <FieldSelector
                                     label="Calidad"
@@ -344,6 +345,7 @@ export default function EditCarPage() {
                                     onChange={(value) => updateField("quality", value)}
                                     placeholder="Seleccionar"
                                     icon={<Award className="w-5 h-5" />}
+                                    clearable
                                 />
                                 <FieldSelector
                                     label="Variedad"
@@ -352,6 +354,7 @@ export default function EditCarPage() {
                                     onChange={(value) => updateField("variety", value)}
                                     placeholder="Seleccionar"
                                     icon={<Layers className="w-5 h-5" />}
+                                    clearable
                                 />
                                 <FieldSelector
                                     label="Acabado"
@@ -360,6 +363,7 @@ export default function EditCarPage() {
                                     onChange={(value) => updateField("finish", value)}
                                     placeholder="Seleccionar"
                                     icon={<PaintBucket className="w-5 h-5" />}
+                                    clearable
                                 />
                             </div>
 

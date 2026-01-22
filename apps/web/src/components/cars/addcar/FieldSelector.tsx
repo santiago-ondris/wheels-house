@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, Check } from "lucide-react";
+import { ChevronDown, Check, X } from "lucide-react";
 import { Combobox, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import MobileBottomSheet from "../../ui/MobileBottomSheet";
@@ -13,6 +13,7 @@ interface FieldSelectorProps {
     icon?: React.ReactNode;
     error?: string;
     required?: boolean;
+    clearable?: boolean;
 }
 
 export default function FieldSelector({
@@ -24,6 +25,7 @@ export default function FieldSelector({
     icon,
     error,
     required = false,
+    clearable = false,
 }: FieldSelectorProps) {
     const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
     const [query, setQuery] = useState("");
@@ -39,6 +41,11 @@ export default function FieldSelector({
         if (newValue !== null) {
             onChange(newValue);
         }
+    };
+
+    const handleClear = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onChange("");
     };
 
     return (
@@ -58,7 +65,17 @@ export default function FieldSelector({
                         {value || placeholder}
                     </span>
                 </div>
-                <ChevronDown className="w-4 h-4 text-white/40" />
+                <div className="flex items-center gap-2">
+                    {clearable && value && (
+                        <span
+                            onClick={handleClear}
+                            className="p-1 hover:bg-white/10 rounded-full transition-colors"
+                        >
+                            <X className="w-4 h-4 text-white/40" />
+                        </span>
+                    )}
+                    <ChevronDown className="w-4 h-4 text-white/40" />
+                </div>
             </button>
 
             <div className="hidden md:block">
@@ -71,14 +88,25 @@ export default function FieldSelector({
                                 </span>
                             )}
                             <Combobox.Input
-                                className={`w-full bg-input-bg border ${error ? "border-danger" : "border-white/5"} ${icon ? "pl-12" : "pl-4"} pr-12 py-3.5 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-base`}
+                                className={`w-full bg-input-bg border ${error ? "border-danger" : "border-white/5"} ${icon ? "pl-12" : "pl-4"} ${clearable && value ? "pr-20" : "pr-12"} py-3.5 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-base`}
                                 displayValue={(option: string) => option}
                                 onChange={(e) => setQuery(e.target.value)}
                                 placeholder={placeholder}
                             />
-                            <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-4">
-                                <ChevronDown className="w-5 h-5 text-white/40" aria-hidden="true" />
-                            </Combobox.Button>
+                            <div className="absolute inset-y-0 right-0 flex items-center pr-4 gap-1">
+                                {clearable && value && (
+                                    <button
+                                        type="button"
+                                        onClick={handleClear}
+                                        className="p-1 hover:bg-white/10 rounded-full transition-colors"
+                                    >
+                                        <X className="w-4 h-4 text-white/40" aria-hidden="true" />
+                                    </button>
+                                )}
+                                <Combobox.Button className="flex items-center">
+                                    <ChevronDown className="w-5 h-5 text-white/40" aria-hidden="true" />
+                                </Combobox.Button>
+                            </div>
                         </div>
 
                         <Transition
@@ -133,6 +161,7 @@ export default function FieldSelector({
                 value={value}
                 onChange={onChange}
                 icon={icon}
+                clearable={clearable}
             />
         </div>
     );

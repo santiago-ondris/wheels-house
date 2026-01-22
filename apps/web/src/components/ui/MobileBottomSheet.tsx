@@ -11,6 +11,7 @@ interface MobileBottomSheetProps {
     value: string;
     onChange: (value: string) => void;
     icon?: React.ReactNode;
+    clearable?: boolean;
 }
 
 export default function MobileBottomSheet({
@@ -21,6 +22,7 @@ export default function MobileBottomSheet({
     value,
     onChange,
     icon,
+    clearable = false,
 }: MobileBottomSheetProps) {
     const [searchQuery, setSearchQuery] = useState("");
     const [isExpanded, setIsExpanded] = useState(false);
@@ -40,6 +42,11 @@ export default function MobileBottomSheet({
 
     const handleSelect = (option: string) => {
         onChange(option);
+        onClose();
+    };
+
+    const handleClear = () => {
+        onChange("");
         onClose();
     };
 
@@ -99,13 +106,24 @@ export default function MobileBottomSheet({
                                             {title}
                                         </Dialog.Title>
                                     </div>
-                                    <button
-                                        type="button"
-                                        onClick={onClose}
-                                        className="p-2 text-white/40 hover:text-white transition-colors rounded-full hover:bg-white/5 active:scale-95"
-                                    >
-                                        <X className="w-5 h-5" />
-                                    </button>
+                                    <div className="flex items-center gap-2">
+                                        {clearable && value && (
+                                            <button
+                                                type="button"
+                                                onClick={handleClear}
+                                                className="px-3 py-1.5 text-sm text-white/60 hover:text-white transition-colors rounded-lg hover:bg-white/5 active:scale-95"
+                                            >
+                                                Limpiar
+                                            </button>
+                                        )}
+                                        <button
+                                            type="button"
+                                            onClick={onClose}
+                                            className="p-2 text-white/40 hover:text-white transition-colors rounded-full hover:bg-white/5 active:scale-95"
+                                        >
+                                            <X className="w-5 h-5" />
+                                        </button>
+                                    </div>
                                 </div>
 
                                 {/* Search Bar */}
