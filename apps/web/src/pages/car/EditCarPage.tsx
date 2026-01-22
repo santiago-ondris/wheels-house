@@ -82,7 +82,7 @@ export default function EditCarPage() {
                 scale: carData.scale,
                 manufacturer: carData.manufacturer,
                 condition: carData.condition || "Abierto",
-                country: carData.country || "",
+                country: carData.country || brandNationalities[carData.brand],
                 description: carData.description || "",
                 designer: carData.designer || "",
                 series: carData.series || "",
