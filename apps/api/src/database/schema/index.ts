@@ -17,5 +17,6 @@ export { group, groupedCar } from './group.schema';
 // WheelWord game domain
 export { gameWord, dailyGame, userGameAttempt } from './wheelword.schema';
 
-// Social domain (future - will be added when implementing social features)
-// export { feedEvent, userPost, userFollow, carLike, notification } from './social.schema';
+// Social domain
+export { feedEvent } from './social.schema';
+export type { FeedEventMetadata } from './social.schema';

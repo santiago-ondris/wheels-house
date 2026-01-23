@@ -1,63 +1,52 @@
-/**
- * Social Events - Event Type Definitions
- * 
- * These are the events that drive the social system.
- * When actions happen (car added, user followed, etc.), events are emitted
- * which are then consumed by subscribers to create feed entries, notifications, etc.
- */
-
 export const EVENTS = {
     // ==================== Car Events ====================
-    /** Emitted when a user adds a new car to their collection */
+    /** Se emite cuando un usuario agrega un auto a su coleccion */
     CAR_ADDED: 'car.added',
-    /** Emitted when a user updates a car's information */
+    /** Se emite cuando un usuario actualiza un auto de su coleccion */
     CAR_UPDATED: 'car.updated',
-    /** Emitted when a user deletes a car from their collection */
+    /** Se emite cuando un usuario elimina un auto de su coleccion */
     CAR_DELETED: 'car.deleted',
 
     // ==================== Wishlist Events ====================
-    /** Emitted when a user adds an item to their wishlist */
+    /** Se emite cuando un usuario agrega un auto a su lista de deseos */
     WISHLIST_ITEM_ADDED: 'wishlist.item_added',
-    /** Emitted when a user marks a wishlist item as achieved (moved to collection) */
+    /** Se emite cuando un usuario marca un auto de su lista de deseos como logrado (movido a coleccion) */
     WISHLIST_ITEM_ACHIEVED: 'wishlist.item_achieved',
 
     // ==================== Group Events ====================
-    /** Emitted when a user creates a new group */
+    /** Se emite cuando un usuario crea un nuevo grupo */
     GROUP_CREATED: 'group.created',
 
     // ==================== Social Events ====================
-    /** Emitted when a user follows another user */
+    /** Se emite cuando un usuario sigue a otro usuario */
     USER_FOLLOWED: 'user.followed',
-    /** Emitted when a user unfollows another user */
+    /** Se emite cuando un usuario deja de seguir a otro usuario */
     USER_UNFOLLOWED: 'user.unfollowed',
-    /** Emitted when a user likes a car */
+    /** Se emite cuando un usuario le da like a un auto */
     CAR_LIKED: 'car.liked',
-    /** Emitted when a user unlikes a car */
+    /** Se emite cuando un usuario le quita like a un auto */
     CAR_UNLIKED: 'car.unliked',
 
     // ==================== Post Events ====================
-    /** Emitted when a user creates a search or offer post */
+    /** Se emite cuando un usuario crea un post de busqueda o oferta */
     POST_CREATED: 'post.created',
-    /** Emitted when a user marks a post as resolved */
+    /** Se emite cuando un usuario marca un post como resuelto */
     POST_RESOLVED: 'post.resolved',
-    /** Emitted when a post expires automatically */
+    /** Se emite cuando un post expira automaticamente */
     POST_EXPIRED: 'post.expired',
 
     // ==================== Milestone Events ====================
-    /** Emitted when a user reaches a collection milestone (50, 100, 250, etc.) */
+    /** Se emite cuando un usuario alcanza un hito en su coleccion (50, 100, 250, etc.) */
     MILESTONE_REACHED: 'milestone.reached',
 
     // ==================== Moderation Events ====================
-    /** Emitted when content is reported by a user */
+    /** Se emite cuando un usuario reporta contenido */
     CONTENT_REPORTED: 'content.reported',
-    /** Emitted when a report threshold is reached for content */
+    /** Se emite cuando se alcanza un umbral de reportes para contenido */
     REPORT_THRESHOLD_REACHED: 'report.threshold_reached',
 } as const;
 
-/** Type-safe event names */
 export type EventName = typeof EVENTS[keyof typeof EVENTS];
-
-// ==================== Event Payload Interfaces ====================
 
 export interface CarAddedPayload {
     userId: number;
