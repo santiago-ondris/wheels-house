@@ -52,6 +52,7 @@ export interface CarAddedPayload {
     userId: number;
     carId: number;
     carName: string;
+    carImage?: string;
     isFromWishlist?: boolean;
 }
 
@@ -69,12 +70,14 @@ export interface WishlistItemAchievedPayload {
     userId: number;
     carId: number;
     carName: string;
+    carImage?: string;
 }
 
 export interface GroupCreatedPayload {
     userId: number;
     groupId: number;
     groupName: string;
+    groupImage?: string;
     carCount: number;
 }
 

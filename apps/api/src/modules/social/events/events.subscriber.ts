@@ -33,7 +33,11 @@ export class EventsSubscriber {
             type: 'car_added',
             userId: payload.userId,
             carId: payload.carId,
-            metadata: { carName: payload.carName, isFromWishlist: payload.isFromWishlist }
+            metadata: {
+                carName: payload.carName,
+                carImage: payload.carImage,
+                isFromWishlist: payload.isFromWishlist
+            }
         });
     }
 
@@ -47,7 +51,10 @@ export class EventsSubscriber {
             type: 'wishlist_achieved',
             userId: payload.userId,
             carId: payload.carId,
-            metadata: { carName: payload.carName }
+            metadata: {
+                carName: payload.carName,
+                carImage: payload.carImage
+            }
         });
     }
 
@@ -63,7 +70,11 @@ export class EventsSubscriber {
                 type: 'group_created',
                 userId: payload.userId,
                 groupId: payload.groupId,
-                metadata: { groupName: payload.groupName, carCount: payload.carCount }
+                metadata: {
+                    groupName: payload.groupName,
+                    groupImage: payload.groupImage,
+                    carCount: payload.carCount
+                }
             });
         }
     }

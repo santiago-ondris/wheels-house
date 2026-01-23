@@ -33,8 +33,10 @@ export const feedEvent = pgTable("feedEvent", {
 // Type para los valores de metadata
 export interface FeedEventMetadata {
     carName?: string;
+    carImage?: string;
     milestone?: number;
     groupName?: string;
+    groupImage?: string;
     carCount?: number;
     isFromWishlist?: boolean;
 }

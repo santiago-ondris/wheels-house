@@ -29,9 +29,16 @@ export default function FeedList({ tab }: FeedListProps) {
 
     if (isLoading) {
         return (
-            <div className="flex flex-col gap-px bg-zinc-800/20">
-                {[...Array(5)].map((_, i) => (
-                    <div key={i} className="h-24 w-full bg-zinc-900/50 animate-pulse border border-zinc-800" />
+            <div className="flex flex-col divide-y divide-white/5">
+                {[...Array(8)].map((_, i) => (
+                    <div key={i} className="flex p-4 animate-pulse">
+                        <div className="w-10 h-10 rounded-full bg-zinc-900 mr-3" />
+                        <div className="flex-1 space-y-3">
+                            <div className="h-2 w-24 bg-zinc-900 rounded" />
+                            <div className="h-4 w-48 bg-zinc-900 rounded" />
+                            <div className="h-20 w-full bg-zinc-900/50 rounded" />
+                        </div>
+                    </div>
                 ))}
             </div>
         );
@@ -39,15 +46,15 @@ export default function FeedList({ tab }: FeedListProps) {
 
     if (isError) {
         return (
-            <div className="p-10 text-center border border-zinc-800 bg-zinc-900/20">
-                <p className="text-zinc-500 font-mono text-sm uppercase tracking-widest mb-4">
-                    [ ERROR_CARGANDO_ACTIVIDAD ]
+            <div className="p-16 text-center">
+                <p className="text-zinc-600 font-mono text-[10px] uppercase tracking-widest mb-6">
+                    [ Error de sincronización ]
                 </p>
                 <button
                     onClick={() => refetch()}
-                    className="px-4 py-2 bg-zinc-800 text-white text-xs font-mono uppercase tracking-widest hover:bg-zinc-700 transition-colors"
+                    className="px-6 py-2 border border-zinc-800 text-zinc-400 text-[10px] font-mono hover:text-white hover:border-zinc-600 transition-all uppercase tracking-widest"
                 >
-                    REINTENTAR
+                    Reintentar
                 </button>
             </div>
         );
@@ -57,35 +64,35 @@ export default function FeedList({ tab }: FeedListProps) {
 
     if (allItems.length === 0) {
         return (
-            <div className="p-20 text-center border border-zinc-800 bg-zinc-900/20">
-                <p className="text-zinc-500 font-mono text-sm uppercase tracking-[0.2em]">
-                    -- SIN ACTIVIDAD RECIENTE --
+            <div className="p-24 text-center">
+                <p className="text-zinc-500 font-mono text-[11px] uppercase tracking-[0.4em]">
+                    Silencio en el Mural
                 </p>
-                {tab === 'following' && (
-                    <p className="text-zinc-600 font-mono text-[10px] mt-2 tracking-widest uppercase">
-                        SEGUÍ A OTROS COLECCIONISTAS PARA VER SUS NOVEDADES
-                    </p>
-                )}
+                <p className="text-zinc-700 font-mono text-[9px] mt-4 tracking-widest uppercase max-w-xs mx-auto leading-relaxed">
+                    {tab === 'following'
+                        ? "Aún no sigues a nadie. Explora la red para encontrar otros coleccionistas."
+                        : "No hay actividad reciente. ¡Sé el primero en compartir algo!"
+                    }
+                </p>
             </div>
         );
     }
 
     return (
-        <div className="flex flex-col gap-px bg-zinc-800/20">
+        <div className="flex flex-col divide-y divide-white/5 bg-transparent">
             {allItems.map((item) => (
                 <FeedItem key={item.id} item={item} />
             ))}
 
-            <div ref={ref} className="h-10 flex items-center justify-center p-8">
-                {isFetchingNextPage && (
-                    <div className="flex items-center gap-3 text-zinc-500 font-mono text-[10px] tracking-[0.3em] uppercase">
-                        <Loader2 className="w-4 h-4 animate-spin text-accent" />
-                        CARGANDO_MÁS
+            <div ref={ref} className="h-24 flex items-center justify-center border-t border-white/5">
+                {isFetchingNextPage ? (
+                    <div className="flex items-center gap-3 text-zinc-600 font-mono text-[9px] tracking-[0.4em] uppercase">
+                        <Loader2 className="w-3 h-3 animate-spin text-accent" />
+                        Actualizando...
                     </div>
-                )}
-                {!hasNextPage && allItems.length > 0 && (
-                    <div className="text-zinc-600/40 font-mono text-[10px] tracking-[0.5em] uppercase">
-                        [ FIN_DE_LA_ACTIVIDAD ]
+                ) : !hasNextPage && allItems.length > 0 && (
+                    <div className="text-zinc-800 font-mono text-[9px] tracking-[0.5em] uppercase">
+                        Fin de transmisión
                     </div>
                 )}
             </div>

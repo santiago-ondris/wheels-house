@@ -546,54 +546,38 @@ if (milestone) {
 **Archivo creado:**
 - `apps/web/src/services/social.service.ts` ✅
 - `apps/web/src/hooks/useSocialFeed.ts` ✅
-    const response = await apiClient.get('/feed', { params });
-    return response.data;
-  }
-};
 ```
 
 ### Frontend - Feed UI
 
 **Mini-objetivos:**
 
-- [ ] Crear página `FeedPage.tsx`
-- [ ] Implementar `FeedTabs` component (Explorar / Siguiendo / Búsquedas)
-- [ ] Implementar `FeedFilters` component (Todo / Autos / Logros / Wishlist)
-- [ ] Implementar `FeedList` component con mapeo de items
-- [ ] Implementar `FeedItem` component con variantes:
-  - `CarAddedItem`
-  - `MilestoneItem`
-  - `WishlistAchievedItem`
-- [ ] Implementar hook `useFeed(tab, filter)`
-- [ ] Implementar hook `useFeedInfiniteScroll(tab, filter)`
-- [ ] Integrar infinite scroll con `IntersectionObserver`
-- [ ] Implementar loading states
-- [ ] Implementar empty states
+- [x] Crear página `CommunityPage.tsx` ✅
+- [x] Implementar `FeedTabs` (dentro de `CommunityPage`) ✅
+- [x] Implementar `FeedList` component con mapeo de items ✅
+- [x] Implementar `FeedItem` component con variantes dinámicas ✅
+- [x] Implementar hook `useSocialFeed` (Infinite Scroll integrado) ✅
+- [x] Integrar infinite scroll con `IntersectionObserver` ✅
+- [x] Implementar loading states (Skeletons) ✅
+- [x] Implementar empty states ✅
 
 **Archivos a crear:**
-- `apps/web/src/features/social/pages/FeedPage.tsx`
-- `apps/web/src/features/social/components/feed/FeedTabs.tsx`
-- `apps/web/src/features/social/components/feed/FeedFilters.tsx`
-- `apps/web/src/features/social/components/feed/FeedList.tsx`
-- `apps/web/src/features/social/components/feed/FeedItem.tsx`
-- `apps/web/src/features/social/components/feed/CarAddedItem.tsx`
-- `apps/web/src/features/social/components/feed/MilestoneItem.tsx`
-- `apps/web/src/features/social/components/feed/WishlistAchievedItem.tsx`
-- `apps/web/src/features/social/components/feed/EmptyFeedState.tsx`
-- `apps/web/src/features/social/hooks/useFeed.ts`
-- `apps/web/src/features/social/hooks/useFeedInfiniteScroll.ts`
+- `apps/web/src/pages/social/CommunityPage.tsx` ✅
+- `apps/web/src/components/social/FeedList.tsx` ✅
+- `apps/web/src/components/social/FeedItem.tsx` ✅
+- `apps/web/src/hooks/useSocialFeed.ts` ✅
 
 ### Frontend - Routing
 
 **Mini-objetivos:**
 
-- [ ] Agregar ruta `/feed` en router principal
-- [ ] Agregar link en navegación principal
-- [ ] Considerar hacer `/feed` la home para usuarios autenticados
+- [x] Agregar ruta `/community` en router principal ✅
+- [x] Agregar link en `Navbar.tsx` ✅
+- [ ] Considerar hacer `/community` la home para usuarios autenticados
 
-**Archivos a modificar:**
-- `apps/web/src/App.tsx` (o archivo de router)
-- `apps/web/src/shared/components/layout/Navigation.tsx`
+**Archivos modificados:**
+- `apps/web/src/routes/router.tsx` ✅
+- `apps/web/src/components/Navbar.tsx` ✅
 
 ### Testing Sprint 1
 
@@ -611,13 +595,13 @@ if (milestone) {
 
 **Criterios de completitud:**
 
-- [ ] Usuario puede navegar a `/feed`
-- [ ] Ve actividad reciente de todos los usuarios
-- [ ] Puede cambiar entre tabs (aunque "Siguiendo" esté vacío aún)
-- [ ] Puede aplicar filtros
-- [ ] Infinite scroll carga más items
-- [ ] Click en item de auto lleva a detalle
-- [ ] Click en avatar lleva a perfil
+- [x] Usuario puede navegar a `/community` ✅
+- [x] Ve actividad reciente de todos los usuarios ✅
+- [x] Puede cambiar entre tabs (Global / Siguiendo) ✅
+- [/] Puede aplicar filtros (Implementado en backend, pendiente UI de filtros avanzada)
+- [x] Infinite scroll carga más items ✅
+- [x] Click en item de auto lleva a detalle ✅
+- [x] Click en avatar lleva a perfil ✅
 
 ---
 
