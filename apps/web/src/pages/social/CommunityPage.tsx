@@ -1,22 +1,35 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { Filter } from "lucide-react";
 import FeedList from "../../components/social/FeedList";
 import LeftSidebar from "../../components/social/LeftSidebar";
 import RightSidebar from "../../components/social/RightSidebar";
+import MobileFeedFilters from "../../components/social/MobileFeedFilters";
 
 export default function CommunityPage() {
     const [activeTab, setActiveTab] = useState<'explore' | 'following'>('explore');
     const [selectedType, setSelectedType] = useState<string>('all');
     const [selectedUser, setSelectedUser] = useState<{ userId: number, username: string } | null>(null);
+    const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
     return (
         <div className="min-h-screen bg-[#050505]">
             {/* Ultra Minimalist Header - Integrated with page background */}
             <div className="sticky top-0 z-30 bg-[#050505]/80 backdrop-blur-md border-b border-white/5">
                 <div className="max-w-2xl mx-auto px-4 lg:px-0 flex items-center justify-between h-14">
-                    <h1 className="text-sm font-black text-white uppercase tracking-[0.2em]">
-                        Comunidad
-                    </h1>
+                    <div className="flex items-center gap-2">
+                        <h1 className="text-sm font-black text-white uppercase tracking-[0.2em]">
+                            Comunidad
+                        </h1>
+                        {/* Mobile Filter Toggle */}
+                        <button 
+                            onClick={() => setIsFiltersOpen(true)}
+                            className="lg:hidden p-2 text-zinc-500 hover:text-white transition-colors"
+                            aria-label="Abrir filtros"
+                        >
+                            <Filter className={`w-4 h-4 ${selectedType !== 'all' || selectedUser ? 'text-accent' : ''}`} />
+                        </button>
+                    </div>
 
                     {/* Compact Tabs */}
                     <div className="flex h-full">
@@ -43,6 +56,15 @@ export default function CommunityPage() {
                     </div>
                 </div>
             </div>
+
+            <MobileFeedFilters 
+                isOpen={isFiltersOpen}
+                onClose={() => setIsFiltersOpen(false)}
+                activeType={selectedType}
+                setSelectedType={setSelectedType}
+                selectedUser={selectedUser}
+                setSelectedUser={setSelectedUser}
+            />
 
             {/* Main Layout Container */}
             <div className="max-w-[1400px] mx-auto px-4 lg:px-6">
