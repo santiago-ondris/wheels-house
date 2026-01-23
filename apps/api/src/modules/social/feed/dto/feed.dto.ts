@@ -2,7 +2,8 @@ export class FeedQueryDto {
     tab?: 'explore' | 'following';
     page?: string; // Viene como string de query params
     limit?: string; // Viene como string de query params
-    filter?: 'all' | 'cars' | 'milestones' | 'wishlist';
+    type?: 'car_added' | 'milestone_reached' | 'wishlist_achieved' | 'group_created';
+    targetUserId?: string; // Viene como string de query params
 }
 
 export interface FeedItemDto {

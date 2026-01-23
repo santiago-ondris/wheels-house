@@ -25,6 +25,8 @@ export interface FeedQueryParams {
     tab?: 'explore' | 'following';
     page?: number;
     limit?: number;
+    type?: string;
+    targetUserId?: number;
 }
 
 /**
@@ -43,6 +45,14 @@ export const getFeed = async (params: FeedQueryParams = {}): Promise<FeedRespons
         page: page.toString(),
         limit: limit.toString(),
     });
+
+    if (params.type && params.type !== 'all') {
+        queryParams.append('type', params.type);
+    }
+
+    if (params.targetUserId) {
+        queryParams.append('targetUserId', params.targetUserId.toString());
+    }
 
     return await apiRequest<FeedResponse>(`/feed?${queryParams.toString()}`);
 };

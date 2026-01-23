@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import FeedList from "../../components/social/FeedList";
+import LeftSidebar from "../../components/social/LeftSidebar";
+import RightSidebar from "../../components/social/RightSidebar";
 
 export default function CommunityPage() {
     const [activeTab, setActiveTab] = useState<'explore' | 'following'>('explore');
+    const [selectedType, setSelectedType] = useState<string>('all');
+    const [selectedUser, setSelectedUser] = useState<{ userId: number, username: string } | null>(null);
 
     return (
         <div className="min-h-screen bg-[#050505]">
@@ -40,10 +44,36 @@ export default function CommunityPage() {
                 </div>
             </div>
 
-            {/* Feed Area - Centralized Column */}
-            <main className="max-w-2xl mx-auto border-x border-white/5 min-h-screen">
-                <FeedList tab={activeTab} />
-            </main>
+            {/* Main Layout Container */}
+            <div className="max-w-[1400px] mx-auto px-4 lg:px-6">
+                <div className="flex justify-center gap-8">
+                    {/* Sidebar Izquierdo - Visible desde XL (1280px) */}
+                    <div className="hidden xl:block w-[280px] shrink-0">
+                        <LeftSidebar />
+                    </div>
+
+                    {/* Feed Area - Centralized Column */}
+                    <main className="w-full max-w-2xl border-x border-white/5 min-h-screen">
+                        <FeedList 
+                            tab={activeTab} 
+                            filters={{ 
+                                type: selectedType !== 'all' ? selectedType : undefined,
+                                targetUserId: selectedUser?.userId 
+                            }} 
+                        />
+                    </main>
+
+                    {/* Sidebar Derecho - Visible desde LG (1024px) */}
+                    <div className="hidden lg:block w-[280px] shrink-0">
+                        <RightSidebar 
+                            activeType={selectedType}
+                            setSelectedType={setSelectedType}
+                            selectedUser={selectedUser}
+                            setSelectedUser={setSelectedUser}
+                        />
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

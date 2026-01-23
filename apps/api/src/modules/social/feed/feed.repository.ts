@@ -81,6 +81,10 @@ export async function getFeedGlobal(options: FeedQueryOptions = {}): Promise<Fee
         conditions.push(eq(feedEvent.type, type));
     }
 
+    if (options.targetUserId) {
+        conditions.push(eq(feedEvent.userId, options.targetUserId));
+    }
+
     const events = await db
         .select({
             feedEventId: feedEvent.feedEventId,
@@ -135,6 +139,10 @@ export async function getFeedFollowing(
 
     if (type) {
         conditions.push(eq(feedEvent.type, type));
+    }
+
+    if (options.targetUserId) {
+        conditions.push(eq(feedEvent.userId, options.targetUserId));
     }
 
     const events = await db
@@ -213,6 +221,10 @@ export async function countFeedEvents(options: FeedQueryOptions = {}): Promise<n
 
     if (type) {
         conditions.push(eq(feedEvent.type, type));
+    }
+
+    if (options.targetUserId) {
+        conditions.push(eq(feedEvent.userId, options.targetUserId));
     }
 
     const result = await db

@@ -22,14 +22,16 @@ export class FeedController {
         const page = parseInt(query.page || '0', 10);
         const limit = parseInt(query.limit || '20', 10);
         const tab = query.tab || 'explore';
+        const type = query.type;
+        const targetUserId = query.targetUserId ? parseInt(query.targetUserId, 10) : undefined;
 
         let result: { items: FeedEventWithUser[]; hasMore: boolean };
 
         if (tab === 'following' && req.user) {
-            result = await this.feedService.getFeedFollowing(req.user.userId, page, limit);
+            result = await this.feedService.getFeedFollowing(req.user.userId, page, limit, { type, targetUserId });
         } else {
             // Default to explore (global)
-            result = await this.feedService.getFeedGlobal(page, limit);
+            result = await this.feedService.getFeedGlobal(page, limit, { type, targetUserId });
         }
 
         // Map to DTO

@@ -1,7 +1,9 @@
 # Wheels House - Sistema Social: Especificación Completa
+
 # PARTE 1 DE 3: Contexto, Visión, Definición y Features (Sprints 1-2)
 
 ## Índice General
+
 - **PARTE 1**: Contexto, Visión, Definición del Producto, Features del Sistema Social, Sprints 1-2
 - **PARTE 2**: Features (Sprints 3-5), Arquitectura y Estructura
 - **PARTE 3**: Experiencia de Usuario, Roadmap Completo, Apéndices
@@ -23,6 +25,7 @@ El producto carece de un **loop de retención**. Una vez que el usuario completa
 **Wheels House evoluciona de "Notion para colecciones" a "producto social para coleccionistas".**
 
 El objetivo es crear interconectividad entre usuarios que genere razones para volver diariamente:
+
 - Ver qué autos consiguió la comunidad
 - Recibir validación social por las propias adquisiciones
 - Descubrir coleccionistas con gustos similares
@@ -54,17 +57,18 @@ Una **plataforma social especializada para coleccionistas de vehículos a escala
 
 ### Diferenciadores vs Competencia
 
-| Aspecto | Instagram/Facebook | Wheels House |
-|---------|-------------------|--------------|
-| Contenido | Mezclado con otros temas | 100% coleccionismo de vehículos |
-| Organización | Posts temporales, búsqueda difícil | Colección permanente + feed temporal |
-| Búsquedas | Se pierden en stories/comments | Feed dedicado con expiración automática |
-| Gestión | No existe | Sistema completo de grupos y estadísticas |
-| Descubrimiento | Algoritmo opaco | Cronológico + filtros claros |
+| Aspecto        | Instagram/Facebook                 | Wheels House                              |
+| -------------- | ---------------------------------- | ----------------------------------------- |
+| Contenido      | Mezclado con otros temas           | 100% coleccionismo de vehículos           |
+| Organización   | Posts temporales, búsqueda difícil | Colección permanente + feed temporal      |
+| Búsquedas      | Se pierden en stories/comments     | Feed dedicado con expiración automática   |
+| Gestión        | No existe                          | Sistema completo de grupos y estadísticas |
+| Descubrimiento | Algoritmo opaco                    | Cronológico + filtros claros              |
 
 ### Usuario Target
 
 **Coleccionista activo de die-cast vehicles** que:
+
 - Tiene 50+ vehículos en su colección (o aspira a tenerlos)
 - Participa en grupos de Facebook/Reddit/Instagram
 - Busca activamente piezas específicas para completar sets
@@ -72,7 +76,7 @@ Una **plataforma social especializada para coleccionistas de vehículos a escala
 - Valora conectar con coleccionistas de gustos similares
 - Considera intercambios o compras ocasionales
 
-**Mercado inicial**: Hispanohablantes 
+**Mercado inicial**: Hispanohablantes
 **Expansión futura**: Global con internacionalización
 
 ---
@@ -82,6 +86,7 @@ Una **plataforma social especializada para coleccionistas de vehículos a escala
 ### 1. Feed de Actividad
 
 #### Propósito
+
 Crear sensación de "comunidad viva" donde los usuarios vean que hay movimiento constante, generando FOMO (fear of missing out) y razones para volver diariamente.
 
 #### Tipos de Eventos en Feed
@@ -89,24 +94,28 @@ Crear sensación de "comunidad viva" donde los usuarios vean que hay movimiento 
 ##### Eventos Pasivos (Actividad de colección)
 
 **Auto agregado**
+
 - Trigger: Usuario sube nuevo auto a su colección
 - Visualización: Card con foto del auto y atributos del mismo
 - Interacción: Click lleva a detalle del auto en perfil del usuario
 - Puede recibir likes
 
 **Milestone alcanzado**
+
 - Trigger: Usuario llega a 50, 100, 250, 500, 1000 autos
 - Visualización: Mensaje de celebración con emoji 🎉
 - Interacción: Click lleva a colección completa del usuario
 - Puede recibir likes
 
 **Wishlist conseguido**
+
 - Trigger: Usuario marca item de wishlist como "conseguido"
 - Visualización: Badge especial "✓ Wishlist" + foto del auto
 - Interacción: Click lleva a detalle del auto
 - Puede recibir likes
 
 **Grupo creado**
+
 - Trigger: Usuario crea nuevo grupo con 5+ autos
 - Visualización: Nombre del grupo + preview de primeros 3 autos
 - Interacción: Click lleva a vista del grupo (si es público)
@@ -115,6 +124,7 @@ Crear sensación de "comunidad viva" donde los usuarios vean que hay movimiento 
 ##### Eventos Activos (Posts de usuario)
 
 **Búsqueda activa**
+
 - Trigger: Usuario crea post "Estoy buscando X"
 - Contenido:
   - Descripción libre: "Ferrari F40 roja"
@@ -127,6 +137,7 @@ Crear sensación de "comunidad viva" donde los usuarios vean que hay movimiento 
 - Usuario puede marcar como "Resuelto" o eliminar antes
 
 **Oferta disponible**
+
 - Trigger: Usuario crea post "Tengo para ofrecer/vender X"
 - Contenido:
   - Auto específico de su colección
@@ -140,10 +151,15 @@ Crear sensación de "comunidad viva" donde los usuarios vean que hay movimiento 
 #### Estructura Técnica
 
 **Tabla: `feed_events`**
+
 ```typescript
 interface FeedEvent {
   id: string;
-  type: 'car_added' | 'milestone_reached' | 'wishlist_achieved' | 'group_created';
+  type:
+    | "car_added"
+    | "milestone_reached"
+    | "wishlist_achieved"
+    | "group_created";
   user_id: string;
   car_id?: string;
   group_id?: string;
@@ -157,11 +173,12 @@ interface FeedEvent {
 ```
 
 **Tabla: `user_posts`**
+
 ```typescript
 interface UserPost {
   id: string;
   user_id: string;
-  type: 'search' | 'offer';
+  type: "search" | "offer";
   car_id?: string; // Para ofertas, referencia al auto
   target_description?: string; // Para búsquedas, texto libre
   target_criteria?: {
@@ -175,7 +192,7 @@ interface UserPost {
   contact_method?: string; // Info de contacto específica del post
   available_for_trade?: boolean;
   available_for_sale?: boolean;
-  status: 'active' | 'resolved' | 'expired';
+  status: "active" | "resolved" | "expired";
   expires_at: Date;
   created_at: Date;
   updated_at: Date;
@@ -185,6 +202,7 @@ interface UserPost {
 #### Sistema de Eventos (Event-Driven)
 
 **EventEmitter Pattern**
+
 ```typescript
 // Cuando usuario agrega auto
 carsService.create() {
@@ -204,6 +222,7 @@ handleCarAdded({ userId, carId }) {
 ```
 
 **Ventajas**:
+
 - Desacoplamiento: `cars` module no conoce `feed` module
 - Escalabilidad: Fácil agregar más listeners
 - Extensibilidad: Nuevos eventos sin modificar código existente
@@ -211,19 +230,23 @@ handleCarAdded({ userId, carId }) {
 #### Reglas de Feed
 
 **Ventana temporal**: 30 días
+
 - Eventos más antiguos no se muestran (pero no se borran)
 - Balance entre "feed fresco" y "suficiente contenido"
 
 **Ordenamiento**: Cronológico inverso (más reciente primero)
+
 - Sin algoritmo de "relevancia" inicialmente
 - Simple, predecible, transparente
 
 **Paginación**: 20 items por carga
+
 - Scroll infinito
 - Indicador de loading al cargar más
 - "Fin del feed" cuando no hay más items
 
-**Cache**: 
+**Cache**:
+
 - Feed global: 5 minutos
 - Feed personalizado: 2 minutos
 - Evita queries constantes a BD
@@ -231,18 +254,21 @@ handleCarAdded({ userId, carId }) {
 #### Tabs del Feed
 
 **Tab 1: Explorar (Global)**
+
 - Muestra actividad de TODOS los usuarios
 - Incluye todos los tipos de eventos
 - Objetivo: Descubrimiento, sentir comunidad activa
 - Usuarios nuevos ven esto primero
 
 **Tab 2: Siguiendo (Personalizado)**
+
 - Muestra SOLO actividad de usuarios que sigo
 - Mismo tipo de eventos
 - Empty state si no sigo a nadie: "Empieza a seguir coleccionistas desde Explorar"
 - Objetivo: Feed relevante, reducción de ruido
 
 **Tab 3: Búsquedas y Ofertas**
+
 - Muestra SOLO posts de tipo `search` y `offer`
 - De todos los usuarios (no filtrado por follows)
 - Solo posts activos (no expirados)
@@ -260,20 +286,24 @@ Filtros implementados client-side inicialmente (menos complejidad backend).
 #### Consideraciones y Casos Edge
 
 **¿Qué pasa si no hay actividad?**
+
 - Empty state claro: "No hay actividad reciente. Sé el primero en agregar autos"
 - En fase inicial, esto incentiva a los primeros usuarios a generar contenido
 
 **¿Usuarios pueden publicar spam?**
+
 - Límites de posts: máximo 5 activos simultáneos, 3 nuevos por día
 - Cooldown: 1 hora entre posts del mismo tipo
 - Sistema de reportes (ver sección de Moderación)
 
 **¿Usuarios publican búsquedas y nunca las cierran?**
+
 - Expiración automática a 30 días
 - Notificación 3 días antes: "Tu búsqueda expira pronto, ¿la extiendes?"
 - Usuario puede marcar como "Resuelta" manualmente
 
 **¿Cómo se mantiene el feed interesante con pocos usuarios?**
+
 - Con 10 usuarios activos subiendo 2 autos/día = 20 eventos/día
 - Con 50 usuarios activos = 100 eventos/día
 - Con 100+ usuarios = feed siempre tiene contenido fresco
@@ -284,17 +314,20 @@ Filtros implementados client-side inicialmente (menos complejidad backend).
 ### 2. Sistema de Follow (Seguimiento)
 
 #### Propósito
+
 Permitir que usuarios "marquen" coleccionistas de interés para personalizar su feed y construir su red.
 
 #### Decisión: Follow Unidireccional (Twitter-style)
 
 **Por qué NO amistad bidireccional (Facebook-style):**
+
 - **Alta fricción**: Requiere esperar aprobación
 - **Crecimiento lento**: Red tarda en formarse
 - **Complejidad**: 3 estados (pending/accepted/rejected) + UI para gestionar solicitudes
 - **Valor retrasado**: Usuario no ve contenido hasta que acepten
 
 **Por qué Follow unidireccional:**
+
 - **Fricción baja**: Click = sigo inmediatamente
 - **Crecimiento rápido**: Construir red de 10-20 usuarios en minutos
 - **Simplicidad**: 2 estados (follow/unfollow)
@@ -303,12 +336,13 @@ Permitir que usuarios "marquen" coleccionistas de interés para personalizar su 
 #### Estructura Técnica
 
 **Tabla: `user_follows`**
+
 ```typescript
 interface UserFollow {
   follower_id: string; // Quien sigue (FK users.id)
   followed_id: string; // A quien sigue (FK users.id)
   created_at: Date;
-  
+
   // Constraints
   UNIQUE(follower_id, followed_id) // No duplicados
   CHECK(follower_id != followed_id) // No auto-follow
@@ -316,12 +350,14 @@ interface UserFollow {
 ```
 
 **Contadores denormalizados en `users`:**
+
 ```sql
 ALTER TABLE users ADD COLUMN followers_count INT DEFAULT 0;
 ALTER TABLE users ADD COLUMN following_count INT DEFAULT 0;
 ```
 
 **¿Por qué denormalizar?**
+
 - Mostrar contadores sin COUNT() query costoso
 - Actualizar con triggers o en service layer
 - Trade-off: Pequeño overhead en write por MUCHO beneficio en read
@@ -339,16 +375,19 @@ GET    /api/users/me/following        // Mis follows (shortcut)
 #### Límites y Restricciones
 
 **Límite de follows**: 1,000 usuarios
+
 - Suficiente para caso de uso real
 - Previene abusos (seguir a todos para conseguir follow-back)
 - Similar a límites de plataformas establecidas
 
 **Throttling**: 10 follows por minuto
+
 - Previene bots
 - Permite crecimiento orgánico rápido
 - Si usuario llega al límite, cooldown de 5 minutos
 
 **NO implementar (al menos inicialmente)**:
+
 - Sugerencias de "a quién seguir"
 - Badge de "mutual follow"
 - Bloqueo de usuarios (puede venir después si hay acoso)
@@ -357,6 +396,7 @@ GET    /api/users/me/following        // Mis follows (shortcut)
 #### Integración con Feed
 
 Una vez implementado follow:
+
 - Tab "Siguiendo" en feed se activa
 - Query filtra eventos por `user_id IN (list_of_followed_users)`
 - Cache separado para feed personalizado
@@ -364,6 +404,7 @@ Una vez implementado follow:
 #### UX de Follow Button
 
 **Estado: No sigo**
+
 ```tsx
 <Button onClick={follow} variant="primary">
   Seguir
@@ -371,6 +412,7 @@ Una vez implementado follow:
 ```
 
 **Estado: Sigo**
+
 ```tsx
 <Button onClick={unfollow} variant="secondary">
   Siguiendo
@@ -378,6 +420,7 @@ Una vez implementado follow:
 ```
 
 **Con contador:**
+
 ```tsx
 <FollowButton>
   <ButtonPrimary onClick={follow}>Seguir</ButtonPrimary>
@@ -388,23 +431,26 @@ Una vez implementado follow:
 #### Visualización de Listas
 
 **En perfil propio:**
+
 - Stats clickeables: "123 seguidores" → `/profile/followers`
 - Stats clickeables: "45 siguiendo" → `/profile/following`
 
 **En perfil ajeno:**
+
 - Mismo patrón
 - Badge adicional: "Te sigue" si el usuario visitado me sigue
 
 **Página de lista:**
+
 ```tsx
 <UserListPage>
   <Header>
     <BackButton />
     <Title>Seguidores</Title>
   </Header>
-  
+
   <UserList>
-    {users.map(user => (
+    {users.map((user) => (
       <UserCard>
         <Avatar />
         <UserInfo>
@@ -422,19 +468,23 @@ Una vez implementado follow:
 #### Consideraciones y Casos Edge
 
 **¿Usuario A sigue a Usuario B, luego B se da de baja?**
+
 - Cascade delete: row en `user_follows` se borra automáticamente
 - Decrementar contador de A
 
 **¿Usuario sigue/unsigue rápidamente (spam)?**
+
 - Throttling lo previene
 - Si detectas patrón (10+ follow/unfollow en hora): temporal ban de feature
 
 **¿Cómo descubro a quién seguir?**
+
 - Desde feed global, veo actividad interesante → clickeo perfil → sigo
 - Desde listas de followers/following de otros usuarios
 - Feature futura: "Sugerencias" basadas en autos en común
 
 **¿Puedo ver followers/following de otros usuarios?**
+
 - SÍ, son públicos
 - Ayuda a descubrimiento: "A quién sigue Juan que colecciona Ferraris?"
 
@@ -455,6 +505,7 @@ Una vez implementado follow:
 - [x] Definir tipos de eventos en `event-types.ts`
 
 **Archivos a crear:**
+
 - `apps/api/src/modules/social/social.module.ts` ✅
 - `apps/api/src/modules/social/events/events.service.ts` ✅
 - `apps/api/src/modules/social/events/events.subscriber.ts` ✅
@@ -483,6 +534,7 @@ Una vez implementado follow:
   - `GET /feed?tab=following&page=0&limit=20` ✅
 
 **Archivos a crear:**
+
 - `apps/api/src/modules/social/feed/entities/feed-event.entity.ts` ✅ (social.schema.ts)
 - `apps/api/src/database/migrations/XXXX_create_feed_events.ts` ✅
 - `apps/api/src/modules/social/feed/feed.repository.ts` ✅
@@ -500,6 +552,7 @@ Una vez implementado follow:
 - [x] Testear: crear auto → verificar que aparece en feed ✅
 
 **Archivos a modificar:**
+
 - `apps/api/src/services/car.service.ts` ✅
 - `apps/api/src/modules/social/events/events.subscriber.ts` ✅
 
@@ -514,13 +567,14 @@ Una vez implementado follow:
 - [x] En subscriber, escuchar `milestone.reached` y crear feed event ✅
 
 **Lógica a implementar:**
+
 ```typescript
 // Pseudocódigo
 const userCarsCount = await this.carsRepo.countByUserId(userId);
 const milestones = [50, 100, 250, 500, 1000];
-const milestone = milestones.find(m => userCarsCount === m);
+const milestone = milestones.find((m) => userCarsCount === m);
 if (milestone) {
-  this.eventEmitter.emit('milestone.reached', { userId, milestone });
+  this.eventEmitter.emit("milestone.reached", { userId, milestone });
 }
 ```
 
@@ -533,6 +587,7 @@ if (milestone) {
 - [x] En subscriber, escuchar y crear feed event ✅
 
 **Archivos a modificar:**
+
 - `apps/api/src/services/car.service.ts` ✅ (contiene la lógica de wishlist achieved)
 
 ### Frontend - API Client
@@ -544,9 +599,11 @@ if (milestone) {
 - [x] Configurar React Query hooks (`useSocialFeed`) ✅
 
 **Archivo creado:**
+
 - `apps/web/src/services/social.service.ts` ✅
 - `apps/web/src/hooks/useSocialFeed.ts` ✅
-```
+
+````
 
 ### Frontend - Feed UI
 
@@ -711,7 +768,7 @@ interface FollowButtonProps {
 
 export const FollowButton: React.FC<FollowButtonProps> = ({...}) => {
   const { follow, unfollow, isLoading } = useFollow(userId);
-  
+
   const handleClick = () => {
     if (isFollowing) {
       unfollow();
@@ -719,9 +776,9 @@ export const FollowButton: React.FC<FollowButtonProps> = ({...}) => {
       follow();
     }
   };
-  
+
   return (
-    <Button 
+    <Button
       onClick={handleClick}
       variant={isFollowing ? 'secondary' : 'primary'}
       loading={isLoading}
@@ -730,7 +787,7 @@ export const FollowButton: React.FC<FollowButtonProps> = ({...}) => {
     </Button>
   );
 };
-```
+````
 
 ### Frontend - Followers/Following Lists
 
@@ -744,6 +801,7 @@ export const FollowButton: React.FC<FollowButtonProps> = ({...}) => {
 - [ ] Agregar paginación (infinite scroll o "Load more")
 
 **Archivos a crear:**
+
 - `apps/web/src/features/social/pages/FollowersPage.tsx`
 - `apps/web/src/features/social/pages/FollowingPage.tsx`
 - `apps/web/src/features/social/components/follow/UserCard.tsx`
@@ -759,6 +817,7 @@ export const FollowButton: React.FC<FollowButtonProps> = ({...}) => {
 - [ ] Mostrar badge "Te sigue" si el usuario visitado me sigue
 
 **Archivos a modificar:**
+
 - Componente de perfil existente
 
 ### Frontend - Feed Integration
@@ -800,38 +859,39 @@ export const FollowButton: React.FC<FollowButtonProps> = ({...}) => {
 **FIN DE PARTE 1**
 
 export const EVENTS = {
-  // Cars
-  CAR_ADDED: 'car.added',
-  CAR_UPDATED: 'car.updated',
-  CAR_DELETED: 'car.deleted',
-  
-  // Wishlist
-  WISHLIST_ITEM_ADDED: 'wishlist.item_added',
-  WISHLIST_ITEM_ACHIEVED: 'wishlist.item_achieved',
-  
-  // Groups
-  GROUP_CREATED: 'group.created',
-  
-  // Social
-  USER_FOLLOWED: 'user.followed',
-  USER_UNFOLLOWED: 'user.unfollowed',
-  CAR_LIKED: 'car.liked',
-  CAR_UNLIKED: 'car.unliked',
-  
-  // Posts
-  POST_CREATED: 'post.created',
-  POST_RESOLVED: 'post.resolved',
-  POST_EXPIRED: 'post.expired',
-  
-  // Milestones
-  MILESTONE_REACHED: 'milestone.reached',
-  
-  // Reports
-  CONTENT_REPORTED: 'content.reported',
-  REPORT_THRESHOLD_REACHED: 'report.threshold_reached',
+// Cars
+CAR_ADDED: 'car.added',
+CAR_UPDATED: 'car.updated',
+CAR_DELETED: 'car.deleted',
+
+// Wishlist
+WISHLIST_ITEM_ADDED: 'wishlist.item_added',
+WISHLIST_ITEM_ACHIEVED: 'wishlist.item_achieved',
+
+// Groups
+GROUP_CREATED: 'group.created',
+
+// Social
+USER_FOLLOWED: 'user.followed',
+USER_UNFOLLOWED: 'user.unfollowed',
+CAR_LIKED: 'car.liked',
+CAR_UNLIKED: 'car.unliked',
+
+// Posts
+POST_CREATED: 'post.created',
+POST_RESOLVED: 'post.resolved',
+POST_EXPIRED: 'post.expired',
+
+// Milestones
+MILESTONE_REACHED: 'milestone.reached',
+
+// Reports
+CONTENT_REPORTED: 'content.reported',
+REPORT_THRESHOLD_REACHED: 'report.threshold_reached',
 } as const;
 
 # Wheels House - Sistema Social: Especificación Completa
+
 # PARTE 3 DE 3: Experiencia de Usuario, Post-Launch y Apéndices
 
 ## Experiencia de Usuario
@@ -904,6 +964,7 @@ export const EVENTS = {
 **Día 15-30 - Retención**
 
 Usuario ahora:
+
 - Entra 2-3 veces por semana
 - Revisa Tab "Siguiendo" → ve qué consiguieron sus follows
 - Da likes regularmente
@@ -959,20 +1020,16 @@ Usuario ahora:
 
 ```tsx
 <Header>
-  <Logo onClick={() => navigate('/')} />
-  
+  <Logo onClick={() => navigate("/")} />
+
   <Nav>
     <NavItem to="/feed" active={isActive}>
       🌍 Explorar
     </NavItem>
-    <NavItem to="/profile/collection">
-      📦 Mi Colección
-    </NavItem>
-    <NavItem to="/profile/wishlist">
-      ⭐ Wishlist
-    </NavItem>
+    <NavItem to="/profile/collection">📦 Mi Colección</NavItem>
+    <NavItem to="/profile/wishlist">⭐ Wishlist</NavItem>
   </Nav>
-  
+
   <UserActions>
     <NotificationBell />
     <UserMenu>
@@ -1002,6 +1059,7 @@ Usuario ahora:
 **Adaptaciones mobile:**
 
 **Header mobile:**
+
 ```tsx
 <HeaderMobile>
   <Logo />
@@ -1022,12 +1080,14 @@ Usuario ahora:
 ```
 
 **Feed mobile:**
+
 - Cards full-width (no grid)
 - Imágenes ocupan ancho completo
 - Texto legible (16px mínimo)
 - Botones táctiles (44px mínimo de altura)
 
 **Tabs mobile:**
+
 - Swipeable tabs (gesto de swipe para cambiar)
 - Indicador de tab activo claro
 
@@ -1082,55 +1142,59 @@ Usuario ahora:
 <FeedPage>
   {/* Tabs principales */}
   <FeedTabs>
-    <Tab active={activeTab === 'explore'} onClick={() => setTab('explore')}>
+    <Tab active={activeTab === "explore"} onClick={() => setTab("explore")}>
       🌍 Explorar
     </Tab>
-    
-    <Tab active={activeTab === 'following'} onClick={() => setTab('following')}>
+
+    <Tab active={activeTab === "following"} onClick={() => setTab("following")}>
       👥 Siguiendo
       {followingCount > 0 && <Badge>{followingCount}</Badge>}
     </Tab>
-    
-    <Tab active={activeTab === 'posts'} onClick={() => setTab('posts')}>
+
+    <Tab active={activeTab === "posts"} onClick={() => setTab("posts")}>
       💬 Búsquedas y ofertas
     </Tab>
   </FeedTabs>
 
   {/* Filtros secundarios (solo en Explorar y Siguiendo) */}
-  <FeedFilters show={activeTab !== 'posts'}>
-    <FilterChip active={filter === 'all'} onClick={() => setFilter('all')}>
+  <FeedFilters show={activeTab !== "posts"}>
+    <FilterChip active={filter === "all"} onClick={() => setFilter("all")}>
       Todo
     </FilterChip>
-    
-    <FilterChip active={filter === 'cars'} onClick={() => setFilter('cars')}>
+
+    <FilterChip active={filter === "cars"} onClick={() => setFilter("cars")}>
       Autos agregados
     </FilterChip>
-    
-    <FilterChip active={filter === 'milestones'} onClick={() => setFilter('milestones')}>
+
+    <FilterChip
+      active={filter === "milestones"}
+      onClick={() => setFilter("milestones")}
+    >
       Logros
     </FilterChip>
-    
-    <FilterChip active={filter === 'wishlist'} onClick={() => setFilter('wishlist')}>
+
+    <FilterChip
+      active={filter === "wishlist"}
+      onClick={() => setFilter("wishlist")}
+    >
       Wishlist conseguidos
     </FilterChip>
   </FeedFilters>
 
   {/* Contenido del feed */}
   <FeedContent>
-    {activeTab === 'following' && followingCount === 0 && (
+    {activeTab === "following" && followingCount === 0 && (
       <EmptyState>
         <Icon>👥</Icon>
         <Title>No sigues a nadie aún</Title>
         <Description>
           Empieza a seguir coleccionistas desde la pestaña Explorar
         </Description>
-        <Button onClick={() => setTab('explore')}>
-          Explorar comunidad
-        </Button>
+        <Button onClick={() => setTab("explore")}>Explorar comunidad</Button>
       </EmptyState>
     )}
 
-    {feedItems.length === 0 && activeTab !== 'following' && (
+    {feedItems.length === 0 && activeTab !== "following" && (
       <EmptyState>
         <Icon>🏜️</Icon>
         <Title>No hay actividad reciente</Title>
@@ -1140,17 +1204,14 @@ Usuario ahora:
 
     {/* Feed items con scroll infinito */}
     <FeedList>
-      {feedItems.map(item => (
+      {feedItems.map((item) => (
         <FeedItem key={item.id} item={item} />
       ))}
-      
-      <InfiniteScrollTrigger 
-        onVisible={loadMoreItems}
-        loading={isLoading}
-      />
-      
+
+      <InfiniteScrollTrigger onVisible={loadMoreItems} loading={isLoading} />
+
       {isLoading && <LoadingSpinner />}
-      
+
       {!hasMore && feedItems.length > 0 && (
         <EndMessage>Has visto toda la actividad reciente</EndMessage>
       )}
@@ -1158,7 +1219,7 @@ Usuario ahora:
   </FeedContent>
 
   {/* FAB para crear post (solo en tab "posts") */}
-  {activeTab === 'posts' && (
+  {activeTab === "posts" && (
     <FloatingActionButton onClick={openCreatePostModal}>
       + Crear búsqueda/oferta
     </FloatingActionButton>
@@ -1263,17 +1324,20 @@ Una vez completados los sprints 1-5 y lanzado el producto, estas son mejoras que
 ## Métricas de Éxito Post-Launch
 
 ### Semana 1
+
 - [ ] 50+ usuarios registrados
 - [ ] 500+ autos agregados
 - [ ] 100+ eventos en feed diarios
 
 ### Mes 1
+
 - [ ] Retención semanal 30%+
 - [ ] 10+ posts de búsqueda/oferta activos
 - [ ] 50+ follows creados
 - [ ] 200+ likes dados
 
 ### Mes 3
+
 - [ ] Retención semanal 40%+
 - [ ] DAU/MAU ratio > 0.2
 - [ ] 5+ intercambios exitosos facilitados
@@ -1284,12 +1348,14 @@ Una vez completados los sprints 1-5 y lanzado el producto, estas son mejoras que
 ## Criterios para Considerar Monetización
 
 ### NO monetizar hasta:
+
 - [ ] 500+ usuarios activos mensuales
 - [ ] Retención semanal consistente 40%+
 - [ ] Usuarios usan la plataforma sin incentivos
 - [ ] Hay evidencia de valor tangible generado (intercambios exitosos)
 
 ### Opciones de monetización cuando llegue el momento:
+
 - Plan free limitado (3 posts activos, 500 follows)
 - Plan premium ($5-10/mes): posts ilimitados, sin expiración, destacados, analytics
 - Sponsorships de tiendas (publicar stock sin límites)
@@ -1326,45 +1392,52 @@ Una vez completados los sprints 1-5 y lanzado el producto, estas son mejoras que
 ### Pre-Launch (Antes de beta con amigos)
 
 **Backend:**
-- [X] Todas las migraciones ejecutadas en producción
-- [X] Variables de entorno configuradas (Cloudinary, Resend, DB)
-- [X] CORS configurado correctamente
+
+- [x] Todas las migraciones ejecutadas en producción
+- [x] Variables de entorno configuradas (Cloudinary, Resend, DB)
+- [x] CORS configurado correctamente
 - [ ] Rate limiting activado
-- [X] Logging configurado (Sentry o similar)
-- [X] Health check endpoint funciona
+- [x] Logging configurado (Sentry o similar)
+- [x] Health check endpoint funciona
 
 **Frontend:**
-- [X] Variables de entorno de producción configuradas
+
+- [x] Variables de entorno de producción configuradas
 - [ ] Analytics configurado (opcional: Google Analytics, Plausible)
 - [ ] Error boundary implementado
 - [ ] Meta tags SEO configurados
-- [X] Favicon y app icons listos
+- [x] Favicon y app icons listos
 
 **Legal:**
+
 - [ ] Términos de servicio publicados
 - [ ] Política de privacidad publicada
 - [ ] Disclaimer en posts de búsqueda/oferta
 
 **Infraestructura:**
-- [X] Dominio configurado
-- [X] SSL certificado activo
-- [X] Vercel deployment funciona
-- [X] Railway deployment funciona
+
+- [x] Dominio configurado
+- [x] SSL certificado activo
+- [x] Vercel deployment funciona
+- [x] Railway deployment funciona
 - [ ] Backups automáticos de BD configurados
 
 ### Post-Launch (Después de beta)
 
 **Monitoreo:**
+
 - [ ] Configurar alertas de downtime
 - [ ] Configurar alertas de errores críticos
 - [ ] Dashboard de métricas clave (usuarios, eventos, posts)
 
 **Comunicación:**
+
 - [ ] Email de contacto configurado
 - [ ] Formulario de feedback en app
 - [ ] Canal para reportar bugs
 
 **Marketing:**
+
 - [ ] Landing page optimizada
 - [ ] Screenshots actualizados
 - [ ] Video demo (opcional)
@@ -1377,11 +1450,13 @@ Una vez completados los sprints 1-5 y lanzado el producto, estas son mejoras que
 ### Problema: Feed no carga
 
 **Diagnóstico:**
+
 1. Verificar que endpoint `/feed` responde (Postman/cURL)
 2. Verificar logs de backend para errores
 3. Verificar query de DB no está tardando mucho (> 2 segundos)
 
 **Soluciones:**
+
 - Agregar índices en tabla `feed_events` (user_id, created_at)
 - Implementar cache en Redis
 - Reducir ventana temporal de 30 a 14 días
@@ -1389,31 +1464,73 @@ Una vez completados los sprints 1-5 y lanzado el producto, estas son mejoras que
 ### Problema: Contadores de followers/likes desincronizados
 
 **Diagnóstico:**
+
 1. Verificar si hay rows en `user_follows` o `car_likes` sin actualizar contador
 2. Correr query manual: `SELECT COUNT(*) FROM user_follows WHERE followed_id = X`
 3. Comparar con `users.followers_count`
 
 **Soluciones:**
+
 - Script de sincronización manual:
+
 ```sql
 UPDATE users SET followers_count = (
   SELECT COUNT(*) FROM user_follows WHERE followed_id = users.id
 );
 ```
+
 - Implementar cron job diario de sincronización
 
 ### Problema: Notificaciones no llegan
 
 **Diagnóstico:**
+
 1. Verificar que evento se está emitiendo correctamente
 2. Verificar que subscriber está registrado
 3. Verificar logs del subscriber
 4. Verificar que notificación se creó en BD
 
 **Soluciones:**
+
 - Agregar logging extensivo en EventsSubscriber
 - Verificar que módulo de notificaciones está importado en AppModule
 - Testear endpoint manualmente: `POST /notifications` (crear notificación directa)
+
+---
+
+## Diseño de Interfaz: Sidebars en Desktop
+
+### Propósito
+
+Optimizar el uso del espacio horizontal en pantallas grandes, reduciendo el "aire" lateral y proporcionando acceso rápido a funciones clave sin salir del feed.
+
+### Implementación Actual (Sprint 1.5)
+
+**Sidebar Izquierdo (Compacto):**
+
+- **Mini-Perfil**: Avatar, handle y contadores rápidos (autos/grupos).
+- **Acceso Directo**: Link a perfil público.
+- **Navegación**: Links rápidos a Mi Colección, Grupos, Wishlist, Stats y Configuración.
+- **Acción Principal**: Botón "Agregar Auto" persistente.
+
+**Sidebar Derecho (Utilidad):**
+
+- **Búsqueda**: Filtro por texto en el feed (Client-side inicialmente).
+- **Filtros de Contenido**: Toggle para filtrar por tipos de eventos (Sólo autos, sólo ofertas, etc).
+- **Filtros de Marca**: Chips para filtrado rápido por marcas populares.
+
+### Futuro: De Sidebars a Discovery Engines
+
+Cuando la base de usuarios crezca, los sidebars evolucionarán hacia:
+
+1. **Discovery Sidebar (Derecha):**
+   - **Sugerencias**: "Coleccionistas para seguir" basado en marcas en común.
+   - **Trending**: Marcas que son tendencia esta semana.
+   - **Actividad Global**: Gráfico minimalista de actividad de la comunidad.
+
+2. **Contextual Sidebar (Izquierda):**
+   - **Notificaciones rápidas**: Preview de últimas alertas.
+   - **Shortcuts dinámicos**: Acceso a los grupos más visitados por el usuario.
 
 ---
 
@@ -1475,7 +1592,6 @@ UPDATE users SET followers_count = (
 2. **Configurar entorno de desarrollo** para features sociales
 3. **Comenzar Sprint 1**: Sistema de eventos + Feed básico
 4. **Testear cada mini-objetivo** antes de avanzar al siguiente
-
 
 ---
 

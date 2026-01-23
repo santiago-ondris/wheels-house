@@ -6,9 +6,13 @@ import { Loader2 } from "lucide-react";
 
 interface FeedListProps {
     tab: 'explore' | 'following';
+    filters?: {
+        type?: string;
+        targetUserId?: number;
+    };
 }
 
-export default function FeedList({ tab }: FeedListProps) {
+export default function FeedList({ tab, filters = {} }: FeedListProps) {
     const {
         data,
         fetchNextPage,
@@ -17,7 +21,7 @@ export default function FeedList({ tab }: FeedListProps) {
         isLoading,
         isError,
         refetch
-    } = useSocialFeed(tab);
+    } = useSocialFeed(tab, filters);
 
     const { ref, inView } = useInView();
 
@@ -69,9 +73,11 @@ export default function FeedList({ tab }: FeedListProps) {
                     Silencio en el Mural
                 </p>
                 <p className="text-zinc-700 font-mono text-[9px] mt-4 tracking-widest uppercase max-w-xs mx-auto leading-relaxed">
-                    {tab === 'following'
-                        ? "Aún no sigues a nadie. Explora la red para encontrar otros coleccionistas."
-                        : "No hay actividad reciente. ¡Sé el primero en compartir algo!"
+                    {filters.targetUserId || filters.type
+                        ? "No se encontró actividad para los filtros seleccionados."
+                        : tab === 'following'
+                            ? "Aún no sigues a nadie. Explora la red para encontrar otros coleccionistas."
+                            : "No hay actividad reciente. ¡Sé el primero en compartir algo!"
                     }
                 </p>
             </div>

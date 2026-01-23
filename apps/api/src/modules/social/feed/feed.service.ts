@@ -22,9 +22,10 @@ export class FeedService {
     /**
      * Obtiene el feed global
      */
-    async getFeedGlobal(page: number, limit: number): Promise<{ items: FeedEventWithUser[]; hasMore: boolean }> {
-        const items = await FeedRepository.getFeedGlobal({ page, limit });
-        const total = await FeedRepository.countFeedEvents({});
+    async getFeedGlobal(page: number, limit: number, options: Partial<FeedQueryOptions> = {}): Promise<{ items: FeedEventWithUser[]; hasMore: boolean }> {
+        const queryOptions: FeedQueryOptions = { page, limit, ...options };
+        const items = await FeedRepository.getFeedGlobal(queryOptions);
+        const total = await FeedRepository.countFeedEvents(queryOptions);
 
         return {
             items,
@@ -34,9 +35,8 @@ export class FeedService {
 
     /**
      * Obtiene el feed personalizado (siguiendo)
-     * Por ahora, si no tenemos el sistema de follows, devolverá vacío o global
      */
-    async getFeedFollowing(userId: number, page: number, limit: number): Promise<{ items: FeedEventWithUser[]; hasMore: boolean }> {
+    async getFeedFollowing(userId: number, page: number, limit: number, options: Partial<FeedQueryOptions> = {}): Promise<{ items: FeedEventWithUser[]; hasMore: boolean }> {
         // TODO: Obtener followedIds de FollowsService cuando esté implementado
         const followedIds: number[] = [];
 
@@ -44,8 +44,9 @@ export class FeedService {
             return { items: [], hasMore: false };
         }
 
-        const items = await FeedRepository.getFeedFollowing(followedIds, { page, limit });
-        const total = await FeedRepository.countFeedEvents({ userIds: followedIds });
+        const queryOptions: FeedQueryOptions = { page, limit, ...options };
+        const items = await FeedRepository.getFeedFollowing(followedIds, queryOptions);
+        const total = await FeedRepository.countFeedEvents({ ...queryOptions, userIds: followedIds });
 
         return {
             items,
