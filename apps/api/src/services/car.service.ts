@@ -4,7 +4,7 @@ import { getUserFromUsername } from 'src/database/crud/user.crud';
 import { CarInfo, CarInfoWithOwner, CarPictureToDB, CarToDB, CarUpdateDTO, CreateCarDTO } from 'src/dto/car.dto';
 import { ERROR_CREATING_CAR, ERROR_DELETING_CAR, ERROR_UPDATING_CAR } from 'src/utils/car.utils';
 import {
-    createCar, deleteCar, getCarByIdWithOwner, getCarsFromUserId, updateCar, createCarPicture, getPicturesFromCar,
+    createCar, deleteCar, getCarById, getCarByIdWithOwner, getCarsFromUserId, updateCar, createCarPicture, getPicturesFromCar,
     deleteAllCarPictures, deleteCarPicture, updateCarPicture, getTotalCarsCount, getCarByOffset, getUniqueCarValues,
     getCarsFromUserIdPaginated, getFilterOptionsForUser, getCarIdsFromUserIdWithFilter,
     getWishedCarsFromUserId
@@ -13,10 +13,14 @@ import { CollectionQueryDTO, PaginatedCarsResponse } from 'src/dto/collection-qu
 import { createGroupedCars, deleteGroupedCarsFromCarId, getGroupsFromCarId } from 'src/database/crud/group.crud';
 import { UploadService } from './upload.service';
 import { getPublicIdFromURL } from 'src/utils/upload.utils';
+import { EventsService } from '../modules/social/events/events.service';
 
 @Injectable()
 export class CarService {
-    constructor(private readonly uploadService: UploadService) { }
+    constructor(
+        private readonly uploadService: UploadService,
+        private readonly eventsService: EventsService
+    ) { }
 
     async createCarService(carData: CreateCarDTO, userData: TokenData) {
         const user = await getUserFromUsername(userData.username);
@@ -48,7 +52,38 @@ export class CarService {
             }
         }
 
+        // Emit social event
+        this.eventsService.emitCarAdded({
+            userId: user.userId,
+            carId: createdCar.carId,
+            carName: createdCar.name,
+            isFromWishlist: false
+        });
+
+        // Check for milestones
+        this.checkAndEmitMilestone(user.userId);
+
         return createdCar.carId;
+    }
+
+    private async checkAndEmitMilestone(userId: number) {
+        try {
+            const totalCars = await getTotalCarsCount(); // This gets global count, we need user count
+            const userCars = await getCarsFromUserId(userId);
+            const count = userCars.length;
+
+            const milestones = [50, 100, 250, 500, 1000];
+            if (milestones.includes(count)) {
+                this.eventsService.emitMilestoneReached({
+                    userId,
+                    milestone: count as any,
+                    totalCars: count
+                });
+            }
+        } catch (error) {
+            // Non-critical error, don't break the main flow
+            console.error('Error checking milestones:', error);
+        }
     }
 
     async listCarsService(username: string) {
@@ -294,9 +329,14 @@ export class CarService {
     }
 
     async wishedCarToCollectionService(carId: number, carChanges: CarUpdateDTO) {
-        const carUpdated = await updateCar(carChanges, carId);
+        const carBeforeUpdate = await getCarById(carId);
+        if (!carBeforeUpdate) {
+            throw ERROR_UPDATING_CAR;
+        }
 
-        if (!carUpdated) {
+        const carUpdatedResult = await updateCar(carChanges, carId);
+
+        if (!carUpdatedResult) {
             throw ERROR_UPDATING_CAR;
         }
 
@@ -352,6 +392,16 @@ export class CarService {
                 throw ERROR_UPDATING_CAR;
             }
         }
+
+        // Emit wishlist achieved event
+        this.eventsService.emitWishlistItemAchieved({
+            userId: carBeforeUpdate.userId,
+            carId: carId,
+            carName: carBeforeUpdate.name
+        });
+
+        // Also count towards milestones
+        this.checkAndEmitMilestone(carBeforeUpdate.userId);
     }
 
     async getWishlistService(username: string) {

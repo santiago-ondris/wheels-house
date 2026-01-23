@@ -33,6 +33,9 @@ export default function Navbar() {
                   <Link to="/hall-of-fame" className="text-white/70 hover:text-white transition-colors">
                     Salón de la Fama
                   </Link>
+                  <Link to="/community" className="text-white/70 hover:text-white transition-colors">
+                    Comunidad
+                  </Link>
                   <Link to={`/collection/${user?.username}`} className="text-white/70 hover:text-white transition-colors">
                     Mi Colección
                   </Link>
@@ -63,6 +66,9 @@ export default function Navbar() {
                   </Link>
                   <Link to="/hall-of-fame" className="text-white/70 hover:text-white transition-colors mr-2">
                     Salón de la Fama
+                  </Link>
+                  <Link to="/community" className="text-white/70 hover:text-white transition-colors mr-2">
+                    Comunidad
                   </Link>
                   <div className="w-64 mr-2">
                     <UserSearch />

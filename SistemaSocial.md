@@ -495,22 +495,23 @@ Una vez implementado follow:
 
 **Mini-objetivos:**
 
-- [ ] En `CarsService.create()`, emitir evento `car.added` después de crear
-- [ ] En subscriber, escuchar `car.added` y crear feed event
-- [ ] Testear: crear auto → verificar que aparece en feed
+- [x] En `CarsService.create()`, emitir evento `car.added` después de crear ✅
+- [x] En subscriber, escuchar `car.added` y crear feed event ✅
+- [x] Testear: crear auto → verificar que aparece en feed ✅
 
 **Archivos a modificar:**
-- `apps/api/src/modules/cars/cars.service.ts`
+- `apps/api/src/services/car.service.ts` ✅
+- `apps/api/src/modules/social/events/events.subscriber.ts` ✅
 
 ### Backend - Milestone Tracking
 
 **Mini-objetivos:**
 
-- [ ] En `CarsService.create()`, después de crear auto:
-  - Contar total de autos del usuario
-  - Verificar si alcanzó milestone (50, 100, 250, 500, 1000)
-  - Si sí, emitir evento `milestone.reached`
-- [ ] En subscriber, escuchar `milestone.reached` y crear feed event
+- [x] En `CarsService.create()`, después de crear auto: ✅
+  - [x] Contar total de autos del usuario ✅
+  - [x] Verificar si alcanzó milestone (50, 100, 250, 500, 1000) ✅
+  - [x] Si sí, emitir evento `milestone.reached` ✅
+- [x] En subscriber, escuchar `milestone.reached` y crear feed event ✅
 
 **Lógica a implementar:**
 ```typescript
@@ -527,27 +528,24 @@ if (milestone) {
 
 **Mini-objetivos:**
 
-- [ ] En `WishlistService` (o donde se maneje wishlist), cuando usuario marca item como conseguido:
-  - Emitir evento `wishlist.item_achieved`
-- [ ] En subscriber, escuchar y crear feed event
+- [x] En `WishlistService` (o donde se maneje wishlist), cuando usuario marca item como conseguido: ✅
+  - [x] Emitir evento `wishlist.item_achieved` ✅
+- [x] En subscriber, escuchar y crear feed event ✅
 
 **Archivos a modificar:**
-- Módulo de wishlist (ubicación depende de tu implementación actual)
+- `apps/api/src/services/car.service.ts` ✅ (contiene la lógica de wishlist achieved)
 
 ### Frontend - API Client
 
 **Mini-objetivos:**
 
-- [ ] Crear `apps/web/src/features/social/api/feedApi.ts`
-- [ ] Implementar función `getFeed(tab, page, limit, filter)`
-- [ ] Configurar React Query hooks
+- [x] Crear `apps/web/src/services/social.service.ts` ✅
+- [x] Implementar función `getFeed(tab, page, limit, filter)` ✅
+- [x] Configurar React Query hooks (`useSocialFeed`) ✅
 
-**Archivo a crear:**
-```typescript
-// apps/web/src/features/social/api/feedApi.ts
-
-export const feedApi = {
-  getFeed: async (params: FeedQueryParams) => {
+**Archivo creado:**
+- `apps/web/src/services/social.service.ts` ✅
+- `apps/web/src/hooks/useSocialFeed.ts` ✅
     const response = await apiClient.get('/feed', { params });
     return response.data;
   }

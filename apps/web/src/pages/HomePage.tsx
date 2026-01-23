@@ -61,7 +61,7 @@ export default function HomePage() {
       <section className="relative min-h-[auto] md:min-h-[70vh] flex items-center overflow-hidden">
         {/* Background Gradients */}
         <div className="absolute inset-0 bg-linear-to-br from-primary/20 via-background to-secondary/20" />
-        
+
         {/* Fade-out gradient at the bottom */}
         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background to-transparent" />
 
@@ -183,6 +183,7 @@ export default function HomePage() {
             01 / Features
           </span>
         </motion.div>
+
 
         <div className="grid md:grid-cols-3 gap-6">
           {features.map((feature, index) => (

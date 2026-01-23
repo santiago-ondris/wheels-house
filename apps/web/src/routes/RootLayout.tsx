@@ -2,12 +2,23 @@ import { useEffect } from "react";
 import { Outlet, ScrollRestoration, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "../contexts/AuthContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            staleTime: 1000 * 60 * 5, // 5 minutes
+            retry: 1,
+        },
+    },
+});
 
 /**
  * Root layout component that provides:
  * - AuthProvider context (must be inside RouterProvider for useNavigate to work)
+ * - QueryClientProvider for React Query
  * - ScrollRestoration for automatic scroll position management
  * - Main layout structure (Navbar, content, Footer)
  * - Toast notifications
@@ -36,68 +47,71 @@ export default function RootLayout() {
     }, [pathname]);
 
     return (
-        <AuthProvider>
-            <div className="min-h-screen bg-background font-arvo flex flex-col">
-                <Navbar />
-                <main className="flex-1">
-                    <Outlet />
-                </main>
-                <Footer />
-            </div>
+        <QueryClientProvider client={queryClient}>
+            <AuthProvider>
+                <div className="min-h-screen bg-background font-arvo flex flex-col">
+                    <Navbar />
+                    <main className="flex-1">
+                        <Outlet />
+                    </main>
+                    <Footer />
+                </div>
 
-            {/* ScrollRestoration handles scroll position on navigation */}
-            {/* For collection pages, we disable auto-restoration since we handle it manually */}
-            {/* after async content loads via useCollectionScrollRestore hook */}
-            <ScrollRestoration
-                getKey={(location) => {
-                    const { pathname } = location;
+                {/* ScrollRestoration handles scroll position on navigation */}
+                {/* For collection pages, we disable auto-restoration since we handle it manually */}
+                {/* after async content loads via useCollectionScrollRestore hook */}
+                <ScrollRestoration
+                    getKey={(location) => {
+                        const { pathname } = location;
 
-                    // Manual restoration only for ProfilePage and GroupDetailPage list views.
-                    // These pages handle their own scroll via useCollectionScrollRestore hook.
-                    // We exclude action sub-paths to avoid "scroll inheritance".
+                        // Manual restoration only for ProfilePage and GroupDetailPage list views.
+                        // These pages handle their own scroll via useCollectionScrollRestore hook.
+                        // We exclude action sub-paths to avoid "scroll inheritance".
 
-                    const isManualProfile = /^\/collection\/[^/]+$/.test(pathname) &&
-                        pathname !== '/collection/add' &&
-                        pathname !== '/collection/quick-add';
+                        const isManualProfile = /^\/collection\/[^/]+$/.test(pathname) &&
+                            pathname !== '/collection/add' &&
+                            pathname !== '/collection/quick-add';
 
-                    const isManualGroup = /^\/collection\/[^/]+\/group\/[^/]+$/.test(pathname) &&
-                        !pathname.includes('/edit') &&
-                        !pathname.includes('/manage');
+                        const isManualGroup = /^\/collection\/[^/]+\/group\/[^/]+$/.test(pathname) &&
+                            !pathname.includes('/edit') &&
+                            !pathname.includes('/manage');
 
-                    if (isManualProfile || isManualGroup) {
-                        return 'collection-manual';
-                    }
+                        if (isManualProfile || isManualGroup) {
+                            return 'collection-manual';
+                        }
 
-                    // For other pages, use pathname + search for proper restoration
-                    return pathname + location.search;
-                }}
-            />
+                        // For other pages, use pathname + search for proper restoration
+                        return pathname + location.search;
+                    }}
+                />
 
-            <Toaster
-                position="bottom-right"
-                toastOptions={{
-                    duration: 4000,
-                    style: {
-                        background: 'rgba(255,255,255,0.05)',
-                        backdropFilter: 'blur(12px)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        color: 'white',
-                        fontFamily: 'Arvo, serif',
-                    },
-                    success: {
-                        iconTheme: {
-                            primary: '#D9731A',
-                            secondary: 'white',
+                <Toaster
+                    position="bottom-right"
+                    toastOptions={{
+                        duration: 4000,
+                        style: {
+                            background: 'rgba(255,255,255,0.05)',
+                            backdropFilter: 'blur(12px)',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            color: 'white',
+                            fontFamily: 'Arvo, serif',
                         },
-                    },
-                    error: {
-                        iconTheme: {
-                            primary: '#BF3939',
-                            secondary: 'white',
+                        success: {
+                            iconTheme: {
+                                primary: '#D9731A',
+                                secondary: 'white',
+                            },
                         },
-                    },
-                }}
-            />
-        </AuthProvider>
+                        error: {
+                            iconTheme: {
+                                primary: '#BF3939',
+                                secondary: 'white',
+                            },
+                        },
+                    }}
+                />
+            </AuthProvider>
+        </QueryClientProvider>
     );
+
 }

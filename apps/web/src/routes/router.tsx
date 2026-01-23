@@ -34,6 +34,7 @@ import OnboardingPage from "../pages/onboarding/OnboardingPage";
 import ImportCarsPage from "../pages/import/ImportCarsPage";
 import AboutUsPage from "../pages/AboutUsPage";
 import WheelWordPage from "../pages/wheelword/WheelWordPage";
+import CommunityPage from "../pages/social/CommunityPage";
 
 // Components
 import ProtectedRoute from "../components/auth/ProtectedRoute";
@@ -49,6 +50,7 @@ export const router = createBrowserRouter([
             { path: "reset-password", element: <ResetPasswordPage /> },
             { path: "auth-required", element: <AuthRequiredPage /> },
             { path: "car/:carId", element: <CarDetailPage /> },
+            { path: "community", element: <CommunityPage /> },
 
             // Protected routes
             {
