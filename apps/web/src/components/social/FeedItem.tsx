@@ -124,11 +124,6 @@ export default function FeedItem({ item }: FeedItemProps) {
                     ) : (
                         <p className="text-white text-base font-black tracking-tighter uppercase leading-none truncate">
                             {item.metadata?.carName || item.metadata?.groupName}
-                            {item.metadata?.carCount && (
-                                <span className="text-zinc-500 font-normal ml-2 tracking-normal lowercase text-xs">
-                                    ({item.metadata?.carCount} piezas)
-                                </span>
-                            )}
                         </p>
                     )}
                 </div>
