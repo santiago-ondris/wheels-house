@@ -1,4 +1,4 @@
-import { API_URL } from './api';
+import { API_URL, apiRequest } from './api';
 
 // Types
 export interface ImportCarRow {
@@ -59,46 +59,24 @@ export async function downloadTemplate(): Promise<void> {
  * Upload Excel file for preview
  */
 export async function uploadForPreview(file: File): Promise<ImportPreviewResponse> {
-    const token = localStorage.getItem("auth_token");
-    
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch(`${API_URL}/car/import/preview`, {
+    return apiRequest<ImportPreviewResponse>('/car/import/preview', {
         method: 'POST',
         headers: {
-            'Authorization': `Bearer ${token}`,
+            'Content-Type': undefined as any, // This forces apiRequest to not set it
         },
         body: formData,
     });
-
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Error al procesar el archivo');
-    }
-
-    return await response.json();
 }
 
 /**
  * Confirm import of validated cars
  */
 export async function confirmImport(cars: ImportCarRow[]): Promise<ImportResult> {
-    const token = localStorage.getItem("auth_token");
-
-    const response = await fetch(`${API_URL}/car/import/confirm`, {
+    return apiRequest<ImportResult>('/car/import/confirm', { 
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-        },
         body: JSON.stringify({ cars }),
     });
-
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Error al importar los autos');
-    }
-
-    return await response.json();
 }

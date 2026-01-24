@@ -17,7 +17,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   // After the token is validated, this method is called
-  async validate(payload: TokenData) {
+  async validate(payload: TokenData & { tokenType?: string }) {
+    if (payload.tokenType !== 'access') {
+      throw new UnauthorizedException('Invalid token type: expected access token');
+    }
     if (!payload.userId) {
       throw new UnauthorizedException('Invalid token payload: missing userId');
     }

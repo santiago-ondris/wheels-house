@@ -1,10 +1,9 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 // Flag to prevent multiple refresh attempts running simultaneously
-let isRefreshing = false;
 let refreshPromise: Promise<string | null> | null = null;
 
-async function refreshAccessToken(): Promise<string | null> {
+export async function refreshAccessToken(): Promise<string | null> {
   const refreshToken = localStorage.getItem('refresh_token');
   if (!refreshToken) return null;
 
@@ -16,14 +15,14 @@ async function refreshAccessToken(): Promise<string | null> {
     });
 
     if (!response.ok) {
-      // Refresh token is invalid/expired
       return null;
     }
 
     const data = await response.json();
     localStorage.setItem('auth_token', data.accessToken);
     return data.accessToken;
-  } catch {
+  } catch (error) {
+    console.error('Refresh token error:', error);
     return null;
   }
 }
@@ -34,38 +33,40 @@ export async function apiRequest<T>(
 ): Promise<T> {
   const token = localStorage.getItem('auth_token');
 
+  // Centralized header construction
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+    ...(options.headers || {}),
+  };
+
   const response = await fetch(`${API_URL}${endpoint}`, {
     ...options,
     credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-      ...options.headers,
-    },
+    headers,
   });
 
   // If 401, try to refresh the token
   if (response.status === 401 && endpoint !== '/refresh' && endpoint !== '/login') {
-    // Prevent multiple simultaneous refresh attempts
-    if (!isRefreshing) {
-      isRefreshing = true;
-      refreshPromise = refreshAccessToken();
+    // Only start one refresh at a time
+    if (!refreshPromise) {
+      refreshPromise = refreshAccessToken().finally(() => {
+        refreshPromise = null;
+      });
     }
 
     const newToken = await refreshPromise;
-    isRefreshing = false;
-    refreshPromise = null;
 
     if (newToken) {
-      // Retry the original request with new token
+      const retryHeaders: HeadersInit = {
+        ...headers,
+        'Authorization': `Bearer ${newToken}`,
+      };
+
       const retryResponse = await fetch(`${API_URL}${endpoint}`, {
         ...options,
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${newToken}`,
-          ...options.headers,
-        },
+        headers: retryHeaders,
       });
 
       if (!retryResponse.ok) {

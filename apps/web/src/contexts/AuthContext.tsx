@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { login as loginService } from "../services/auth.service";
 
 import { getPublicProfile } from "../services/profile.service";
+import { refreshAccessToken } from "../services/api";
 
 interface User {
   username: string;
@@ -54,46 +55,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const initAuth = async () => {
-      let token = localStorage.getItem("auth_token");
+      const token = localStorage.getItem("auth_token");
       const refreshToken = localStorage.getItem("refresh_token");
 
-      // If no access token but refresh token exists, try to refresh
-      if (!token && refreshToken) {
-        try {
-          const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/refresh`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ refreshToken }),
+      if (!token && !refreshToken) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        let currentToken = token;
+
+        // If we only have a refresh token, we need to get a new access token first
+        if (!currentToken && refreshToken) {
+          currentToken = await refreshAccessToken();
+        }
+
+        const decoded = currentToken ? decodeToken(currentToken) : null;
+        if (decoded?.username) {
+          const profile = await getPublicProfile(decoded.username);
+          setUser({
+            username: profile.username,
+            picture: profile.picture,
+            defaultSortPreference: profile.defaultSortPreference
           });
-
-          if (response.ok) {
-            const data = await response.json();
-            localStorage.setItem('auth_token', data.accessToken);
-            token = data.accessToken;
-          } else {
-            // Refresh failed, clear everything
-            localStorage.removeItem("refresh_token");
-          }
-        } catch {
-          localStorage.removeItem("refresh_token");
         }
+      } catch (error) {
+        // If it fails even after refresh attempt, or no refresh token
+        console.error("Auth init failed:", error);
+      } finally {
+        setIsLoading(false);
       }
-
-      if (token) {
-        try {
-          const decoded = decodeToken(token);
-          try {
-            const profile = await getPublicProfile(decoded.username);
-            setUser({ username: decoded.username, picture: profile.picture, defaultSortPreference: profile.defaultSortPreference });
-          } catch {
-            setUser({ username: decoded.username, defaultSortPreference: 'id:desc' });
-          }
-        } catch {
-          localStorage.removeItem("auth_token");
-          localStorage.removeItem("refresh_token");
-        }
-      }
-      setIsLoading(false);
     };
 
     initAuth();

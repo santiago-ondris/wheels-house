@@ -64,43 +64,26 @@ export async function getFounders(): Promise<Founder[]> {
 }
 
 export async function getSearchHistory(): Promise<BasicUser[]> {
-    const token = localStorage.getItem("auth_token");
     // Add timestamp to prevent caching
-    return apiRequest<BasicUser[]>(`/search-history?t=${new Date().getTime()}`, {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-    });
+    return apiRequest<BasicUser[]>(`/search-history?t=${new Date().getTime()}`);
 }
 
 export async function addToSearchHistory(searchedUsername: string): Promise<void> {
-    const token = localStorage.getItem("auth_token");
     return apiRequest<void>('/search-history', {
         method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        },
         body: JSON.stringify({ searchedUsername }),
     });
 }
 
 export async function removeFromSearchHistory(searchedUsername: string): Promise<void> {
-    const token = localStorage.getItem("auth_token");
     return apiRequest<void>(`/search-history/${encodeURIComponent(searchedUsername)}`, {
         method: 'DELETE',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        },
     });
 }
 
 export async function clearSearchHistory(): Promise<void> {
-    const token = localStorage.getItem("auth_token");
     return apiRequest<void>('/search-history', {
         method: 'DELETE',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        },
     });
 }
 
@@ -109,34 +92,22 @@ export async function getUserStats(username: string): Promise<UserStats> {
 }
 
 export async function updateProfile(data: Partial<PublicProfile>): Promise<PublicProfile> {
-    const token = localStorage.getItem("auth_token");
     return apiRequest<PublicProfile>('/user/update-info', {
         method: 'PUT',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        },
         body: JSON.stringify(data),
     });
 }
 
 export async function updatePassword(oldPassword: string, newPassword: string): Promise<void> {
-    const token = localStorage.getItem("auth_token");
     return apiRequest<void>('/user/update-password', {
         method: 'PUT',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        },
         body: JSON.stringify({ oldPassword, newPassword }),
     });
 }
 
 export async function deleteUser(): Promise<void> {
-    const token = localStorage.getItem("auth_token");
     return apiRequest<void>('/user', {
         method: 'DELETE',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        },
     });
 }
 

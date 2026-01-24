@@ -34,12 +34,8 @@ export interface CreateGroupData {
 export type UpdateGroupData = CreateGroupData;
 
 export async function createGroup(data: CreateGroupData): Promise<boolean> {
-    const token = localStorage.getItem("auth_token");
     return apiRequest<boolean>('/group/create', {
         method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        },
         body: JSON.stringify(data),
     });
 }
@@ -61,22 +57,14 @@ export async function listFeaturedGroups(username: string): Promise<GroupBasicIn
 }
 
 export async function updateGroup(groupId: number, data: UpdateGroupData): Promise<boolean> {
-    const token = localStorage.getItem("auth_token");
     return apiRequest<boolean>(`/group/update/${groupId}`, {
         method: 'PUT',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        },
         body: JSON.stringify(data),
     });
 }
 
 export async function deleteGroup(groupId: number): Promise<boolean> {
-    const token = localStorage.getItem("auth_token");
     return apiRequest<boolean>(`/group/${groupId}`, {
         method: 'DELETE',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
     });
 }

@@ -1,4 +1,4 @@
-import { API_URL } from './api';
+import { apiRequest } from './api';
 
 interface CloudinarySignature {
     signature: string;
@@ -14,26 +14,16 @@ interface CloudinarySignature {
  * Solo funciona para usuarios autenticados.
  */
 async function getUploadSignature(): Promise<CloudinarySignature> {
-    const token = localStorage.getItem('auth_token');
-    if (!token) {
-        throw new Error('No encontramos tu sesión. Por favor iniciá sesión nuevamente.');
-    }
-
-    const response = await fetch(`${API_URL}/upload/signature`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-        },
-    });
-
-    if (!response.ok) {
-        if (response.status === 401) {
+    try {
+        return await apiRequest<CloudinarySignature>('/upload/signature', {
+            method: 'GET',
+        });
+    } catch (error: any) {
+        if (error.statusCode === 401) {
             throw new Error('Tu sesión expiró. Por favor iniciá sesión nuevamente.');
         }
         throw new Error('Error al obtener permisos de subida');
     }
-
-    return response.json();
 }
 
 /**
@@ -99,54 +89,35 @@ async function uploadImageViaBackend(file: File, isPublic: boolean): Promise<str
     formData.append('file', file);
 
     const token = localStorage.getItem('auth_token');
+    const endpoint = isPublic && !token ? '/upload/image/public' : '/upload/image';
 
-    if (!token && !isPublic) {
-        throw new Error('No encontramos tu sesión. Por favor iniciá sesión nuevamente.');
-    }
-
-    const endpoint = isPublic && !token ? `${API_URL}/upload/image/public` : `${API_URL}/upload/image`;
-
-    const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-        },
-        body: formData,
-    });
-
-    if (!response.ok) {
-        if (response.status === 401) {
-            throw new Error('Tu sesión expiró. Por favor iniciá sesión nuevamente.');
-        }
-        if (response.status === 413) {
+    try {
+        const data = await apiRequest<{ url: string }>(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': undefined as any, // Important for FormData
+            },
+            body: formData,
+        });
+        return data.url;
+    } catch (error: any) {
+        if (error.statusCode === 413) {
             throw new Error('La imagen es demasiado grande. Máximo 10MB.');
         }
-        if (response.status === 400) {
-            const error = await response.json().catch(() => null);
-            throw new Error(error?.message || 'Formato de imagen no válido. Usá JPG, PNG, GIF o WEBP.');
+        if (error.statusCode === 400) {
+            throw new Error(error.message || 'Formato de imagen no válido. Usá JPG, PNG, GIF o WEBP.');
         }
-        if (response.status === 429) {
+        if (error.statusCode === 429) {
             throw new Error('Demasiadas peticiones. Por favor esperá un momento.');
         }
-
-        const error = await response.json().catch(() => ({ message: 'Error al subir la imagen' }));
-        throw new Error(error.message || 'Error al conectarse con el servidor');
+        throw new Error(error.message || 'Error al subir la imagen');
     }
-
-    const data = await response.json();
-    return data.url;
 }
 
 export async function deleteRemoteImage(publicId: string): Promise<void> {
-    const token = localStorage.getItem('auth_token');
-    if (!token) return;
-
     try {
-        await fetch(`${API_URL}/upload/image/${encodeURIComponent(publicId)}`, {
+        await apiRequest(`/upload/image/${encodeURIComponent(publicId)}`, {
             method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            },
         });
     } catch (error) {
         console.error('Error deleting image:', error);

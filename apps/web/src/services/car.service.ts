@@ -30,54 +30,34 @@ export interface CarSuggestions {
 export type CarUpdateDTO = Partial<CarData>;
 
 export async function createCar(data: CarData): Promise<number> {
-    const token = localStorage.getItem("auth_token");
     return apiRequest<number>('/car/create', {
         method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        },
         body: JSON.stringify(data),
     });
 }
 
 export async function listCars(username: string): Promise<CarData[]> {
-    const token = localStorage.getItem("auth_token");
     return apiRequest<CarData[]>(`/car/list/${username}`, {
         method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
     });
 }
 
 export async function getCar(carId: string): Promise<CarData> {
-    const token = localStorage.getItem("auth_token");
     return apiRequest<CarData>(`/car/info/${carId}`, {
         method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
     });
 }
 
 export async function updateCar(carId: number, data: CarUpdateDTO): Promise<boolean> {
-    const token = localStorage.getItem("auth_token");
     return apiRequest<boolean>(`/car/update-info/${carId}`, {
         method: 'PUT',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        },
         body: JSON.stringify(data),
     });
 }
 
 export async function deleteCar(carId: number): Promise<boolean> {
-    const token = localStorage.getItem("auth_token");
     return apiRequest<boolean>(`/car/${carId}`, {
         method: 'DELETE',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
     });
 }
 
@@ -86,23 +66,15 @@ export async function getCarGroups(carId: number): Promise<number[]> {
 }
 
 export async function updateCarGroups(carId: number, groupIds: number[]): Promise<boolean> {
-    const token = localStorage.getItem("auth_token");
     return apiRequest<boolean>(`/car/${carId}/groups`, {
         method: 'PUT',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        },
         body: JSON.stringify({ groups: groupIds }),
     });
 }
 
 export async function getSuggestions(): Promise<CarSuggestions> {
-    const token = localStorage.getItem("auth_token");
     return apiRequest<CarSuggestions>(`/car/suggestions`, {
         method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
     });
 }
 
@@ -200,12 +172,8 @@ export interface BulkAddToGroupResponse {
 }
 
 export async function bulkAddToGroup(request: BulkAddToGroupRequest): Promise<BulkAddToGroupResponse> {
-    const token = localStorage.getItem("auth_token");
     return apiRequest<BulkAddToGroupResponse>('/car/bulk/add-to-group', {
         method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        },
         body: JSON.stringify(request),
     });
 }
@@ -238,23 +206,15 @@ export interface WishedCarToCollectionDTO {
 }
 
 export async function wishedCarToCollection(carId: number, data: WishedCarToCollectionDTO): Promise<void> {
-    const token = localStorage.getItem("auth_token");
     return apiRequest<void>(`/car/wishedCarToCollection/${carId}`, {
         method: 'PUT',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        },
         body: JSON.stringify(data),
     });
 }
 
 export async function createWishedCar(data: CarData & { wished: true }): Promise<number> {
-    const token = localStorage.getItem("auth_token");
     return apiRequest<number>('/car/create', {
         method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        },
         body: JSON.stringify(data),
     });
 }
