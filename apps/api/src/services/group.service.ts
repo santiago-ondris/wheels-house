@@ -3,7 +3,7 @@ import { TokenData } from '../dto/user.dto';
 import { getUserFromUsername } from 'src/database/crud/user.crud';
 import { getPicturesFromCar } from 'src/database/crud/car.crud';
 import { CreateGroupDTO, GroupInfo, GroupInfoWoCar, GroupToDB, UpdateGroupDTO } from 'src/dto/group.dto';
-import { createGroup, createGroupedCars, deleteGroupedCarFromGroupIdAndCarId, deleteGroupedCarsFromGroupId, deleteGroupFromId, getCarsFromGroupId, getGroupedCarsFromGroupId, getGroupFromId, getGroupFromNameAndUserId, getGroupsFromUserId, getFeaturedGroupsFromUserId, countFeaturedGroupsFromUserId, updateGroup } from 'src/database/crud/group.crud';
+import { createGroup, createGroupedCars, deleteGroupedCarFromGroupIdAndCarId, deleteGroupedCarsFromGroupId, deleteGroupFromId, getCarsFromGroupId, getGroupedCarsFromGroupId, getGroupFromId, getGroupFromNameAndUserId, getGroupsFromUserId, getFeaturedGroupsFromUserId, countFeaturedGroupsFromUserId, updateGroup, deleteFeedEventsFromGroupId } from 'src/database/crud/group.crud';
 import { ERROR_CREATING_GROUP, ERROR_DELETING_GROUP, ERROR_UPDATING_GROUP, INEXISTENT_GROUP, MAX_FEATURED_GROUPS, MAX_FEATURED_GROUPS_REACHED } from 'src/utils/group.utils';
 import { CarInfoWoGroups } from 'src/dto/car.dto';
 import { UploadService } from './upload.service';
@@ -174,7 +174,7 @@ export class GroupService {
     }
 
     async deleteGroupService(groupId: number) {
-        if (!(await deleteGroupedCarsFromGroupId(groupId))) {
+        if (!(await deleteGroupedCarsFromGroupId(groupId)) || !(await deleteFeedEventsFromGroupId(groupId))) {
             throw ERROR_DELETING_GROUP;
         }
 

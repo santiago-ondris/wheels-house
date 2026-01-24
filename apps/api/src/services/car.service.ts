@@ -7,7 +7,8 @@ import {
     createCar, deleteCar, getCarById, getCarByIdWithOwner, getCarsFromUserId, updateCar, createCarPicture, getPicturesFromCar,
     deleteAllCarPictures, deleteCarPicture, updateCarPicture, getTotalCarsCount, getCarByOffset, getUniqueCarValues,
     getCarsFromUserIdPaginated, getFilterOptionsForUser, getCarIdsFromUserIdWithFilter,
-    getWishedCarsFromUserId
+    getWishedCarsFromUserId,
+    deleteFeedEventsFromCarId
 } from 'src/database/crud/car.crud';
 import { CollectionQueryDTO, PaginatedCarsResponse } from 'src/dto/collection-query.dto';
 import { createGroupedCars, deleteGroupedCarsFromCarId, getGroupsFromCarId, getGroupFromId, getGroupedCarsFromGroupId } from 'src/database/crud/group.crud';
@@ -154,9 +155,10 @@ export class CarService {
     async deleteCarService(carId: number) {
         const groupedCarDeleted = await deleteGroupedCarsFromCarId(carId);
         const picturesDeleted = await deleteAllCarPictures(carId);
+        const feedEventsDeleted = await deleteFeedEventsFromCarId(carId);
         const carDeleted = await deleteCar(carId);
 
-        if (!carDeleted || (picturesDeleted == null) || !groupedCarDeleted) {
+        if (!carDeleted || (picturesDeleted == null) || !groupedCarDeleted || !feedEventsDeleted) {
             throw ERROR_DELETING_CAR;
         }
 
