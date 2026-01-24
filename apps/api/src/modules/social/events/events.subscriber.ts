@@ -63,7 +63,7 @@ export class EventsSubscriber {
     @OnEvent(EVENTS.GROUP_CREATED)
     async handleGroupCreated(payload: GroupCreatedPayload): Promise<void> {
         // Solo crear evento si el grupo tiene 5+ autos (según spec)
-        if (payload.carCount >= 5) {
+        // if (payload.carCount >= 5) {
             this.logger.log(`📁 Group created: User ${payload.userId} created "${payload.groupName}" with ${payload.carCount} cars`);
 
             await this.feedService.createEvent({
@@ -76,7 +76,7 @@ export class EventsSubscriber {
                     carCount: payload.carCount
                 }
             });
-        }
+        // }
     }
 
     // ==================== Milestone Events ====================
