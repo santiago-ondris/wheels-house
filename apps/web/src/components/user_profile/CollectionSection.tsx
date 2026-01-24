@@ -289,7 +289,7 @@ export default function CollectionSection({
 
             <div className="flex gap-6">
                 <div className="hidden lg:block w-64 shrink-0">
-                    <div className="sticky top-20 bg-white/[0.02] border border-white/5 rounded-xl p-4 max-h-[calc(100vh-8rem)] overflow-y-auto custom-scrollbar">
+                    <div className="sticky top-[80px] bg-white/[0.02] border border-white/5 rounded-xl p-4 max-h-[calc(100vh-8rem)] overflow-y-auto custom-scrollbar">
                         <CollectionFilters
                             filters={filters}
                             selectedBrands={params.brands}

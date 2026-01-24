@@ -51,7 +51,7 @@ export default function RootLayout() {
             <AuthProvider>
                 <div className="min-h-screen bg-background font-arvo flex flex-col">
                     <Navbar />
-                    <main className="flex-1">
+                    <main className="flex-1 pt-[88px]">
                         <Outlet />
                     </main>
                     <Footer />

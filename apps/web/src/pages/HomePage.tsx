@@ -58,7 +58,7 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col">
-      <section className="relative min-h-[auto] md:min-h-[70vh] flex items-center overflow-hidden">
+      <section className="relative min-h-[auto] md:min-h-[70vh] flex items-center overflow-hidden -mt-[158px]">
         {/* Background Gradients */}
         <div className="absolute inset-0 bg-linear-to-br from-primary/20 via-background to-secondary/20" />
 
@@ -78,7 +78,7 @@ export default function HomePage() {
         <div className="absolute top-20 right-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
         <div className="absolute bottom-20 left-20 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
 
-        <div className="relative z-10 container mx-auto px-6 py-10 md:py-16">
+        <div className="relative z-10 container mx-auto px-6 pt-36 pb-10 md:pt-44 md:pb-16">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8 lg:gap-16">
             <motion.div
               variants={fadeInUp}
