@@ -1,8 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useInView } from "react-intersection-observer";
-import { useSocialFeed } from "../../hooks/useSocialFeed";
+import { useSocialFeed, useNewActivityCheck, useFeedRefresh } from "../../hooks/useSocialFeed";
 import FeedItem from "./FeedItem";
 import { Loader2 } from "lucide-react";
+import NewActivityIndicator from "./NewActivityIndicator";
 
 interface FeedListProps {
     tab: 'explore' | 'following';
@@ -10,9 +11,10 @@ interface FeedListProps {
         type?: string;
         targetUserId?: number;
     };
+    onUnreadChange?: (hasUnread: boolean) => void;
 }
 
-export default function FeedList({ tab, filters = {} }: FeedListProps) {
+export default function FeedList({ tab, filters = {}, onUnreadChange }: FeedListProps) {
     const {
         data,
         fetchNextPage,
@@ -24,12 +26,34 @@ export default function FeedList({ tab, filters = {} }: FeedListProps) {
     } = useSocialFeed(tab, filters);
 
     const { ref, inView } = useInView();
+    const refresh = useFeedRefresh();
+
+    // Get the ID of the most recent item in the current feed
+    const topItemId = useMemo(() => {
+        return data?.pages[0]?.items[0]?.id;
+    }, [data]);
+
+    // Check for new activity in the background
+    const { showPill, hidePill, resetCheck, hasUnreadContent } = useNewActivityCheck(topItemId, tab, filters);
+
+    useEffect(() => {
+        if (onUnreadChange) {
+            onUnreadChange(hasUnreadContent);
+        }
+    }, [hasUnreadContent, onUnreadChange]);
 
     useEffect(() => {
         if (inView && hasNextPage && !isFetchingNextPage) {
             fetchNextPage();
         }
     }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+    const handleRefresh = async () => {
+        await refresh(tab);
+        resetCheck();
+        // Scroll to top smoothly
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     if (isLoading) {
         return (
@@ -85,7 +109,14 @@ export default function FeedList({ tab, filters = {} }: FeedListProps) {
     }
 
     return (
-        <div className="flex flex-col divide-y divide-white/5 bg-transparent">
+        <div className="relative flex flex-col divide-y divide-white/5 bg-transparent">
+            {/* New items notification pill */}
+            <NewActivityIndicator
+                show={showPill}
+                onClick={handleRefresh}
+                onHide={hidePill}
+            />
+
             {allItems.map((item) => (
                 <FeedItem key={item.id} item={item} />
             ))}

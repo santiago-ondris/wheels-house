@@ -234,3 +234,27 @@ export async function countFeedEvents(options: FeedQueryOptions = {}): Promise<n
 
     return Number(result[0].count);
 }
+
+/**
+ * Verifica si ya existe un evento específico para evitar duplicados
+ */
+export async function existsFeedEvent(type: FeedEventType, userId: number, targetId: { carId?: number, groupId?: number }): Promise<boolean> {
+    const conditions = [
+        eq(feedEvent.type, type),
+        eq(feedEvent.userId, userId),
+    ];
+
+    if (targetId.carId) {
+        conditions.push(eq(feedEvent.carId, targetId.carId));
+    }
+    if (targetId.groupId) {
+        conditions.push(eq(feedEvent.groupId, targetId.groupId));
+    }
+
+    const result = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(feedEvent)
+        .where(and(...conditions));
+
+    return Number(result[0].count) > 0;
+}

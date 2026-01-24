@@ -61,9 +61,9 @@ export default function FeedItem({ item }: FeedItemProps) {
             case 'milestone_reached':
                 return "Alcanzó un hito";
             case 'wishlist_achieved':
-                return "Deseo logrado";
+                return "Consiguió de su wishlist";
             case 'group_created':
-                return "Nueva serie";
+                return "Creó un grupo";
             default:
                 return "Actividad";
         }

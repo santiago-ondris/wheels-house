@@ -53,4 +53,11 @@ export class FeedService {
             hasMore: (page + 1) * limit < total
         };
     }
+
+    /**
+     * Verifica si ya existe un evento para evitar duplicados
+     */
+    async existsEvent(type: FeedRepository.FeedEventType, userId: number, targetId: { carId?: number, groupId?: number }): Promise<boolean> {
+        return await FeedRepository.existsFeedEvent(type, userId, targetId);
+    }
 }

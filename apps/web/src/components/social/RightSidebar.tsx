@@ -78,16 +78,9 @@ export default function RightSidebar({
                     </p>
                     <div className="h-px bg-white/5 w-1/2" />
                     <p className="text-[10px] text-zinc-600 leading-relaxed">
-                        Estamos construyendo herramientas para ayudarte a encontrar las colecciones más valiosas.
+                        Estamos construyendo herramientas para ayudarte a encontrar otras colecciones de la comunidad.
                     </p>
                 </div>
-            </div>
-
-            {/* Subtle branding footer */}
-            <div className="mt-auto px-1 opacity-20">
-                <p className="text-[8px] font-mono uppercase tracking-[0.3em] text-zinc-500">
-                    Wheels House v0.5.0
-                </p>
             </div>
         </aside>
     );

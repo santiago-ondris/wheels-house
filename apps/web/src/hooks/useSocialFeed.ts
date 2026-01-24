@@ -1,5 +1,6 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getFeed } from '../services/social.service';
+import { useState, useEffect } from 'react';
 
 export interface SocialFeedFilters {
     type?: string;
@@ -8,12 +9,9 @@ export interface SocialFeedFilters {
 
 /**
  * Hook to manage the social feed with infinite scrolling
- * @param tab 'explore' (global) or 'following' (users being followed)
- * @param filters search and type filters
- * @param limit number of items per page
  */
 export function useSocialFeed(
-    tab: 'explore' | 'following' = 'explore', 
+    tab: 'explore' | 'following' = 'explore',
     filters: SocialFeedFilters = {},
     limit: number = 20
 ) {
@@ -29,11 +27,56 @@ export function useSocialFeed(
 }
 
 /**
+ * Hook to check for new items in the background
+ */
+export function useNewActivityCheck(
+    topItemId: number | undefined,
+    tab: 'explore' | 'following',
+    filters: SocialFeedFilters = {}
+) {
+    const [hasNewItemsPill, setHasNewItemsPill] = useState(false);
+    const [hasDetectedNewItems, setHasDetectedNewItems] = useState(false);
+
+    const { data } = useQuery({
+        queryKey: ['feed-check', tab, filters.type, filters.targetUserId],
+        queryFn: () => getFeed({ tab, page: 0, limit: 1, ...filters }),
+        refetchInterval: 1000 * 30, // Poll every 30 seconds
+        enabled: !!topItemId && !hasDetectedNewItems, // Stop polling once new content is detected
+    });
+
+    useEffect(() => {
+        if (data?.items?.[0] && topItemId) {
+            if (data.items[0].id > topItemId) {
+                setHasNewItemsPill(true);
+                setHasDetectedNewItems(true);
+            }
+        }
+    }, [data, topItemId]);
+
+    return {
+        showPill: hasNewItemsPill,
+        hasUnreadContent: hasDetectedNewItems,
+        hidePill: () => setHasNewItemsPill(false),
+        resetCheck: () => {
+            setHasNewItemsPill(false);
+            setHasDetectedNewItems(false);
+        }
+    };
+}
+
+/**
  * Hook to refresh the feed
- * (Currently simple wrapper, but can be expanded later)
  */
 export function useFeedRefresh() {
-    // This could return a function that invalidates the feed query
-    // const queryClient = useQueryClient();
-    // return () => queryClient.invalidateQueries({ queryKey: ['feed'] });
+    const queryClient = useQueryClient();
+
+    const refresh = async (tab?: string) => {
+        if (tab) {
+            await queryClient.invalidateQueries({ queryKey: ['feed', tab] });
+        } else {
+            await queryClient.invalidateQueries({ queryKey: ['feed'] });
+        }
+    };
+
+    return refresh;
 }

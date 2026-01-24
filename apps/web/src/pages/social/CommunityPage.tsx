@@ -5,12 +5,28 @@ import FeedList from "../../components/social/FeedList";
 import LeftSidebar from "../../components/social/LeftSidebar";
 import RightSidebar from "../../components/social/RightSidebar";
 import MobileFeedFilters from "../../components/social/MobileFeedFilters";
+import { useFeedRefresh } from "../../hooks/useSocialFeed";
 
 export default function CommunityPage() {
     const [activeTab, setActiveTab] = useState<'explore' | 'following'>('explore');
     const [selectedType, setSelectedType] = useState<string>('all');
     const [selectedUser, setSelectedUser] = useState<{ userId: number, username: string } | null>(null);
     const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+    const [exploreHasUnread, setExploreHasUnread] = useState(false);
+    const [followingHasUnread, setFollowingHasUnread] = useState(false);
+
+    const refresh = useFeedRefresh();
+
+    const handleTabClick = async (tab: 'explore' | 'following') => {
+        if (activeTab === tab) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            await refresh(tab);
+            if (tab === 'explore') setExploreHasUnread(false);
+            else setFollowingHasUnread(false);
+        } else {
+            setActiveTab(tab);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-[#050505]">
@@ -22,7 +38,7 @@ export default function CommunityPage() {
                             Comunidad
                         </h1>
                         {/* Mobile Filter Toggle */}
-                        <button 
+                        <button
                             onClick={() => setIsFiltersOpen(true)}
                             className="lg:hidden p-2 text-zinc-500 hover:text-white transition-colors"
                             aria-label="Abrir filtros"
@@ -34,21 +50,31 @@ export default function CommunityPage() {
                     {/* Compact Tabs */}
                     <div className="flex h-full">
                         <button
-                            onClick={() => setActiveTab('explore')}
+                            onClick={() => handleTabClick('explore')}
                             className={`relative px-4 flex items-center text-[10px] font-mono tracking-[0.1em] uppercase transition-colors ${activeTab === 'explore' ? 'text-white' : 'text-zinc-600 hover:text-zinc-400'
                                 }`}
                         >
-                            Global
+                            <span className="relative">
+                                Global
+                                {exploreHasUnread && (
+                                    <span className="absolute -top-1 -right-2 w-1.5 h-1.5 bg-accent rounded-full shadow-[0_0_8px_rgba(255,255,255,0.4)]" />
+                                )}
+                            </span>
                             {activeTab === 'explore' && (
                                 <motion.div layoutId="activeUnderline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent" />
                             )}
                         </button>
                         <button
-                            onClick={() => setActiveTab('following')}
+                            onClick={() => handleTabClick('following')}
                             className={`relative px-4 flex items-center text-[10px] font-mono tracking-[0.1em] uppercase transition-colors ${activeTab === 'following' ? 'text-white' : 'text-zinc-600 hover:text-zinc-400'
                                 }`}
                         >
-                            Siguiendo
+                            <span className="relative">
+                                Siguiendo
+                                {followingHasUnread && (
+                                    <span className="absolute -top-1 -right-2 w-1.5 h-1.5 bg-accent rounded-full shadow-[0_0_8px_rgba(255,255,255,0.4)]" />
+                                )}
+                            </span>
                             {activeTab === 'following' && (
                                 <motion.div layoutId="activeUnderline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent" />
                             )}
@@ -57,7 +83,7 @@ export default function CommunityPage() {
                 </div>
             </div>
 
-            <MobileFeedFilters 
+            <MobileFeedFilters
                 isOpen={isFiltersOpen}
                 onClose={() => setIsFiltersOpen(false)}
                 activeType={selectedType}
@@ -76,18 +102,22 @@ export default function CommunityPage() {
 
                     {/* Feed Area - Centralized Column */}
                     <main className="w-full max-w-2xl border-x border-white/5 min-h-screen">
-                        <FeedList 
-                            tab={activeTab} 
-                            filters={{ 
+                        <FeedList
+                            tab={activeTab}
+                            filters={{
                                 type: selectedType !== 'all' ? selectedType : undefined,
-                                targetUserId: selectedUser?.userId 
-                            }} 
+                                targetUserId: selectedUser?.userId
+                            }}
+                            onUnreadChange={(hasUnread) => {
+                                if (activeTab === 'explore') setExploreHasUnread(hasUnread);
+                                else setFollowingHasUnread(hasUnread);
+                            }}
                         />
                     </main>
 
                     {/* Sidebar Derecho - Visible desde LG (1024px) */}
                     <div className="hidden lg:block w-[280px] shrink-0">
-                        <RightSidebar 
+                        <RightSidebar
                             activeType={selectedType}
                             setSelectedType={setSelectedType}
                             selectedUser={selectedUser}

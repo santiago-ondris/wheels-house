@@ -154,22 +154,6 @@ export class GroupService {
             }
         }
 
-        for (const carId of setGroupedCars) {
-            if (!(await deleteGroupedCarFromGroupIdAndCarId(groupId, carId))) {
-                throw ERROR_UPDATING_GROUP;
-            }
-        }
-
-        if (groupChanges.cars && groupChanges.cars.length >= 5) {
-            this.eventsService.emitGroupCreated({
-                userId: currentGroup.userId,
-                groupId,
-                groupName: groupChanges.name || currentGroup.name,
-                groupImage: groupChanges.picture || currentGroup.picture || undefined,
-                carCount: groupChanges.cars.length
-            });
-        }
-
         return true;
     }
 

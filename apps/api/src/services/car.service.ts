@@ -75,7 +75,7 @@ export class CarService {
 
             console.log(`[MilestoneCheck] User ${userId} now has ${count} cars.`);
 
-            const milestones = [5, 10, 25, 50, 100, 250, 500, 1000];
+            const milestones = [5, 25, 50, 100, 200];
             if (milestones.includes(count)) {
                 this.eventsService.emitMilestoneReached({
                     userId,
@@ -214,19 +214,6 @@ export class CarService {
         await deleteGroupedCarsFromCarId(carId);
         for (const groupId of groupIds) {
             await createGroupedCars({ groupId, carId });
-
-            // Emit social event if car count is relevant (5+)
-            const carsInGroup = await getGroupedCarsFromGroupId(groupId);
-            if (carsInGroup.length >= 5) {
-                const group = await getGroupFromId(groupId);
-                this.eventsService.emitGroupCreated({
-                    userId: group.userId,
-                    groupId: groupId,
-                    groupName: group.name,
-                    groupImage: group.picture || undefined,
-                    carCount: carsInGroup.length
-                });
-            }
         }
         return true;
     }
@@ -275,19 +262,6 @@ export class CarService {
             const result = await createGroupedCars({ groupId, carId });
             if (result && result.length > 0) addedCount++;
             else alreadyInGroup++;
-        }
-
-        // Emit social event if car count is relevant (5+)
-        const carsInGroup = await getGroupedCarsFromGroupId(groupId);
-        if (carsInGroup.length >= 5) {
-            const group = await getGroupFromId(groupId);
-            this.eventsService.emitGroupCreated({
-                userId: user.userId,
-                groupId: groupId,
-                groupName: group.name,
-                groupImage: group.picture || undefined,
-                carCount: carsInGroup.length
-            });
         }
 
         return { addedCount, alreadyInGroup, totalRequested: targetCarIds.length };
