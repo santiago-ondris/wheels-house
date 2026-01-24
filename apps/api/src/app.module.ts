@@ -24,6 +24,8 @@ import { HealthController } from './controllers/health.controller';
 import { EmailService } from './services/email.service';
 import { WheelwordController } from './controllers/wheelword.controller';
 import { WheelwordService } from './services/wheelword.service';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { SocialModule } from './modules/social/social.module';
 
 
 @Module({
@@ -41,6 +43,8 @@ import { WheelwordService } from './services/wheelword.service';
       secret: process.env.JWT_SECRET!,
       // Expiration set per token type in UserService
     }),
+    EventEmitterModule.forRoot(),
+    SocialModule,
   ],
   controllers: [UserController, CarController, UploadController, GroupController, StatsController, SearchHistoryController, ImportController, HealthController, WheelwordController],
   providers: [

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Search } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
@@ -12,10 +12,25 @@ export default function Navbar() {
   const { isAuthenticated, user } = useAuth();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <>
-      <nav className="bg-white/5 backdrop-blur-md border-b border-white/10 px-6 py-4 relative z-50">
+      <nav
+        className={`fixed top-0 w-full px-6 z-50 transition-all duration-500 ease-in-out flex items-center ${isScrolled
+            ? "bg-background/80 backdrop-blur-2xl border-b border-white/5 shadow-[0_8px_32px_rgba(0,0,0,0.3)] h-[72px]"
+            : "bg-transparent border-b border-transparent h-[88px]"
+          }`}
+      >
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-2">
@@ -32,6 +47,9 @@ export default function Navbar() {
                   </Link>
                   <Link to="/hall-of-fame" className="text-white/70 hover:text-white transition-colors">
                     Salón de la Fama
+                  </Link>
+                  <Link to="/community" className="text-white/70 hover:text-white transition-colors">
+                    Comunidad
                   </Link>
                   <Link to={`/collection/${user?.username}`} className="text-white/70 hover:text-white transition-colors">
                     Mi Colección
@@ -63,6 +81,9 @@ export default function Navbar() {
                   </Link>
                   <Link to="/hall-of-fame" className="text-white/70 hover:text-white transition-colors mr-2">
                     Salón de la Fama
+                  </Link>
+                  <Link to="/community" className="text-white/70 hover:text-white transition-colors mr-2">
+                    Comunidad
                   </Link>
                   <div className="w-64 mr-2">
                     <UserSearch />

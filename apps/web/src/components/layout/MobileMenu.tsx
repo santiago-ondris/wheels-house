@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { Disclosure, Transition } from "@headlessui/react";
-import { X, Menu as MenuIcon, Home, Car, LogIn, UserPlus, Trophy, User, Gamepad2 } from "lucide-react";
+import { X, Menu as MenuIcon, Home, Car, LogIn, UserPlus, Trophy, User, Gamepad2, LayoutGrid } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -51,6 +51,15 @@ export default function MobileMenu({ onLoginClick }: MobileMenuProps) {
                   >
                     <Trophy className="w-5 h-5" />
                     Salón de la Fama
+                  </Link>
+
+                  <Link
+                    to="/community"
+                    onClick={() => close()}
+                    className="flex items-center gap-3 px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors"
+                  >
+                    <LayoutGrid className="w-5 h-5" />
+                    Comunidad
                   </Link>
 
                   <Link

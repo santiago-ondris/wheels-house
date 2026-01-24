@@ -1,7 +1,7 @@
 import { CarPictureToDB, CarToDB, CarUpdateDTO } from "src/dto/car.dto";
 import { CollectionQueryDTO } from "src/dto/collection-query.dto";
 import { db } from "../index";
-import { car, carPicture, user, groupedCar } from "../schema";
+import { car, carPicture, user, groupedCar, feedEvent } from "../schema";
 import { count, eq, or, and, ilike, asc, desc, sql, SQL, inArray, notInArray } from 'drizzle-orm';
 
 // Create
@@ -181,6 +181,15 @@ export async function deleteCarsFromUserId(userId: number) {
         return deletedCars;
     } catch {
         return null;
+    }
+}
+
+export async function deleteFeedEventsFromCarId(carId: number) {
+    try {
+        await db.delete(feedEvent).where(eq(feedEvent.carId, carId));
+        return true;
+    } catch {
+        return false;
     }
 }
 

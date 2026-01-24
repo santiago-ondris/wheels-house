@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { RegisterDTO, UserToDB, LoginDTO, LoginResponse, TokenData, UpdateUserProfileDTO, UpdatePasswordDTO, ResetPasswordDTO, ForgotPasswordDTO } from '../dto/user.dto';
+import { RegisterDTO, UserToDB, LoginDTO, TokenData, UpdateUserProfileDTO, UpdatePasswordDTO, ResetPasswordDTO, ForgotPasswordDTO } from '../dto/user.dto';
 import { PublicProfileDTO, PublicCarDTO } from '../dto/public-profile.dto';
 import {
     createUser, getUserFromUsernameOrEmail, getPublicProfileByUsername, searchUsers, updateUserFromUserId, getUserFromUsername,
     updatePasswordFromUserId, deleteUserFromUsername,
-    getUserFromEmail,
     updateResetPasswordToken,
     getUserFromRequestTokenSelector,
     updatePasswordFromReset,
     deleteSearchHistoryFromUserId,
-    getFounders
+    getFounders,
+    deleteFeedEventsFromUserId
 } from 'src/database/crud/user.crud';
 import { deleteAllCarPictures, deleteCarsFromUserId, getCarsFromUserId, getPicturesFromCar } from 'src/database/crud/car.crud';
 import { deleteGroupedCarsFromCarId, deleteGroupedCarsFromGroupId, deleteGroupsFromUserId, getGroupsFromUserId } from 'src/database/crud/group.crud';
@@ -237,7 +237,8 @@ export class UserService {
         }
 
         const deletedSearchHistory = await deleteSearchHistoryFromUserId(user.userId);
-        if (!deletedSearchHistory) {
+        const deletedFeedEvents = await deleteFeedEventsFromUserId(user.userId);
+        if (!deletedSearchHistory || !deletedFeedEvents) {
             throw ERROR_DELETING_USER;
         }
 

@@ -1,5 +1,5 @@
 import { db } from '../index'
-import { group, groupedCar, user, car } from 'src/database/schema'
+import { group, groupedCar, user, car, feedEvent } from 'src/database/schema'
 import { eq, and, sql, asc, count, desc } from 'drizzle-orm';
 import { GroupToDB, UpdateGroupDTO } from 'src/dto/group.dto';
 
@@ -163,5 +163,14 @@ export async function deleteGroupsFromUserId(userId: number) {
         return deletedGroups;
     } catch {
         return null;
+    }
+}
+
+export async function deleteFeedEventsFromGroupId(groupId: number) {
+    try {
+        await db.delete(feedEvent).where(eq(feedEvent.groupId, groupId));
+        return true;
+    } catch {
+        return false;
     }
 }
