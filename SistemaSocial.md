@@ -828,9 +828,9 @@ export const FollowButton: React.FC<FollowButtonProps> = ({...}) => {
 
 **Mini-objetivos:**
 
-- [ ] En `FeedPage`, activar tab "Siguiendo"
-- [ ] Implementar empty state: "No sigues a nadie aún. Empieza a seguir desde Explorar"
-- [ ] Cuando usuario está en tab "Siguiendo", pasar `tab=following` al hook
+- [x] En `FeedPage`, activar tab "Siguiendo"
+- [x] Implementar empty state: "No sigues a nadie aún. Empieza a seguir desde Explorar"
+- [x] Cuando usuario está en tab "Siguiendo", pasar `tab=following` al hook
 
 ### Testing Sprint 2
 
@@ -850,13 +850,13 @@ export const FollowButton: React.FC<FollowButtonProps> = ({...}) => {
 
 **Criterios de completitud:**
 
-- [ ] Usuario puede seguir a otro desde su perfil
-- [ ] Botón cambia a "Siguiendo" inmediatamente
-- [ ] Contadores se actualizan
-- [ ] Usuario puede dejar de seguir
-- [ ] Tab "Siguiendo" en feed muestra solo actividad de quien sigo
-- [ ] Listas de followers/following son accesibles
-- [ ] Badge "Te sigue" aparece en perfiles ajenos cuando corresponde
+- [x] Usuario puede seguir a otro desde su perfil
+- [x] Botón cambia a "Siguiendo" inmediatamente
+- [no] Contadores se actualizan - QUEDO OBSOLETO - SE DECIDIO TOMAR UN APPROACH TIPO VSCO
+- [x] Usuario puede dejar de seguir
+- [x] Tab "Siguiendo" en feed muestra solo actividad de quien sigo
+- [x] Listas de followers/following son accesibles
+- [no] Badge "Te sigue" aparece en perfiles ajenos cuando corresponde - QUEDO OBSOLETO - SE DECIDIO TOMAR UN APPROACH TIPO VSCO
 
 ---
 

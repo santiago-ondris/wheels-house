@@ -33,7 +33,7 @@ import { SocialModule } from './modules/social/social.module';
     SentryModule.forRoot(),
     ThrottlerModule.forRoot([{
       ttl: 60000, // Time to live in milliseconds (1 minute)
-      limit: 3,   // Max 3 requests per minute
+      limit: 30,  // Max 30 requests per minute
     }]),
     PassportModule,
     ConfigModule.forRoot({
