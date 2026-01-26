@@ -3,6 +3,8 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Folder, Plus, ChevronRight } from "lucide-react";
 import { listGroups, GroupBasicInfo } from "../../services/group.service";
+import { LikeButton } from "../../features/social/components/likes/LikeButton";
+
 import { useAuth } from "../../contexts/AuthContext";
 import PageHeader from "../../components/ui/PageHeader";
 import toast from "react-hot-toast";
@@ -85,16 +87,18 @@ export default function GroupsListPage() {
                             >
                                 <Link
                                     to={`/collection/${username}/group/${encodeURIComponent(group.name)}`}
-                                    className="blueprint-card block relative overflow-hidden group aspect-[3/1] rounded-xl border border-white/5 bg-white/[0.02]"
+                                    className="blueprint-card block relative overflow-hidden group aspect-[2/1] sm:aspect-[3/1] rounded-xl border border-white/5 bg-white/[0.02]"
                                 >
+
                                     {/* Background Image - using crop-friendly aspect ratio */}
                                     {group.picture && (
                                         <div className="absolute inset-0 z-0">
                                             <img
                                                 src={group.picture}
                                                 alt={group.name}
-                                                className="w-full h-full object-cover opacity-20 grayscale group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out"
+                                                className="w-full h-full object-cover opacity-40 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out"
                                             />
+
                                             <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent group-hover:via-black/30 transition-all duration-500" />
                                         </div>
                                     )}
@@ -118,11 +122,13 @@ export default function GroupsListPage() {
                                             </div>
 
                                             {/* Tech Lines Top Right */}
-                                            <div className="relative w-8 h-8 opacity-50">
+                                            <div className="relative w-8 h-8 opacity-50 hidden sm:block">
                                                 <div className="absolute top-0 right-0 w-3 h-[1px] bg-white/50" />
                                                 <div className="absolute top-0 right-0 w-[1px] h-3 bg-white/50" />
                                             </div>
                                         </div>
+
+
 
                                         <div className="max-w-[85%]">
                                             <h3 className="text-2xl md:text-3xl font-mono font-black text-white truncate uppercase tracking-tighter group-hover:text-accent transition-colors drop-shadow-lg mb-2">
@@ -136,6 +142,19 @@ export default function GroupsListPage() {
                                                         {String(group.totalCars).padStart(3, '0')}
                                                     </span>
                                                 </div>
+                                                <div className="w-[1px] h-3 bg-white/20" />
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-white/40 uppercase">Likes:</span>
+                                                    <LikeButton
+                                                        id={group.groupId}
+                                                        initialIsLiked={group.isLiked || false}
+                                                        initialLikesCount={group.likesCount || 0}
+                                                        type="group"
+                                                        showCount={true}
+                                                        className="p-0 hover:bg-transparent"
+                                                    />
+                                                </div>
+
                                                 <div className="w-[1px] h-3 bg-white/20" />
                                                 <div className="flex items-center gap-1 text-white/40 group-hover:text-accent/80 transition-colors">
                                                     <span>VER DETALLES</span>

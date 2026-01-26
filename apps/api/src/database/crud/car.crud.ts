@@ -50,6 +50,7 @@ export async function getCarByIdWithOwner(carId: number) {
             quality: car.quality,
             variety: car.variety,
             finish: car.finish,
+            likesCount: car.likesCount,
             ownerUsername: user.username,
         })
         .from(car)
@@ -58,6 +59,7 @@ export async function getCarByIdWithOwner(carId: number) {
 
     return result[0];
 }
+
 
 export async function getCarsFromUserId(userId: number) {
     return await db.select().from(car).where(and(eq(car.userId, userId), eq(car.wished, false)));
@@ -111,6 +113,7 @@ export async function getCarByOffset(offset: number) {
             quality: car.quality,
             variety: car.variety,
             finish: car.finish,
+            likesCount: car.likesCount,
             ownerUsername: user.username,
         })
         .from(car)
@@ -121,6 +124,7 @@ export async function getCarByOffset(offset: number) {
 
     return result[0] ?? null;
 }
+
 
 export async function getPicturesFromCar(carId: number) {
     return await db.select().from(carPicture).where(eq(carPicture.carId, carId)).orderBy(carPicture.index);
@@ -327,6 +331,7 @@ export async function getCarsFromUserIdPaginated(userId: number, query: Collecti
             quality: car.quality,
             variety: car.variety,
             finish: car.finish,
+            likesCount: car.likesCount,
         })
         .from(car)
         .where(whereClause)

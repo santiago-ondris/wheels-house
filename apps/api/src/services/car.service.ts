@@ -15,6 +15,7 @@ import { createGroupedCars, deleteGroupedCarsFromCarId, getGroupsFromCarId, getG
 import { UploadService } from './upload.service';
 import { getPublicIdFromURL } from 'src/utils/upload.utils';
 import { EventsService } from '../modules/social/events/events.service';
+import * as likesRepository from '../modules/social/likes/likes.repository';
 
 @Injectable()
 export class CarService {
@@ -88,7 +89,7 @@ export class CarService {
         }
     }
 
-    async listCarsService(username: string) {
+    async listCarsService(username: string, viewerId?: number) {
         const user = await getUserFromUsername(username);
         const carsFromDB = await getCarsFromUserId(user.userId);
         let listedCars: CarInfo[] = [];
@@ -96,29 +97,38 @@ export class CarService {
         for (const car of carsFromDB) {
             const carPicturesFromDB = await getPicturesFromCar(car.carId);
             const carPictures = carPicturesFromDB.map(picture => picture.url);
+
+            const isLiked = viewerId ? await likesRepository.isCarLiked(viewerId, car.carId) : false;
+
             listedCars.push(new CarInfo(
                 car.carId, car.name, car.color, car.brand,
                 car.scale, car.manufacturer, car.condition, car.wished,
                 car.description, car.designer, car.series, carPictures, car.country,
-                car.rarity, car.quality, car.variety, car.finish
+                car.rarity, car.quality, car.variety, car.finish,
+                car.likesCount || 0, isLiked
             ));
         }
         return listedCars;
     }
 
-    async getCarService(carId: number) {
+
+    async getCarService(carId: number, viewerId?: number) {
         const carFromDB = await getCarByIdWithOwner(carId);
         const carPicturesFromDB = await getPicturesFromCar(carFromDB.carId);
         const carPicturesURLs = carPicturesFromDB.map(picture => picture.url);
+
+        const isLiked = viewerId ? await likesRepository.isCarLiked(viewerId, carFromDB.carId) : false;
 
         return new CarInfoWithOwner(
             carFromDB.carId, carFromDB.name, carFromDB.color, carFromDB.brand,
             carFromDB.scale, carFromDB.manufacturer, carFromDB.condition, carFromDB.wished,
             carFromDB.ownerUsername, carFromDB.description, carFromDB.designer, carFromDB.series,
             carPicturesURLs, carFromDB.country,
-            carFromDB.rarity, carFromDB.quality, carFromDB.variety, carFromDB.finish
+            carFromDB.rarity, carFromDB.quality, carFromDB.variety, carFromDB.finish,
+            carFromDB.likesCount || 0, isLiked
         );
     }
+
 
     async updateCarService(carChanges: CarUpdateDTO, carId: number) {
         const carUpdated = await updateCar(carChanges, carId);
@@ -188,7 +198,7 @@ export class CarService {
         };
     }
 
-    async getFeaturedCarService() {
+    async getFeaturedCarService(viewerId?: number) {
         const totalCars = await getTotalCarsCount();
         if (totalCars === 0) return null;
         const epoch = new Date('2025-01-01T00:00:00Z').getTime();
@@ -201,14 +211,18 @@ export class CarService {
         const carPicturesFromDB = await getPicturesFromCar(carFromDB.carId);
         const carPicturesURLs = carPicturesFromDB.map(picture => picture.url);
 
+        const isLiked = viewerId ? await likesRepository.isCarLiked(viewerId, carFromDB.carId) : false;
+
         return new CarInfoWithOwner(
             carFromDB.carId, carFromDB.name, carFromDB.color, carFromDB.brand,
             carFromDB.scale, carFromDB.manufacturer, carFromDB.condition, carFromDB.wished,
             carFromDB.ownerUsername, carFromDB.description, carFromDB.designer, carFromDB.series,
             carPicturesURLs, carFromDB.country,
-            carFromDB.rarity, carFromDB.quality, carFromDB.variety, carFromDB.finish
+            carFromDB.rarity, carFromDB.quality, carFromDB.variety, carFromDB.finish,
+            carFromDB.likesCount || 0, isLiked
         );
     }
+
 
     async updateCarGroupsService(carId: number, groupIds: number[]) {
         await deleteGroupedCarsFromCarId(carId);
@@ -223,7 +237,7 @@ export class CarService {
         return groups.map(g => g.groupId);
     }
 
-    async listCarsPaginatedService(username: string, query: CollectionQueryDTO): Promise<PaginatedCarsResponse<CarInfo>> {
+    async listCarsPaginatedService(username: string, query: CollectionQueryDTO, viewerId?: number): Promise<PaginatedCarsResponse<CarInfo>> {
         const user = await getUserFromUsername(username);
         const { items, pagination } = await getCarsFromUserIdPaginated(user.userId, query);
 
@@ -231,17 +245,22 @@ export class CarService {
         for (const carData of items) {
             const carPicturesFromDB = await getPicturesFromCar(carData.carId);
             const carPictures = carPicturesFromDB.map(picture => picture.url);
+
+            const isLiked = viewerId ? await likesRepository.isCarLiked(viewerId, carData.carId) : false;
+
             listedCars.push(new CarInfo(
                 carData.carId, carData.name, carData.color, carData.brand,
                 carData.scale, carData.manufacturer, carData.condition, carData.wished,
                 carData.description, carData.designer, carData.series, carPictures, carData.country,
-                carData.rarity, carData.quality, carData.variety, carData.finish
+                carData.rarity, carData.quality, carData.variety, carData.finish,
+                carData.likesCount || 0, isLiked
             ));
         }
 
         const filters = await getFilterOptionsForUser(user.userId, query.groupId);
         return { items: listedCars, pagination, filters };
     }
+
 
     async bulkAddToGroupService(username: string, groupId: number, carIds?: number[], filterQuery?: CollectionQueryDTO) {
         const user = await getUserFromUsername(username);
@@ -313,7 +332,7 @@ export class CarService {
         this.checkAndEmitMilestone(carBeforeUpdate.userId);
     }
 
-    async getWishlistService(username: string) {
+    async getWishlistService(username: string, viewerId?: number) {
         const user = await getUserFromUsername(username);
         const wishedCarsFromDB = await getWishedCarsFromUserId(user.userId);
         let wishlist: CarInfo[] = [];
@@ -321,11 +340,15 @@ export class CarService {
         for (const car of wishedCarsFromDB) {
             const carPicturesFromDB = await getPicturesFromCar(car.carId);
             const carPictures = carPicturesFromDB.map(picture => picture.url);
+
+            const isLiked = viewerId ? await likesRepository.isCarLiked(viewerId, car.carId) : false;
+
             wishlist.push(new CarInfo(
                 car.carId, car.name, car.color, car.brand,
                 car.scale, car.manufacturer, car.condition, car.wished,
                 car.description, car.designer, car.series, carPictures, car.country,
-                car.rarity, car.quality, car.variety, car.finish
+                car.rarity, car.quality, car.variety, car.finish,
+                car.likesCount || 0, isLiked
             ));
         }
         return wishlist;

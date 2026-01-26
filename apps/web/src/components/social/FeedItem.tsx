@@ -2,6 +2,8 @@ import { motion } from "framer-motion";
 import { User, Car, Trophy, Star, Users, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { FeedItemDto } from "../../services/social.service";
+import { LikeButton } from "../../features/social/components/likes/LikeButton";
+
 
 interface FeedItemProps {
     item: FeedItemDto;
@@ -146,19 +148,33 @@ export default function FeedItem({ item }: FeedItemProps) {
                 )}
 
                 {/* Actions Bar (Minimalist) */}
-                <div className="flex items-center gap-4 mt-2">
-                    <div className={`p-1.5 rounded-md bg-white/[0.03] ${theme.color}`}>
-                        {theme.icon}
+                <div className="flex items-center gap-6 mt-2">
+                    <div className="flex items-center gap-4">
+                        <div className={`p-1.5 rounded-md bg-white/[0.03] ${theme.color}`}>
+                            {theme.icon}
+                        </div>
+                        {(item.carId || item.groupId) && (
+                            <Link
+                                to={item.carId ? `/car/${item.carId}` : `/collection/${item.username}/group/${item.metadata?.groupName}`}
+                                className="text-[9px] font-mono font-bold text-zinc-600 hover:text-white transition-colors uppercase tracking-[0.2em]"
+                            >
+                                Ver detalle
+                            </Link>
+                        )}
                     </div>
+
+                    {/* Like Button */}
                     {(item.carId || item.groupId) && (
-                        <Link
-                            to={item.carId ? `/car/${item.carId}` : `/collection/${item.username}/group/${item.metadata?.groupName}`}
-                            className="text-[9px] font-mono font-bold text-zinc-600 hover:text-white transition-colors uppercase tracking-[0.2em]"
-                        >
-                            Ver detalle
-                        </Link>
+                        <LikeButton
+                            id={(item.carId || item.groupId)!}
+                            initialIsLiked={item.isLiked}
+                            initialLikesCount={item.likesCount}
+                            type={item.carId ? 'car' : 'group'}
+                            className="ml-auto"
+                        />
                     )}
                 </div>
+
             </div>
         </motion.div>
     );

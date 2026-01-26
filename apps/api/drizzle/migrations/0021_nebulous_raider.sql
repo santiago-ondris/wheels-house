@@ -1,0 +1,1 @@
+ALTER TABLE "car" ADD COLUMN "likesCount" integer DEFAULT 0 NOT NULL;

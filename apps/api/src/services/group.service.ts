@@ -9,6 +9,7 @@ import { CarInfoWoGroups } from 'src/dto/car.dto';
 import { UploadService } from './upload.service';
 import { getPublicIdFromURL } from 'src/utils/upload.utils';
 import { EventsService } from '../modules/social/events/events.service';
+import * as likesRepository from '../modules/social/likes/likes.repository';
 
 @Injectable()
 export class GroupService {
@@ -52,27 +53,37 @@ export class GroupService {
         return true;
     }
 
-    async getGroupService(groupId: number) {
+    async getGroupService(groupId: number, viewerId?: number) {
         const group = await getGroupFromId(groupId);
         const carsFromGroupDB = await getCarsFromGroupId(groupId);
         const carsFromGroup: CarInfoWoGroups[] = [];
 
         for (const car of carsFromGroupDB) {
             const carPicturesFromDB = await getPicturesFromCar(car.carId);
-            carsFromGroup.push(new CarInfoWoGroups(
+            const isCarLiked = viewerId ? await likesRepository.isCarLiked(viewerId, car.carId) : false;
+
+            const carInfo = new CarInfoWoGroups(
                 car.carId, car.name, car.color, car.brand, car.scale,
                 car.manufacturer, car.condition || "", car.description, car.designer, car.series,
                 carPicturesFromDB.map(p => p.url), car.country
-            ));
+            );
+            (carInfo as any).likesCount = car.likesCount || 0;
+            (carInfo as any).isLiked = isCarLiked;
+
+            carsFromGroup.push(carInfo);
         }
+
+        const isGroupLiked = viewerId ? await likesRepository.isGroupLiked(viewerId, group.groupId) : false;
 
         return new GroupInfo(
             group.groupId, group.name, carsFromGroup.length, carsFromGroup,
-            group.description, group.picture, group.featured, group.order
+            group.description, group.picture, group.featured, group.order,
+            group.likesCount || 0, isGroupLiked
         );
     }
 
-    async getGroupByNameService(username: string, groupName: string) {
+
+    async getGroupByNameService(username: string, groupName: string, viewerId?: number) {
         const user = await getUserFromUsername(username);
         if (!user) throw INEXISTENT_GROUP;
 
@@ -84,48 +95,66 @@ export class GroupService {
 
         for (const car of carsFromGroupDB) {
             const carPicturesFromDB = await getPicturesFromCar(car.carId);
-            carsFromGroup.push(new CarInfoWoGroups(
+            const isCarLiked = viewerId ? await likesRepository.isCarLiked(viewerId, car.carId) : false;
+
+            const carInfo = new CarInfoWoGroups(
                 car.carId, car.name, car.color, car.brand, car.scale,
                 car.manufacturer, car.condition || "", car.description, car.designer, car.series,
                 carPicturesFromDB.map(p => p.url), car.country
-            ));
+            );
+            (carInfo as any).likesCount = car.likesCount || 0;
+            (carInfo as any).isLiked = isCarLiked;
+
+            carsFromGroup.push(carInfo);
         }
+
+        const isGroupLiked = viewerId ? await likesRepository.isGroupLiked(viewerId, group.groupId) : false;
 
         return new GroupInfo(
             group.groupId, group.name, carsFromGroup.length, carsFromGroup,
-            group.description, group.picture, group.featured, group.order
+            group.description, group.picture, group.featured, group.order,
+            group.likesCount || 0, isGroupLiked
         );
     }
 
-    async listGroupsService(username: string) {
+
+    async listGroupsService(username: string, viewerId?: number) {
         const user = await getUserFromUsername(username);
         const groupsFromUserFromDB = await getGroupsFromUserId(user.userId);
         const groupsFromUser: GroupInfoWoCar[] = [];
 
         for (const group of groupsFromUserFromDB) {
             const totalCars = (await getCarsFromGroupId(group.groupId)).length;
+            const isGroupLiked = viewerId ? await likesRepository.isGroupLiked(viewerId, group.groupId) : false;
+
             groupsFromUser.push(new GroupInfoWoCar(
                 group.groupId, group.name, totalCars, group.description,
-                group.picture, group.featured, group.order
+                group.picture, group.featured, group.order,
+                group.likesCount || 0, isGroupLiked
             ));
         }
         return groupsFromUser;
     }
 
-    async listFeaturedGroupsService(username: string) {
+
+    async listFeaturedGroupsService(username: string, viewerId?: number) {
         const user = await getUserFromUsername(username);
         const featuredGroupsFromDB = await getFeaturedGroupsFromUserId(user.userId);
         const featuredGroups: GroupInfoWoCar[] = [];
 
         for (const group of featuredGroupsFromDB) {
             const totalCars = (await getCarsFromGroupId(group.groupId)).length;
+            const isGroupLiked = viewerId ? await likesRepository.isGroupLiked(viewerId, group.groupId) : false;
+
             featuredGroups.push(new GroupInfoWoCar(
                 group.groupId, group.name, totalCars, group.description,
-                group.picture, group.featured, group.order
+                group.picture, group.featured, group.order,
+                group.likesCount || 0, isGroupLiked
             ));
         }
         return featuredGroups;
     }
+
 
     async updateGroupService(groupId: number, groupChanges: UpdateGroupDTO) {
         const currentGroup = await getGroupFromId(groupId);

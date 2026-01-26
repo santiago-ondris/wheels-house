@@ -58,14 +58,19 @@ export class GroupInfoWoCar {
     picture?: string | null = '';
     featured?: boolean = false;
     order?: number | null = null;
+    likesCount: number = 0;
+    isLiked: boolean = false;
 
     constructor(groupId: number, name: string, totalCars: number,
         description: string | null = '', picture: string | null = '',
-        featured: boolean | null = false, order: number | null = null
+        featured: boolean | null = false, order: number | null = null,
+        likesCount: number = 0, isLiked: boolean = false
     ) {
         this.groupId = groupId, this.name = name, this.totalCars = totalCars;
         this.description = description, this.picture = picture;
         this.featured = featured ?? false, this.order = order;
+        this.likesCount = likesCount;
+        this.isLiked = isLiked;
     }
 }
 
@@ -74,9 +79,10 @@ export class GroupInfo extends GroupInfoWoCar {
 
     constructor(groupId: number, name: string, totalCars: number, cars: CarInfoWoGroups[],
         description: string | null = '', picture: string | null = '',
-        featured: boolean | null = false, order: number | null = null
+        featured: boolean | null = false, order: number | null = null,
+        likesCount: number = 0, isLiked: boolean = false
     ) {
-        super(groupId, name, totalCars, description, picture, featured, order);
+        super(groupId, name, totalCars, description, picture, featured, order, likesCount, isLiked);
         this.cars = cars;
     }
 }

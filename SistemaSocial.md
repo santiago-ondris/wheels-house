@@ -876,6 +876,7 @@ Validación social directa: "Mi auto es cool, la gente lo reconoce". Engagement 
 
 **¿Qué se puede likear?**
 - ✅ Autos individuales en colecciones ajenas
+- ✅ Grupos de colecciones ajenas
 - ❌ Colecciones completas (demasiado abstracto)
 - ❌ Usuarios (no es red social de "popularidad")
 - ❌ Posts de búsqueda/oferta (no tiene sentido, son utilitarios)
@@ -883,6 +884,7 @@ Validación social directa: "Mi auto es cool, la gente lo reconoce". Engagement 
 **¿Dónde aparece el botón de like?**
 - Card de auto en feed
 - Modal/detalle de auto
+- En cada grupo ajeno
 - Galería de colección ajena (cada auto tiene botón)
 
 #### Estructura Técnica
@@ -1183,23 +1185,25 @@ interface Report {
 
 **Mini-objetivos:**
 
-- [ ] Crear entidad `CarLike` con Drizzle
-- [ ] Crear migración para tabla `car_likes` con constraint único
-- [ ] Ejecutar migración
-- [ ] Agregar campo a `cars`: `likes_count INT DEFAULT 0`
-- [ ] Crear migración para campo nuevo
-- [ ] Crear `LikesRepository` con métodos:
+- [x] Crear entidad `CarLike` con Drizzle
+- [x] Crear migración para tabla `car_likes` con constraint único
+- [x] Ejecutar migración
+- [x] Agregar campo a `cars`: `likes_count INT DEFAULT 0`
+- [x] Crear migración para campo nuevo
+- [x] Crear `LikesRepository` con métodos:
   - `create(userId, carId)`
   - `delete(userId, carId)`
   - `findByCarId(carId, page, limit)`
   - `isLiked(userId, carId)`
   - `getLikesCount(carId)`
-- [ ] Crear `LikesService` con lógica:
+- [x] Crear `LikesService` con lógica:
   - `likeCar(userId, carId)` - Verificar auto existe, no es propio, crear, incrementar, emitir evento
   - `unlikeCar(userId, carId)` - Eliminar, decrementar, emitir evento
   - `getLikers(carId, page, limit)` (máximo 100)
-- [ ] Implementar throttling: 50 likes por hora
-- [ ] Crear `LikesController` con endpoints
+
+- [x] Implementar throttling: 100 likes por hora
+- [x] Crear `LikesController` con endpoints
+
 
 **Archivos a crear:**
 - `apps/api/src/modules/social/likes/entities/car-like.entity.ts`
@@ -1239,33 +1243,23 @@ interface Report {
 
 **Mini-objetivos:**
 
-- [ ] Crear component `LikeButton.tsx`
-- [ ] Implementar estados (no likeado / likeado / loading)
-- [ ] Implementar hook `useLike(carId)`
-- [ ] Manejar optimistic updates
-- [ ] Agregar animación al likear
+- [x] Crear component `LikeButton.tsx`
+- [x] Implementar estados (no likeado / likeado / loading)
+- [x] Implementar hook `useLike(carId)`
+- [x] Manejar optimistic updates
+- [x] Agregar animación al likear
+
 
 **Archivo a crear:**
 - `apps/web/src/features/social/components/likes/LikeButton.tsx`
-
-### Frontend - Likers Modal
-
-**Mini-objetivos:**
-
-- [ ] Crear component `LikersModal.tsx`
-- [ ] Mostrar lista de usuarios que likearon
-- [ ] Implementar hook `useLikers(carId)`
-
-**Archivo a crear:**
-- `apps/web/src/features/social/components/likes/LikersModal.tsx`
 
 ### Frontend - Integration with Feed
 
 **Mini-objetivos:**
 
-- [ ] En `CarAddedItem` y `WishlistAchievedItem`, agregar `LikeButton`
-- [ ] En detalle de auto, agregar `LikeButton`
-- [ ] En galería de colección, agregar `LikeButton` en cada card
+- [x] En `CarAddedItem` y `WishlistAchievedItem`, agregar `LikeButton`
+- [x] En detalle de auto, agregar `LikeButton`
+- [x] En galería de colección, agregar `LikeButton` en cada card
 
 ### Frontend - Notifications Bell
 
@@ -1292,14 +1286,6 @@ interface Report {
 - [ ] Agregar `NotificationBell` al header
 - [ ] Posicionar a la izquierda del avatar
 - [ ] Testear que no rompe layout en mobile
-
-### Frontend - "Top Liked Cars" Section
-
-**Mini-objetivos:**
-
-- [ ] En perfil propio, agregar sección "Mis autos más populares"
-- [ ] Query: top 10 autos ordenados por `likes_count DESC`
-- [ ] Mostrar cards con imagen, nombre, contador de likes
 
 ### Testing Sprint 3
 

@@ -10,6 +10,7 @@ import { CarMasonryGrid } from "../../components/cars/CarMasonryGrid";
 import Modal from "../../components/ui/Modal";
 import toast from "react-hot-toast";
 import RelatedCarsCarousel from "../../components/cars/RelatedCarsCarousel";
+import { LikeButton } from "../../features/social/components/likes/LikeButton";
 
 export const CarDetailPage = () => {
     const { carId } = useParams<{ carId: string }>();
@@ -128,8 +129,15 @@ export const CarDetailPage = () => {
                         </motion.button>
                     </div>
 
-                    {isOwner && (
-                        <div className="flex gap-3">
+                    {isOwner ? (
+                        <div className="flex gap-3 items-center">
+                            <LikeButton
+                                id={car.carId!}
+                                initialIsLiked={car.isLiked || false}
+                                initialLikesCount={car.likesCount || 0}
+                                type="car"
+                            />
+                            <div className="w-px h-6 bg-white/10 mx-1" />
                             <button
                                 onClick={handleEdit}
                                 className={`p-2 border rounded-lg transition-colors ${car.wished
@@ -146,7 +154,17 @@ export const CarDetailPage = () => {
                                 <Trash2 size={18} />
                             </button>
                         </div>
+                    ) : (
+                        <div className="flex gap-3 items-center">
+                            <LikeButton
+                                id={car.carId!}
+                                initialIsLiked={car.isLiked || false}
+                                initialLikesCount={car.likesCount || 0}
+                                type="car"
+                            />
+                        </div>
                     )}
+
                 </div>
 
                 {galleryImages.length > 0 && (

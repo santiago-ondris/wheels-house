@@ -30,10 +30,18 @@ export class FeedController {
         let result: { items: FeedEventWithUser[]; hasMore: boolean };
 
         if (tab === 'following' && req.user) {
-            result = await this.feedService.getFeedFollowing(req.user.userId, page, limit, { type, targetUserId });
+            result = await this.feedService.getFeedFollowing(req.user.userId, page, limit, {
+                type,
+                targetUserId,
+                viewerId: req.user.userId
+            });
         } else {
             // Default to explore (global)
-            result = await this.feedService.getFeedGlobal(page, limit, { type, targetUserId });
+            result = await this.feedService.getFeedGlobal(page, limit, {
+                type,
+                targetUserId,
+                viewerId: req.user?.userId
+            });
         }
 
         // Map to DTO
@@ -49,7 +57,10 @@ export class FeedController {
             groupId: item.groupId,
             metadata: item.metadata,
             createdAt: item.createdAt.toISOString(),
+            likesCount: item.likesCount,
+            isLiked: item.isLiked,
         }));
+
 
         return {
             items,

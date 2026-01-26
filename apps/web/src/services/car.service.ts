@@ -19,6 +19,8 @@ export interface CarData {
     quality?: string;
     variety?: string;
     finish?: string;
+    likesCount?: number;
+    isLiked?: boolean;
 }
 
 export interface CarSuggestions {

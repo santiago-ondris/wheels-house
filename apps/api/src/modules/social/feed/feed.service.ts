@@ -58,6 +58,7 @@ export class FeedService {
         };
     }
 
+
     /**
      * Verifica si ya existe un evento para evitar duplicados
      */

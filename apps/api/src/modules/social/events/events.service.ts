@@ -9,7 +9,9 @@ import {
     UserFollowedPayload,
     UserUnfollowedPayload,
     CarLikedPayload,
+    GroupLikedPayload,
     MilestoneReachedPayload,
+
     PostCreatedPayload,
 } from './event-types';
 
@@ -58,6 +60,19 @@ export class EventsService {
     emitCarLiked(payload: CarLikedPayload): void {
         this.eventEmitter.emit(EVENTS.CAR_LIKED, payload);
     }
+
+    emitCarUnliked(payload: CarLikedPayload): void {
+        this.eventEmitter.emit(EVENTS.CAR_UNLIKED, payload);
+    }
+
+    emitGroupLiked(payload: GroupLikedPayload): void {
+        this.eventEmitter.emit(EVENTS.GROUP_LIKED, payload);
+    }
+
+    emitGroupUnliked(payload: GroupLikedPayload): void {
+        this.eventEmitter.emit(EVENTS.GROUP_UNLIKED, payload);
+    }
+
 
     // ==================== Milestone Events ====================
 

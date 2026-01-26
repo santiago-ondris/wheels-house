@@ -7,6 +7,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import PageHeader from "../../components/ui/PageHeader";
 import CollectionSection from "../../components/user_profile/CollectionSection";
 import GroupNotFoundPage from "./GroupNotFoundPage";
+import { LikeButton } from "../../features/social/components/likes/LikeButton";
+
 
 export default function GroupDetailPage() {
     const { username, groupName } = useParams<{ username: string; groupName: string }>();
@@ -82,25 +84,37 @@ export default function GroupDetailPage() {
                         </button>
 
                         {/* Actions Top Right */}
-                        {isOwner && group.groupId && (
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={() => navigate(`/collection/group/manage/${group.groupId}`)}
-                                    className="p-2 bg-black/40 hover:bg-black/60 backdrop-blur-md text-white border border-white/10 rounded-full transition-all"
-                                    title="Gestionar Autos"
-                                >
-                                    <Grid className="w-5 h-5" />
-                                </button>
-                                <button
-                                    onClick={() => navigate(`/collection/group/edit/${group.groupId}`)}
-                                    className="p-2 bg-black/40 hover:bg-black/60 backdrop-blur-md text-white border border-white/10 rounded-full transition-all"
-                                    title="Editar Grupo"
-                                >
-                                    <Edit className="w-5 h-5" />
-                                </button>
-                            </div>
-                        )}
+                        <div className="flex gap-2.5 items-center">
+                            <LikeButton
+                                id={group.groupId!}
+                                initialIsLiked={group.isLiked || false}
+                                initialLikesCount={group.likesCount || 0}
+                                type="group"
+                                className="bg-black/40 hover:bg-black/60 backdrop-blur-xl border border-white/20 rounded-full pr-3 !transition-all active:scale-90"
+                            />
+                            {isOwner && group.groupId && (
+                                <>
+                                    <div className="w-[1px] h-5 bg-white/10 mx-1" />
+                                    <button
+                                        onClick={() => navigate(`/collection/group/manage/${group.groupId}`)}
+                                        className="p-2.5 bg-black/40 hover:bg-black/60 backdrop-blur-xl text-white border border-white/20 rounded-full transition-all active:scale-90"
+                                        title="Gestionar Autos"
+                                    >
+                                        <Grid className="w-5 h-5 text-white/80" />
+                                    </button>
+                                    <button
+                                        onClick={() => navigate(`/collection/group/edit/${group.groupId}`)}
+                                        className="p-2.5 bg-black/40 hover:bg-black/60 backdrop-blur-xl text-white border border-white/20 rounded-full transition-all active:scale-90"
+                                        title="Editar Grupo"
+                                    >
+                                        <Edit className="w-5 h-5 text-white/80" />
+                                    </button>
+                                </>
+                            )}
+                        </div>
+
                     </div>
+
 
                     {/* Content Bottom */}
                     <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10 z-20">
@@ -146,25 +160,35 @@ export default function GroupDetailPage() {
                     icon={Folder}
                     onBack={handleBack}
                     actions={
-                        isOwner && group.groupId ? (
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={() => navigate(`/collection/group/manage/${group.groupId}`)}
-                                    className="flex items-center gap-2 px-4 py-2 border border-white/10 text-white/70 hover:text-white hover:bg-white/5 text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all"
-                                >
-                                    <Grid className="w-4 h-4" />
-                                    <span className="hidden md:inline">Gestionar Autos</span>
-                                </button>
-                                <button
-                                    onClick={() => navigate(`/collection/group/edit/${group.groupId}`)}
-                                    className="flex items-center gap-2 px-4 py-2 border border-white/10 text-white/70 hover:text-white hover:bg-white/5 text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all"
-                                >
-                                    <Edit className="w-4 h-4" />
-                                    <span className="hidden md:inline">Editar Info</span>
-                                </button>
-                            </div>
-                        ) : undefined
+                        <div className="flex gap-3 items-center">
+                            <LikeButton
+                                id={group.groupId!}
+                                initialIsLiked={group.isLiked || false}
+                                initialLikesCount={group.likesCount || 0}
+                                type="group"
+                            />
+                            {isOwner && group.groupId && (
+                                <>
+                                    <div className="w-px h-6 bg-white/10 mx-1" />
+                                    <button
+                                        onClick={() => navigate(`/collection/group/manage/${group.groupId}`)}
+                                        className="flex items-center gap-2 px-4 py-2 border border-white/10 text-white/70 hover:text-white hover:bg-white/5 text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all"
+                                    >
+                                        <Grid className="w-4 h-4" />
+                                        <span className="hidden md:inline">Gestionar Autos</span>
+                                    </button>
+                                    <button
+                                        onClick={() => navigate(`/collection/group/edit/${group.groupId}`)}
+                                        className="flex items-center gap-2 px-4 py-2 border border-white/10 text-white/70 hover:text-white hover:bg-white/5 text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all"
+                                    >
+                                        <Edit className="w-4 h-4" />
+                                        <span className="hidden md:inline">Editar Info</span>
+                                    </button>
+                                </>
+                            )}
+                        </div>
                     }
+
                 />
             )}
 

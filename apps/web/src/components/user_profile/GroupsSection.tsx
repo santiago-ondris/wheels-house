@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { Folder, ChevronRight, Plus } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { listFeaturedGroups, GroupBasicInfo } from "../../services/group.service";
+import { LikeButton } from "../../features/social/components/likes/LikeButton";
+
 
 interface GroupsSectionProps {
     username: string;
@@ -150,22 +152,39 @@ export default function GroupsSection({ username, totalGroups, isOwner }: Groups
                                             </div>
 
                                             {/* Tech Lines Top Right */}
-                                            <div className="relative w-8 h-8">
+                                            <div className="relative w-8 h-8 opacity-50 hidden sm:block">
                                                 <div className="absolute top-0 right-0 w-2 h-[1px] bg-white/30" />
                                                 <div className="absolute top-0 right-0 w-[1px] h-2 bg-white/30" />
                                             </div>
                                         </div>
 
+
+
                                         <div className="space-y-1 max-w-[80%]">
                                             <h3 className="text-xl md:text-2xl font-mono font-black text-white truncate uppercase tracking-tighter group-hover:text-accent transition-colors drop-shadow-lg">
                                                 {group.name}
                                             </h3>
-                                            <div className="flex items-center gap-2 text-[11px] font-mono">
-                                                <span className="text-white/40 uppercase">Total Items:</span>
-                                                <span className="text-white/80 font-bold bg-white/10 px-1.5 py-0.5 rounded">
-                                                    {String(group.totalCars).padStart(3, '0')}
-                                                </span>
+                                            <div className="flex items-center gap-3 text-[11px] font-mono">
+                                                <div className="flex items-center gap-1.5">
+                                                    <span className="text-white/40 uppercase">Total Items:</span>
+                                                    <span className="text-white/80 font-bold bg-white/10 px-1.5 py-0.5 rounded">
+                                                        {String(group.totalCars).padStart(3, '0')}
+                                                    </span>
+                                                </div>
+                                                <div className="w-[1px] h-3 bg-white/20" />
+                                                <div className="flex items-center gap-1.5">
+                                                    <span className="text-white/40 uppercase">Likes:</span>
+                                                    <LikeButton
+                                                        id={group.groupId}
+                                                        initialIsLiked={group.isLiked || false}
+                                                        initialLikesCount={group.likesCount || 0}
+                                                        type="group"
+                                                        showCount={true}
+                                                        className="p-0 hover:bg-transparent"
+                                                    />
+                                                </div>
                                             </div>
+
                                         </div>
                                     </div>
                                 </Link>
