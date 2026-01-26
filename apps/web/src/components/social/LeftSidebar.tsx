@@ -50,7 +50,7 @@ export default function LeftSidebar() {
     ];
 
   return (
-    <aside className="w-full flex flex-col gap-6 py-6 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto custom-scrollbar pr-4">
+    <aside className="w-full flex flex-col gap-6 py-6 sticky top-[calc(var(--navbar-height)+3.5rem)] h-[calc(100vh-var(--navbar-height)-3.5rem)] overflow-y-auto scrollbar-hide pr-4 transition-[top,height] duration-500">
       {/* User Mini Profile or Guest CTA */}
       {isAuthenticated && user ? (
         <div className="bg-zinc-900/50 border border-white/5 rounded-2xl p-5 flex flex-col gap-4">

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Search } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
@@ -8,20 +8,14 @@ import LoginModal from "./auth/LoginModal";
 import UserSearch from "./ui/UserSearch";
 import MobileUserSearch from "./ui/MobileUserSearch";
 
-export default function Navbar() {
+interface NavbarProps {
+  isScrolled: boolean;
+}
+
+export default function Navbar({ isScrolled }: NavbarProps) {
   const { isAuthenticated, user } = useAuth();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   return (
     <>

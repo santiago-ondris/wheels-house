@@ -33,7 +33,7 @@ export default function CommunityPage() {
     return (
         <div className="min-h-screen bg-[#050505]">
             {/* Ultra Minimalist Header - Integrated with page background */}
-            <div className="sticky top-[72px] z-30 bg-[#050505]/80 backdrop-blur-md border-b border-white/5">
+            <div className="sticky top-[var(--navbar-height)] z-30 bg-[#050505]/80 backdrop-blur-md border-b border-white/5 transition-[top] duration-500">
                 <div className="max-w-2xl mx-auto px-4 lg:px-0 flex items-center justify-between h-14">
                     <div className="flex items-center gap-2">
                         <h1 className="text-sm font-black text-white uppercase tracking-[0.2em]">

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, ScrollRestoration, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "../contexts/AuthContext";
@@ -25,6 +25,16 @@ const queryClient = new QueryClient({
  */
 export default function RootLayout() {
     const { pathname } = useLocation();
+    const [isScrolled, setIsScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 10);
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     // Force scroll to top for specific pages that should always start at the beginning
     useEffect(() => {
@@ -49,9 +59,15 @@ export default function RootLayout() {
     return (
         <QueryClientProvider client={queryClient}>
             <AuthProvider>
-                <div className="min-h-screen bg-background font-arvo flex flex-col">
-                    <Navbar />
-                    <main className="flex-1 pt-[88px]">
+                <div
+                    className="min-h-screen bg-background font-arvo flex flex-col"
+                    style={{
+                        '--navbar-height': isScrolled ? '72px' : '88px',
+                        transition: 'padding-top 0.5s ease-in-out'
+                    } as React.CSSProperties}
+                >
+                    <Navbar isScrolled={isScrolled} />
+                    <main className="flex-1 pt-[var(--navbar-height)]">
                         <Outlet />
                     </main>
                     <Footer />
