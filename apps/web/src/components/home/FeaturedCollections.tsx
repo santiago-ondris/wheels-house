@@ -16,7 +16,17 @@ export default function FeaturedCollections() {
         const fetchFeatured = async () => {
             try {
                 const founders = await getFounders();
-                setFeaturedUsers(founders.slice(0, 2));
+                // Filter users with at least 1 car and shuffle them
+                const shuffled = founders
+                    .filter(f => f.carCount > 0)
+                    .sort(() => Math.random() - 0.5);
+
+                // Take 2 random users (or fall back to first 2 if none have cars)
+                const selected = shuffled.length >= 2
+                    ? shuffled.slice(0, 2)
+                    : founders.slice(0, 2);
+
+                setFeaturedUsers(selected);
                 setTotalFounders(founders.length);
             } catch (error) {
                 console.error("Error fetching featured users:", error);
