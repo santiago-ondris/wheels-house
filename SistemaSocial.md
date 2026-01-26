@@ -670,14 +670,14 @@ if (milestone) {
 
 **Mini-objetivos:**
 
-- [ ] Crear entidad `UserFollow` con Drizzle
-- [ ] Crear migración para tabla `user_follows` con constraint único
-- [ ] Ejecutar migración
-- [ ] Agregar campos a `users`:
+- [x] Crear entidad `UserFollow` con Drizzle
+- [x] Crear migración para tabla `user_follows` con constraint único
+- [x] Ejecutar migración
+- [x] Agregar campos a `users`:
   - `followers_count INT DEFAULT 0`
   - `following_count INT DEFAULT 0`
-- [ ] Crear migración para campos nuevos
-- [ ] Crear `FollowsRepository` con métodos:
+- [x] Crear migración para campos nuevos
+- [x] Crear `FollowsRepository` con métodos:
   - `create(followerId, followedId)`
   - `delete(followerId, followedId)`
   - `findFollowers(userId, page, limit)`
@@ -685,7 +685,7 @@ if (milestone) {
   - `isFollowing(followerId, followedId)`
   - `getFollowersCount(userId)`
   - `getFollowingCount(userId)`
-- [ ] Crear `FollowsService` con lógica:
+- [x] Crear `FollowsService` con lógica:
   - `follow(followerId, followedId)`
     - Verificar no self-follow
     - Crear registro
@@ -697,9 +697,9 @@ if (milestone) {
     - Emitir evento `user.unfollowed`
   - `getFollowers(userId, page, limit)`
   - `getFollowing(userId, page, limit)`
-- [ ] Implementar throttling: máximo 10 follows por minuto
-- [ ] Implementar límite: máximo 1000 follows por usuario
-- [ ] Crear `FollowsController` con endpoints:
+- [x] Implementar throttling: máximo 10 follows por minuto
+- [x] Implementar límite: máximo 1000 follows por usuario
+- [x] Crear `FollowsController` con endpoints:
   - `POST /users/:id/follow`
   - `DELETE /users/:id/unfollow`
   - `GET /users/:id/followers`
@@ -717,16 +717,16 @@ if (milestone) {
 
 **Mini-objetivos:**
 
-- [ ] Modificar `FeedService.getFeedFollowing()`:
+- [x] Modificar `FeedService.getFeedFollowing()`:
   - Obtener lista de `followed_ids` del usuario
   - Filtrar feed events donde `user_id IN (followed_ids)`
-- [ ] Cachear lista de follows del usuario (5 minutos)
+- [x] Cachear lista de follows del usuario (5 minutos)
 
 ### Backend - Contadores Denormalizados
 
 **Mini-objetivos:**
 
-- [ ] Implementar triggers o lógica en service para actualizar contadores:
+- [x] Implementar triggers o lógica en service para actualizar contadores:
   - Cuando se crea follow → +1 en ambos contadores
   - Cuando se elimina follow → -1 en ambos contadores
 - [ ] Testear que contadores se actualizan correctamente
@@ -735,8 +735,8 @@ if (milestone) {
 
 **Mini-objetivos:**
 
-- [ ] Crear `apps/web/src/features/social/api/followsApi.ts`
-- [ ] Implementar funciones:
+- [x] Crear `apps/web/src/features/social/api/followsApi.ts`
+- [x] Implementar funciones:
   - `followUser(userId)`
   - `unfollowUser(userId)`
   - `getFollowers(userId, page, limit)`
@@ -746,14 +746,14 @@ if (milestone) {
 
 **Mini-objetivos:**
 
-- [ ] Crear component `FollowButton.tsx`
-- [ ] Implementar estados:
+- [x] Crear component `FollowButton.tsx`
+- [x] Implementar estados:
   - No sigo → "Seguir" (botón primary)
   - Sigo → "Siguiendo" (botón secondary)
   - Loading → spinner
-- [ ] Implementar hook `useFollow(userId)`
-- [ ] Manejar optimistic updates
-- [ ] Manejar errores (mostrar toast)
+- [x] Implementar hook `useFollow(userId)`
+- [x] Manejar optimistic updates
+- [x] Manejar errores (mostrar toast)
 
 **Archivo a crear:**
 ```tsx
@@ -793,12 +793,14 @@ export const FollowButton: React.FC<FollowButtonProps> = ({...}) => {
 
 **Mini-objetivos:**
 
-- [ ] Crear página `FollowersPage.tsx`
-- [ ] Crear página `FollowingPage.tsx`
-- [ ] Implementar component `UserCard` (avatar, username, bio, stats, FollowButton)
-- [ ] Implementar hook `useFollowersList(userId)`
-- [ ] Implementar hook `useFollowingList(userId)`
-- [ ] Agregar paginación (infinite scroll o "Load more")
+- [no] Crear página `FollowersPage.tsx`
+  QUEDO OBSOLETO - SE DECIDIO TOMAR UN APPROACH TIPO VSCO
+- [no] Crear página `FollowingPage.tsx`
+  QUEDO OBSOLETO - SE DECIDIO TOMAR UN APPROACH TIPO VSCO
+- [x] Implementar component `UserCard` (avatar, username, bio, stats, FollowButton)
+- [x] Implementar hook `useFollowersList(userId)`
+- [x] Implementar hook `useFollowingList(userId)`
+- [x] Agregar paginación (infinite scroll o "Load more")
 
 **Archivos a crear:**
 
@@ -810,11 +812,13 @@ export const FollowButton: React.FC<FollowButtonProps> = ({...}) => {
 
 **Mini-objetivos:**
 
-- [ ] En componente de perfil, agregar stats clickeables:
-  - "123 seguidores" → `/profile/:username/followers`
-  - "45 siguiendo" → `/profile/:username/following`
-- [ ] En perfil ajeno, mostrar `FollowButton`
-- [ ] Mostrar badge "Te sigue" si el usuario visitado me sigue
+- [no] En componente de perfil, agregar stats clickeables:
+  - "123 seguidores" → `/collection/:username/followers`
+  - "45 siguiendo" → `/collection/:username/following`
+  QUEDO OBSOLETO - SE DECIDIO TOMAR UN APPROACH TIPO VSCO
+- [x] En perfil ajeno, mostrar `FollowButton`
+- [no] Mostrar badge "Te sigue" si el usuario visitado me sigue
+  QUEDO OBSOLETO - SE DECIDIO TOMAR UN APPROACH TIPO VSCO
 
 **Archivos a modificar:**
 
@@ -857,6 +861,841 @@ export const FollowButton: React.FC<FollowButtonProps> = ({...}) => {
 ---
 
 **FIN DE PARTE 1**
+
+# Wheels House - Sistema Social: Especificación Completa
+# PARTE 2 DE 3: Features (Sprints 3-5) y Arquitectura
+
+## Continuación de Features del Sistema Social
+
+### 3. Sistema de Likes
+
+#### Propósito
+Validación social directa: "Mi auto es cool, la gente lo reconoce". Engagement básico que incentiva subir más contenido.
+
+#### Alcance
+
+**¿Qué se puede likear?**
+- ✅ Autos individuales en colecciones ajenas
+- ❌ Colecciones completas (demasiado abstracto)
+- ❌ Usuarios (no es red social de "popularidad")
+- ❌ Posts de búsqueda/oferta (no tiene sentido, son utilitarios)
+
+**¿Dónde aparece el botón de like?**
+- Card de auto en feed
+- Modal/detalle de auto
+- Galería de colección ajena (cada auto tiene botón)
+
+#### Estructura Técnica
+
+**Tabla: `car_likes`**
+```typescript
+interface CarLike {
+  user_id: string;   // Quien likea (FK users.id)
+  car_id: string;    // Auto likeado (FK cars.id)
+  created_at: Date;
+  
+  // Constraints
+  UNIQUE(user_id, car_id) // Un usuario solo puede likear un auto una vez
+}
+```
+
+**Contador denormalizado en `cars`:**
+```sql
+ALTER TABLE cars ADD COLUMN likes_count INT DEFAULT 0;
+```
+
+**¿Por qué denormalizar?**
+- Mostrar contador sin COUNT() query
+- Cache del contador en FE
+- Actualizar incrementally (+1 / -1)
+
+#### Endpoints
+
+```typescript
+POST   /api/cars/:id/like
+DELETE /api/cars/:id/unlike
+GET    /api/cars/:id/likes        // Lista de usuarios que likearon (max 100)
+GET    /api/users/:id/liked-cars  // Autos que el usuario likeó
+```
+
+#### Límites y Restricciones
+
+**Throttling**: 50 likes por hora
+- Suficiente para uso genuino
+- Previene abuse (likear todo para llamar atención)
+
+**Lista de "quién likeó"**: Máximo 100 usuarios visibles
+- Si auto tiene 500 likes, muestra "500 likes" pero lista solo primeros 100
+- Reduce carga de UI y queries
+
+**NO puede likear sus propios autos**
+- Validación en backend
+- UI no muestra botón en autos propios
+
+#### Feature: "Mis autos más populares"
+
+En perfil propio:
+```tsx
+<ProfileSection>
+  <SectionTitle>Mis autos más populares</SectionTitle>
+  
+  <CarGrid>
+    {topLikedCars.map(car => (
+      <CarCard>
+        <CarImage src={car.mainImage} />
+        <CarName>{car.name}</CarName>
+        <LikeCount>❤️ {car.likesCount}</LikeCount>
+      </CarCard>
+    ))}
+  </CarGrid>
+</ProfileSection>
+```
+
+Query: Top 10 autos del usuario ordenados por `likes_count DESC`.
+
+---
+
+### 4. Sistema de Notificaciones
+
+#### Propósito
+Pull-back mechanism: traer usuarios de vuelta cuando algo relevante pasa.
+
+#### Tipos de Notificaciones
+
+**1. Nuevo seguidor**
+- Trigger: Usuario B sigue a usuario A
+- Notificación para A: "Juan te siguió"
+- Click → perfil de Juan
+- Metadata: `{ actorId: B }`
+
+**2. Like en auto**
+- Trigger: Usuario B likea auto de usuario A
+- Notificación para A: "María likeó tu [Corvette C8]"
+- Click → detalle del auto
+- Metadata: `{ actorId: B, carId: X }`
+
+**3. Milestone alcanzado**
+- Trigger: Usuario alcanza 50, 100, 250, 500, 1000 autos
+- Notificación para el mismo usuario: "¡Llegaste a 100 autos! 🎉"
+- Click → vista de colección
+- Metadata: `{ milestone: 100 }`
+
+**4. Wishlist match (Fase futura)**
+- Trigger: Usuario B agrega auto X que está en wishlist de usuario A
+- Notificación para A: "Pedro agregó [Skyline GT-R] - está en tu wishlist"
+- Click → perfil de Pedro o auto específico
+- Metadata: `{ actorId: B, carId: X }`
+
+#### Estructura Técnica
+
+**Tabla: `notifications`**
+```typescript
+interface Notification {
+  id: string;
+  user_id: string;           // A quién va dirigida
+  type: 'new_follower' | 'car_liked' | 'milestone_reached' | 'wishlist_match';
+  actor_id?: string;         // Quién hizo la acción (null para milestone)
+  car_id?: string;           // Auto relacionado (null para follower)
+  metadata?: {
+    milestone?: number;
+    carName?: string;
+  };
+  read: boolean;             // Leída o no
+  created_at: Date;
+}
+
+// Índices
+CREATE INDEX idx_notifications_user_unread ON notifications(user_id, read, created_at);
+```
+
+#### Endpoints
+
+```typescript
+GET    /api/notifications               // Últimas 50 notificaciones
+GET    /api/notifications/unread-count  // Para badge en header
+PUT    /api/notifications/:id/read      // Marcar una como leída
+PUT    /api/notifications/read-all      // Marcar todas como leídas
+DELETE /api/notifications/:id           // Eliminar una
+```
+
+#### Límites
+
+**Retención**: Últimas 100 notificaciones
+- Notificaciones mayores a 100 se borran automáticamente (FIFO)
+- Cron job semanal para limpieza
+
+**Agrupación (Fase futura)**:
+- Si usuario B likea 5 autos de usuario A en 10 minutos
+- En vez de 5 notificaciones: "Juan likeó 5 de tus autos"
+- Reduce spam de notificaciones
+
+#### Comportamiento
+
+**Click en notificación:**
+1. Marca como leída (optimistic update)
+2. Navega al destino correspondiente:
+   - `new_follower` → `/profile/{actor.username}`
+   - `car_liked` → `/profile/{car.owner.username}/cars/{car.id}`
+   - `milestone_reached` → `/profile/collection`
+
+**Polling vs WebSocket:**
+- **Inicialmente**: Polling cada 30 segundos cuando usuario está activo
+- **Futuro**: WebSocket para real-time (mayor complejidad)
+
+---
+
+### 5. Sistema de Posts (Búsquedas y Ofertas)
+
+#### Propósito
+Facilitar señalización de intención ("busco X", "ofrezco Y") sin convertirse en marketplace. Toda negociación y transacción sucede FUERA de Wheels House.
+
+#### Filosofía
+
+**Wheels House NO es un marketplace. Es un tablón de anuncios.**
+
+- ❌ NO procesamos pagos
+- ❌ NO moderamos negociaciones
+- ❌ NO garantizamos transacciones
+- ❌ NO manejamos disputas
+- ❌ NO verificamos identidades
+- ✅ SÍ facilitamos conexiones
+- ✅ SÍ permitimos señalización de intención
+- ✅ SÍ mostramos info de contacto
+
+**Responsabilidad legal**: Mínima. Disclaimer claro en ToS y en cada post.
+
+#### Shortcut desde Wishlist
+
+Integración directa:
+```tsx
+<WishlistItem car={car}>
+  <CarImage />
+  <CarName />
+  
+  <Actions>
+    <Button onClick={markAsAcquired}>
+      ✓ Lo conseguí
+    </Button>
+    
+    <Button onClick={() => createSearchPost(car)}>
+      🔍 Publicar búsqueda
+    </Button>
+  </Actions>
+</WishlistItem>
+```
+
+Click en "Publicar búsqueda" → modal pre-rellenado con info del auto.
+
+#### Límites y Reglas
+
+**Límites por usuario:**
+- Máximo 5 posts activos simultáneamente
+- Máximo 3 posts nuevos por día
+- Cooldown: 1 hora entre posts del mismo tipo
+
+**Expiración automática:**
+- Posts expiran a los 30 días
+- Notificación 3 días antes: "Tu búsqueda expira pronto. ¿La extiendes por 30 días más?"
+- Usuario puede marcar como "Resuelta" antes de expirar
+- Usuario puede eliminar en cualquier momento
+
+**Auto-moderación:**
+- Si post recibe 5+ reportes → se oculta automáticamente (pending review)
+- Filtros de palabras clave: detectar URLs sospechosas, "envía dinero", etc.
+
+#### Perfil de Usuario: Contacto
+
+**Campo nuevo en `users`:**
+```typescript
+contact_info: string;  // Máx 500 caracteres
+is_trader: boolean;    // Badge "Hace intercambios"
+is_seller: boolean;    // Badge "Vendedor"
+```
+
+#### Disclaimer Legal
+
+**En footer de cada post:**
+```tsx
+<Disclaimer>
+  ⚠️ Wheels House facilita conexiones entre coleccionistas pero no interviene 
+  en negociaciones, intercambios o ventas. Toda comunicación y transacción 
+  ocurre fuera de la plataforma. Ten precaución y verifica identidad antes 
+  de realizar intercambios o compras.
+</Disclaimer>
+```
+
+---
+
+### 6. Sistema de Reportes y Moderación
+
+#### Propósito
+Permitir que la comunidad auto-modere contenido inapropiado, spam o scams. Reducir carga de moderación manual inicial.
+
+#### Qué se Puede Reportar
+
+- ✅ Posts de búsqueda/oferta
+- ✅ Usuarios (perfil completo)
+- ✅ Autos individuales (en caso de contenido inapropiado)
+- ❌ Comments (no existen aún)
+- ❌ Likes (no tiene sentido)
+
+#### Estructura Técnica
+
+**Tabla: `reports`**
+```typescript
+interface Report {
+  id: string;
+  reporter_id: string;         // Quien reporta (FK users.id)
+  reported_user_id?: string;   // Si reporte es de usuario
+  reported_post_id?: string;   // Si reporte es de post
+  reported_car_id?: string;    // Si reporte es de auto
+  reason: 'spam' | 'scam' | 'inappropriate' | 'harassment' | 'other';
+  description?: string;         // Detalles opcionales
+  status: 'pending' | 'reviewed' | 'resolved' | 'dismissed';
+  created_at: Date;
+  reviewed_at?: Date;
+  reviewed_by?: string;        // Admin user_id
+  
+  // Constraints
+  CHECK((reported_user_id IS NOT NULL) OR 
+        (reported_post_id IS NOT NULL) OR 
+        (reported_car_id IS NOT NULL))
+}
+```
+
+#### Límites
+
+**Por usuario:**
+- No puede reportar el mismo contenido dos veces
+- Máximo 10 reportes por día (previene abuse)
+
+**Threshold de auto-moderación:**
+- Post con 5+ reportes → se oculta automáticamente (status: `under_review`)
+- Usuario con 10+ reportes (diferentes posts/autos) → flag para revisión de cuenta
+
+---
+
+## ROADMAP: SPRINT 3 - Likes y Notificaciones
+
+**Objetivo:** Usuarios pueden likear autos y reciben notificaciones de actividad social.
+
+### Backend - Likes System
+
+**Mini-objetivos:**
+
+- [ ] Crear entidad `CarLike` con Drizzle
+- [ ] Crear migración para tabla `car_likes` con constraint único
+- [ ] Ejecutar migración
+- [ ] Agregar campo a `cars`: `likes_count INT DEFAULT 0`
+- [ ] Crear migración para campo nuevo
+- [ ] Crear `LikesRepository` con métodos:
+  - `create(userId, carId)`
+  - `delete(userId, carId)`
+  - `findByCarId(carId, page, limit)`
+  - `isLiked(userId, carId)`
+  - `getLikesCount(carId)`
+- [ ] Crear `LikesService` con lógica:
+  - `likeCar(userId, carId)` - Verificar auto existe, no es propio, crear, incrementar, emitir evento
+  - `unlikeCar(userId, carId)` - Eliminar, decrementar, emitir evento
+  - `getLikers(carId, page, limit)` (máximo 100)
+- [ ] Implementar throttling: 50 likes por hora
+- [ ] Crear `LikesController` con endpoints
+
+**Archivos a crear:**
+- `apps/api/src/modules/social/likes/entities/car-like.entity.ts`
+- `apps/api/src/database/migrations/XXXX_create_car_likes.ts`
+- `apps/api/src/modules/social/likes/likes.repository.ts`
+- `apps/api/src/modules/social/likes/likes.service.ts`
+- `apps/api/src/modules/social/likes/likes.controller.ts`
+
+### Backend - Notifications System
+
+**Mini-objetivos:**
+
+- [ ] Crear entidad `Notification` con Drizzle
+- [ ] Crear migración para tabla `notifications`
+- [ ] Ejecutar migración
+- [ ] Crear `NotificationsRepository` con métodos CRUD
+- [ ] Crear `NotificationsService` con lógica de negocio
+- [ ] Crear `NotificationsController` con endpoints
+- [ ] Implementar cron job semanal para limpiar notificaciones antiguas
+
+**Archivos a crear:**
+- `apps/api/src/modules/social/notifications/entities/notification.entity.ts`
+- `apps/api/src/database/migrations/XXXX_create_notifications.ts`
+- `apps/api/src/modules/social/notifications/notifications.repository.ts`
+- `apps/api/src/modules/social/notifications/notifications.service.ts`
+- `apps/api/src/modules/social/notifications/notifications.controller.ts`
+
+### Backend - Event Subscribers for Notifications
+
+**Mini-objetivos:**
+
+- [ ] En `EventsSubscriber`, agregar handler para `user.followed`
+- [ ] Agregar handler para `car.liked`
+- [ ] Agregar handler para `milestone.reached`
+
+### Frontend - Like Button
+
+**Mini-objetivos:**
+
+- [ ] Crear component `LikeButton.tsx`
+- [ ] Implementar estados (no likeado / likeado / loading)
+- [ ] Implementar hook `useLike(carId)`
+- [ ] Manejar optimistic updates
+- [ ] Agregar animación al likear
+
+**Archivo a crear:**
+- `apps/web/src/features/social/components/likes/LikeButton.tsx`
+
+### Frontend - Likers Modal
+
+**Mini-objetivos:**
+
+- [ ] Crear component `LikersModal.tsx`
+- [ ] Mostrar lista de usuarios que likearon
+- [ ] Implementar hook `useLikers(carId)`
+
+**Archivo a crear:**
+- `apps/web/src/features/social/components/likes/LikersModal.tsx`
+
+### Frontend - Integration with Feed
+
+**Mini-objetivos:**
+
+- [ ] En `CarAddedItem` y `WishlistAchievedItem`, agregar `LikeButton`
+- [ ] En detalle de auto, agregar `LikeButton`
+- [ ] En galería de colección, agregar `LikeButton` en cada card
+
+### Frontend - Notifications Bell
+
+**Mini-objetivos:**
+
+- [ ] Crear component `NotificationBell.tsx`
+- [ ] Implementar badge con contador de no leídas
+- [ ] Implementar hook `useNotifications()`
+- [ ] Implementar hook `useUnreadCount()` con polling cada 30 segundos
+- [ ] Implementar dropdown `NotificationDropdown.tsx`
+- [ ] Implementar component `NotificationItem.tsx` con variantes
+- [ ] Click en notificación: marca como leída, navega, cierra dropdown
+- [ ] Botón "Marcar todas como leídas"
+
+**Archivos a crear:**
+- `apps/web/src/features/social/components/notifications/NotificationBell.tsx`
+- `apps/web/src/features/social/components/notifications/NotificationDropdown.tsx`
+- `apps/web/src/features/social/components/notifications/NotificationItem.tsx`
+
+### Frontend - Header Integration
+
+**Mini-objetivos:**
+
+- [ ] Agregar `NotificationBell` al header
+- [ ] Posicionar a la izquierda del avatar
+- [ ] Testear que no rompe layout en mobile
+
+### Frontend - "Top Liked Cars" Section
+
+**Mini-objetivos:**
+
+- [ ] En perfil propio, agregar sección "Mis autos más populares"
+- [ ] Query: top 10 autos ordenados por `likes_count DESC`
+- [ ] Mostrar cards con imagen, nombre, contador de likes
+
+### Testing Sprint 3
+
+**Mini-objetivos:**
+
+- [ ] Backend: Testear endpoints de likes
+- [ ] Backend: Testear constraint único, throttling, eventos
+- [ ] Backend: Testear endpoints de notificaciones
+- [ ] Frontend: Verificar LikeButton, NotificationBell, animaciones
+
+### Validación Sprint 3
+
+**Criterios de completitud:**
+
+- [ ] Usuario puede likear autos ajenos
+- [ ] Contador se actualiza inmediatamente
+- [ ] Dueño del auto recibe notificación
+- [ ] NotificationBell muestra badge correcto
+- [ ] Click en notificación navega correctamente
+- [ ] Sección "Mis autos más populares" aparece en perfil
+
+---
+
+## ROADMAP: SPRINT 4 - Posts de Búsqueda y Oferta
+
+**Objetivo:** Usuarios pueden publicar búsquedas y ofertas que aparecen en el feed.
+
+### Backend - User Contact Info
+
+**Mini-objetivos:**
+
+- [ ] Agregar campos a tabla `users`: `contact_info`, `is_trader`, `is_seller`
+- [ ] Crear migración
+- [ ] Modificar DTOs de usuario para incluir campos
+- [ ] Modificar endpoint `PUT /users/me` para permitir actualizar
+
+### Backend - User Posts
+
+**Mini-objetivos:**
+
+- [ ] Crear entidad `UserPost` con Drizzle
+- [ ] Crear migración para tabla `user_posts`
+- [ ] Crear `PostsRepository` con métodos CRUD
+- [ ] Crear `PostsService` con lógica:
+  - Validar límites (5 activos, 3 por día)
+  - Calcular `expires_at` (30 días)
+  - Emitir eventos
+- [ ] Implementar cron job diario para expirar posts
+- [ ] Implementar throttling
+- [ ] Crear `PostsController` con endpoints
+
+**Archivos a crear:**
+- `apps/api/src/modules/social/posts/entities/user-post.entity.ts`
+- `apps/api/src/database/migrations/XXXX_create_user_posts.ts`
+- `apps/api/src/modules/social/posts/posts.repository.ts`
+- `apps/api/src/modules/social/posts/posts.service.ts`
+- `apps/api/src/modules/social/posts/posts.controller.ts`
+
+### Backend - Integration with Feed
+
+**Mini-objetivos:**
+
+- [ ] En `EventsSubscriber`, agregar handler para `post.created`
+- [ ] Modificar `FeedService` para incluir posts en queries
+- [ ] Agregar método `FeedService.getPostsFeed(page, limit)`
+
+### Frontend - Profile Settings
+
+**Mini-objetivos:**
+
+- [ ] En página de settings, agregar sección "Contacto e Intercambios"
+- [ ] Campo `contact_info` (textarea, 500 chars max)
+- [ ] Checkboxes `is_trader` y `is_seller`
+
+### Frontend - Post Creator
+
+**Mini-objetivos:**
+
+- [ ] Crear component `PostCreator.tsx`
+- [ ] Implementar form con radio para tipo, campos específicos por tipo
+- [ ] Implementar hook `useCreatePost()`
+- [ ] Validaciones y preview
+
+**Archivos a crear:**
+- `apps/web/src/features/social/components/posts/PostCreator.tsx`
+- `apps/web/src/features/social/components/posts/SearchPostForm.tsx`
+- `apps/web/src/features/social/components/posts/OfferPostForm.tsx`
+
+### Frontend - Wishlist Integration
+
+**Mini-objetivos:**
+
+- [ ] En cada item de wishlist, agregar botón "🔍 Publicar búsqueda"
+- [ ] Click abre `PostCreator` con datos pre-rellenados
+
+### Frontend - Post Cards en Feed
+
+**Mini-objetivos:**
+
+- [ ] Crear component `SearchPostCard.tsx`
+- [ ] Crear component `OfferPostCard.tsx`
+- [ ] Implementar botón "Contactar" que muestra modal
+- [ ] Implementar `ContactModal.tsx` con disclaimer
+
+**Archivos a crear:**
+- `apps/web/src/features/social/components/posts/SearchPostCard.tsx`
+- `apps/web/src/features/social/components/posts/OfferPostCard.tsx`
+- `apps/web/src/features/social/components/posts/ContactModal.tsx`
+
+### Frontend - Tab "Búsquedas y Ofertas"
+
+**Mini-objetivos:**
+
+- [ ] En `FeedPage`, activar tab completamente
+- [ ] Implementar FAB visible solo en este tab
+- [ ] Click en FAB abre `PostCreator`
+
+### Frontend - Profile "Posts Activos" Tab
+
+**Mini-objetivos:**
+
+- [ ] En perfil, agregar tab "Posts activos"
+- [ ] Mostrar posts del usuario activos
+- [ ] Empty state apropiado
+
+### Frontend - Badges en Perfil
+
+**Mini-objetivos:**
+
+- [ ] Si `user.is_trader`, mostrar badge "🔄 Hace intercambios"
+- [ ] Si `user.is_seller`, mostrar badge "💰 Vendedor"
+- [ ] Badges en header de perfil, cards de usuario, posts
+
+### Testing Sprint 4
+
+**Mini-objetivos:**
+
+- [ ] Backend: Testear creación de posts, límites, expiración
+- [ ] Frontend: Verificar PostCreator, shortcut desde wishlist, badges
+
+### Validación Sprint 4
+
+**Criterios de completitud:**
+
+- [ ] Usuario puede crear posts de búsqueda y oferta
+- [ ] Posts aparecen en feed
+- [ ] Tab dedicado muestra solo posts
+- [ ] Botón "Contactar" funciona
+- [ ] Posts expiran automáticamente
+- [ ] Badges aparecen correctamente
+
+---
+
+## ROADMAP: SPRINT 5 - Sistema de Reportes
+
+**Objetivo:** Comunidad puede reportar contenido y sistema auto-modera.
+
+### Backend - Reports System
+
+**Mini-objetivos:**
+
+- [ ] Crear entidad `Report` con Drizzle
+- [ ] Crear migración para tabla `reports`
+- [ ] Crear `ReportsRepository` con métodos CRUD
+- [ ] Crear `ReportsService` con lógica de threshold
+- [ ] Implementar límite: 10 reportes por día por usuario
+- [ ] Crear `ReportsController` con endpoints (admin protegido)
+
+**Archivos a crear:**
+- `apps/api/src/modules/social/reports/entities/report.entity.ts`
+- `apps/api/src/database/migrations/XXXX_create_reports.ts`
+- `apps/api/src/modules/social/reports/reports.repository.ts`
+- `apps/api/src/modules/social/reports/reports.service.ts`
+- `apps/api/src/modules/social/reports/reports.controller.ts`
+
+### Backend - Auto-Moderation
+
+**Mini-objetivos:**
+
+- [ ] En `EventsSubscriber`, handler para `report.threshold_reached`
+- [ ] Implementar servicio de emails para alertas
+- [ ] Template de email para moderación
+
+### Backend - Admin Guards
+
+**Mini-objetivos:**
+
+- [ ] Crear guard `AdminGuard`
+- [ ] Agregar campo `is_admin BOOLEAN` a users
+- [ ] Proteger endpoints de admin
+
+**Archivo a crear:**
+- `apps/api/src/shared/guards/admin.guard.ts`
+
+### Frontend - Report Modal
+
+**Mini-objetivos:**
+
+- [ ] Crear component `ReportModal.tsx`
+- [ ] Form con motivo, textarea opcional, disclaimer
+- [ ] Implementar hook `useReport()`
+
+**Archivo a crear:**
+- `apps/web/src/features/social/components/reports/ReportModal.tsx`
+
+### Frontend - Report Button Integration
+
+**Mini-objetivos:**
+
+- [ ] En dropdown de posts, agregar "🚩 Reportar"
+- [ ] En perfil ajeno, agregar "🚩 Reportar usuario"
+
+### Frontend - Admin Panel
+
+**Mini-objetivos:**
+
+- [ ] Crear página `AdminReportsPage.tsx` (protegida)
+- [ ] Implementar filtros (status, content type)
+- [ ] Implementar lista de reportes con acciones
+- [ ] Modal de acciones (descartar, eliminar, advertir, suspender, banear)
+
+**Archivos a crear:**
+- `apps/web/src/features/social/pages/AdminReportsPage.tsx`
+- `apps/web/src/features/social/components/reports/ReportCard.tsx`
+
+### Frontend - Routing
+
+**Mini-objetivos:**
+
+- [ ] Agregar ruta `/admin/reports` protegida
+- [ ] Redirect si usuario no es admin
+
+### Testing Sprint 5
+
+**Mini-objetivos:**
+
+- [ ] Backend: Testear creación de reportes, límites, threshold
+- [ ] Frontend: Verificar modal, admin panel, protección de rutas
+
+### Validación Sprint 5
+
+**Criterios de completitud:**
+
+- [ ] Usuario puede reportar contenido
+- [ ] Admin recibe email cuando threshold
+- [ ] Contenido se oculta automáticamente
+- [ ] Admin puede gestionar reportes
+
+---
+
+## Arquitectura y Estructura
+
+### Reestructuración del Monorepo
+
+**Estado actual:**
+```
+wheels/
+├── apps/
+│   ├── api/
+│   │   └── src/
+│   │       ├── controllers/
+│   │       ├── database/
+│   │       ├── dto/
+│   │       ├── services/
+│   │       └── validators/
+│   └── web/
+└── packages/
+```
+
+**Problema:** Organización por capa dificulta escalar.
+
+**Solución: Feature-based organization**
+
+```
+wheels/
+├── apps/
+│   ├── api/
+│   │   └── src/
+│   │       ├── modules/
+│   │       │   ├── auth/
+│   │       │   ├── users/
+│   │       │   ├── cars/
+│   │       │   └── social/              ← NUEVO
+│   │       │       ├── social.module.ts
+│   │       │       ├── events/
+│   │       │       │   ├── events.service.ts
+│   │       │       │   ├── events.subscriber.ts
+│   │       │       │   └── event-types.ts
+│   │       │       ├── feed/
+│   │       │       │   ├── feed.controller.ts
+│   │       │       │   ├── feed.service.ts
+│   │       │       │   ├── feed.repository.ts
+│   │       │       │   ├── entities/
+│   │       │       │   └── dto/
+│   │       │       ├── follows/
+│   │       │       ├── likes/
+│   │       │       ├── notifications/
+│   │       │       ├── posts/
+│   │       │       └── reports/
+│   │       ├── shared/
+│   │       ├── database/
+│   │       └── config/
+│   │
+│   └── web/
+│       └── src/
+│           ├── features/
+│           │   ├── auth/
+│           │   ├── cars/
+│           │   ├── profile/
+│           │   └── social/           ← NUEVO
+│           │       ├── components/
+│           │       │   ├── feed/
+│           │       │   ├── follow/
+│           │       │   ├── likes/
+│           │       │   ├── notifications/
+│           │       │   ├── posts/
+│           │       │   └── reports/
+│           │       ├── hooks/
+│           │       ├── pages/
+│           │       └── api/
+│           ├── shared/
+│           └── lib/
+│
+└── packages/
+    └── shared-types/
+```
+
+### Sistema de Eventos (Crítico)
+
+**Sin eventos:**
+```typescript
+// 😱 Acoplamiento directo
+async create(createCarDto) {
+  const car = await this.carsRepo.save(createCarDto);
+  await this.feedService.createEvent(...);
+  await this.notificationsService.notifyFollowers(...);
+  return car;
+}
+```
+
+**Con eventos:**
+```typescript
+// 🎉 Desacoplado
+async create(createCarDto) {
+  const car = await this.carsRepo.save(createCarDto);
+  this.eventEmitter.emit('car.added', { userId, carId });
+  return car;
+}
+
+// En subscriber
+@OnEvent('car.added')
+async handleCarAdded({ userId, carId }) {
+  await this.feedService.createEvent(...);
+  await this.notificationsService.notifyFollowers(...);
+}
+```
+
+**Eventos a implementar:**
+
+```typescript
+export const EVENTS = {
+  // Cars
+  CAR_ADDED: 'car.added',
+  CAR_UPDATED: 'car.updated',
+  CAR_DELETED: 'car.deleted',
+  
+  // Wishlist
+  WISHLIST_ITEM_ADDED: 'wishlist.item_added',
+  WISHLIST_ITEM_ACHIEVED: 'wishlist.item_achieved',
+  
+  // Groups
+  GROUP_CREATED: 'group.created',
+  
+  // Social
+  USER_FOLLOWED: 'user.followed',
+  USER_UNFOLLOWED: 'user.unfollowed',
+  CAR_LIKED: 'car.liked',
+  CAR_UNLIKED: 'car.unliked',
+  
+  // Posts
+  POST_CREATED: 'post.created',
+  POST_RESOLVED: 'post.resolved',
+  POST_EXPIRED: 'post.expired',
+  
+  // Milestones
+  MILESTONE_REACHED: 'milestone.reached',
+  
+  // Reports
+  CONTENT_REPORTED: 'content.reported',
+  REPORT_THRESHOLD_REACHED: 'report.threshold_reached',
+} as const;
+```
+
+---
+
+**FIN DE PARTE 2**
 
 export const EVENTS = {
 // Cars

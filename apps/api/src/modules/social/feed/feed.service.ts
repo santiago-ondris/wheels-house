@@ -1,10 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as FeedRepository from './feed.repository';
 import type { FeedQueryOptions, CreateFeedEventInput, FeedEventWithUser } from './feed.repository';
+import * as FollowsRepository from '../follows/follows.repository';
 
 @Injectable()
 export class FeedService {
     private readonly logger = new Logger(FeedService.name);
+
+    // Cache simple en memoria para IDs de seguidos
+    private followsCache = new Map<number, { ids: number[], timestamp: number }>();
+    private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutos
 
     /**
      * Crea un nuevo evento en el feed
@@ -37,8 +42,7 @@ export class FeedService {
      * Obtiene el feed personalizado (siguiendo)
      */
     async getFeedFollowing(userId: number, page: number, limit: number, options: Partial<FeedQueryOptions> = {}): Promise<{ items: FeedEventWithUser[]; hasMore: boolean }> {
-        // TODO: Obtener followedIds de FollowsService cuando esté implementado
-        const followedIds: number[] = [];
+        const followedIds = await this.getCachedFollowedIds(userId);
 
         if (followedIds.length === 0) {
             return { items: [], hasMore: false };
@@ -59,5 +63,32 @@ export class FeedService {
      */
     async existsEvent(type: FeedRepository.FeedEventType, userId: number, targetId: { carId?: number, groupId?: number }): Promise<boolean> {
         return await FeedRepository.existsFeedEvent(type, userId, targetId);
+    }
+
+    /**
+     * Invalida la caché de seguidos para un usuario
+     */
+    invalidateCache(userId: number): void {
+        this.followsCache.delete(userId);
+    }
+
+    /**
+     * Helper para obtener IDs de seguidos con cache 
+     */
+    private async getCachedFollowedIds(userId: number): Promise<number[]> {
+        const now = Date.now();
+        const cached = this.followsCache.get(userId);
+
+        if (cached && (now - cached.timestamp < this.CACHE_TTL)) {
+            return cached.ids;
+        }
+
+        // Cache miss o expirado
+        const ids = await FollowsRepository.getFollowingIds(userId);
+
+        // Actualizar cache
+        this.followsCache.set(userId, { ids, timestamp: now });
+
+        return ids;
     }
 }

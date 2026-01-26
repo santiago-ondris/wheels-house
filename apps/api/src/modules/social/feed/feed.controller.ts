@@ -1,7 +1,8 @@
-import { Controller, Get, Query, Request } from '@nestjs/common';
+import { Controller, Get, Query, Request, UseGuards } from '@nestjs/common';
 import { FeedService } from './feed.service';
 import { FeedQueryDto, FeedResponseDto, FeedItemDto } from './dto/feed.dto';
 import type { FeedEventWithUser } from './feed.repository';
+import { OptionalJwtAuthGuard } from 'src/validators/auth.validator';
 
 interface AuthenticatedRequest extends Request {
     user?: {
@@ -14,6 +15,7 @@ interface AuthenticatedRequest extends Request {
 export class FeedController {
     constructor(private readonly feedService: FeedService) { }
 
+    @UseGuards(OptionalJwtAuthGuard)
     @Get()
     async getFeed(
         @Query() query: FeedQueryDto,

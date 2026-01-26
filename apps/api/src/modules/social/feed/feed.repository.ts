@@ -227,6 +227,10 @@ export async function countFeedEvents(options: FeedQueryOptions = {}): Promise<n
         conditions.push(eq(feedEvent.userId, options.targetUserId));
     }
 
+    if (options.userIds && options.userIds.length > 0) {
+        conditions.push(inArray(feedEvent.userId, options.userIds));
+    }
+
     const result = await db
         .select({ count: sql<number>`count(*)` })
         .from(feedEvent)

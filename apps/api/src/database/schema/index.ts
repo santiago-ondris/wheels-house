@@ -18,5 +18,5 @@ export { group, groupedCar } from './group.schema';
 export { gameWord, dailyGame, userGameAttempt } from './wheelword.schema';
 
 // Social domain
-export { feedEvent } from './social.schema';
+export { feedEvent, userFollow } from './social.schema';
 export type { FeedEventMetadata } from './social.schema';

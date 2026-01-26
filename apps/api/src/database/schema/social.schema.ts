@@ -40,3 +40,15 @@ export interface FeedEventMetadata {
     carCount?: number;
     isFromWishlist?: boolean;
 }
+
+export const userFollow = pgTable("userFollow", {
+    followerId: integer("followerId").references(() => user.userId).notNull(), // Quien sigue
+    followedId: integer("followedId").references(() => user.userId).notNull(), // A quien sigue
+    createdAt: timestamp("createdAt", { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [
+    // Un usuario solo puede seguir a otro una vez
+    { pk: [t.followerId, t.followedId] },
+    // Indices para buscar seguidores y seguidos
+    index("userFollow_followerId_idx").on(t.followerId),
+    index("userFollow_followedId_idx").on(t.followedId),
+]);

@@ -5,6 +5,7 @@ import { login as loginService } from "../services/auth.service";
 import { getPublicProfile } from "../services/profile.service";
 
 interface User {
+  userId: number;
   username: string;
   picture?: string;
   defaultSortPreference?: string;
@@ -22,7 +23,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-function decodeToken(token: string): { username: string } {
+function decodeToken(token: string): { username: string, userId: number } {
   const payload = token.split('.')[1];
   const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
   return JSON.parse(atob(base64));
@@ -84,9 +85,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const decoded = decodeToken(token);
           try {
             const profile = await getPublicProfile(decoded.username);
-            setUser({ username: decoded.username, picture: profile.picture, defaultSortPreference: profile.defaultSortPreference });
+            setUser({
+              username: decoded.username,
+              userId: decoded.userId,
+              picture: profile.picture,
+              defaultSortPreference: profile.defaultSortPreference
+            });
           } catch {
-            setUser({ username: decoded.username, defaultSortPreference: 'id:desc' });
+            setUser({
+              username: decoded.username,
+              userId: decoded.userId,
+              defaultSortPreference: 'id:desc'
+            });
           }
         } catch {
           localStorage.removeItem("auth_token");
@@ -111,9 +121,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Fetch user picture from profile
     try {
       const profile = await getPublicProfile(decoded.username);
-      setUser({ username: decoded.username, picture: profile.picture, defaultSortPreference: profile.defaultSortPreference });
+      setUser({
+        username: decoded.username,
+        userId: decoded.userId,
+        picture: profile.picture,
+        defaultSortPreference: profile.defaultSortPreference
+      });
     } catch {
-      setUser({ username: decoded.username, defaultSortPreference: 'id:desc' });
+      setUser({
+        username: decoded.username,
+        userId: decoded.userId,
+        defaultSortPreference: 'id:desc'
+      });
     }
   };
 

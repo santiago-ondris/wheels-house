@@ -3,6 +3,7 @@ import { FeedService } from './feed.service';
 import { FeedController } from './feed.controller';
 
 @Module({
+    imports: [],
     providers: [FeedService],
     exports: [FeedService],
     controllers: [FeedController],

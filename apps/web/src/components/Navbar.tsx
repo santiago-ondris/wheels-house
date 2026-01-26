@@ -27,8 +27,8 @@ export default function Navbar() {
     <>
       <nav
         className={`fixed top-0 w-full px-6 z-50 transition-all duration-500 ease-in-out flex items-center ${isScrolled
-            ? "bg-background/80 backdrop-blur-2xl border-b border-white/5 shadow-[0_8px_32px_rgba(0,0,0,0.3)] h-[72px]"
-            : "bg-transparent border-b border-transparent h-[88px]"
+          ? "bg-background/80 backdrop-blur-2xl border-b border-white/5 shadow-[0_8px_32px_rgba(0,0,0,0.3)] h-[72px]"
+          : "bg-transparent border-b border-transparent h-[88px]"
           }`}
       >
         <div className="container mx-auto flex items-center justify-between">
@@ -50,6 +50,9 @@ export default function Navbar() {
                   </Link>
                   <Link to="/community" className="text-white/70 hover:text-white transition-colors">
                     Comunidad
+                  </Link>
+                  <Link to="/people" className="text-white/70 hover:text-white transition-colors">
+                    Personas
                   </Link>
                   <Link to={`/collection/${user?.username}`} className="text-white/70 hover:text-white transition-colors">
                     Mi Colección
