@@ -7,6 +7,7 @@ import MobileMenu from "./layout/MobileMenu";
 import LoginModal from "./auth/LoginModal";
 import UserSearch from "./ui/UserSearch";
 import MobileUserSearch from "./ui/MobileUserSearch";
+import NotificationBell from "../features/social/components/notifications/NotificationBell";
 
 interface NavbarProps {
   isScrolled: boolean;
@@ -56,11 +57,13 @@ export default function Navbar({ isScrolled }: NavbarProps) {
                   </div>
                 </div>
 
-                <div className="hidden md:block">
+                <div className="hidden md:flex items-center gap-4">
+                  <NotificationBell />
                   <UserMenu />
                 </div>
 
                 <div className="flex items-center gap-2 md:hidden">
+                  <NotificationBell />
                   <button
                     onClick={() => setIsSearchOpen(true)}
                     className="p-2 text-white/70 hover:text-white transition-colors"

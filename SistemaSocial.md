@@ -970,10 +970,10 @@ Pull-back mechanism: traer usuarios de vuelta cuando algo relevante pasa.
 - Click → perfil de Juan
 - Metadata: `{ actorId: B }`
 
-**2. Like en auto**
-- Trigger: Usuario B likea auto de usuario A
+**2. Like en auto/grupo**
+- Trigger: Usuario B likea auto/grupo de usuario A
 - Notificación para A: "María likeó tu [Corvette C8]"
-- Click → detalle del auto
+- Click → detalle del auto/grupo
 - Metadata: `{ actorId: B, carId: X }`
 
 **3. Milestone alcanzado**
@@ -1216,12 +1216,12 @@ interface Report {
 
 **Mini-objetivos:**
 
-- [ ] Crear entidad `Notification` con Drizzle
-- [ ] Crear migración para tabla `notifications`
-- [ ] Ejecutar migración
-- [ ] Crear `NotificationsRepository` con métodos CRUD
-- [ ] Crear `NotificationsService` con lógica de negocio
-- [ ] Crear `NotificationsController` con endpoints
+- [x] Crear entidad `Notification` con Drizzle
+- [x] Crear migración para tabla `notifications`
+- [x] Ejecutar migración
+- [x] Crear `NotificationsRepository` con métodos CRUD
+- [x] Crear `NotificationsService` con lógica de negocio
+- [x] Crear `NotificationsController` con endpoints
 - [ ] Implementar cron job semanal para limpiar notificaciones antiguas
 
 **Archivos a crear:**
@@ -1235,9 +1235,9 @@ interface Report {
 
 **Mini-objetivos:**
 
-- [ ] En `EventsSubscriber`, agregar handler para `user.followed`
-- [ ] Agregar handler para `car.liked`
-- [ ] Agregar handler para `milestone.reached`
+- [x] En `EventsSubscriber`, agregar handler para `user.followed`
+- [x] Agregar handler para `car.liked`
+- [x] Agregar handler para `milestone.reached`
 
 ### Frontend - Like Button
 
@@ -1265,14 +1265,14 @@ interface Report {
 
 **Mini-objetivos:**
 
-- [ ] Crear component `NotificationBell.tsx`
-- [ ] Implementar badge con contador de no leídas
-- [ ] Implementar hook `useNotifications()`
-- [ ] Implementar hook `useUnreadCount()` con polling cada 30 segundos
-- [ ] Implementar dropdown `NotificationDropdown.tsx`
-- [ ] Implementar component `NotificationItem.tsx` con variantes
-- [ ] Click en notificación: marca como leída, navega, cierra dropdown
-- [ ] Botón "Marcar todas como leídas"
+- [x] Crear component `NotificationBell.tsx`
+- [x] Implementar badge con contador de no leídas
+- [x] Implementar hook `useNotifications()`
+- [x] Implementar hook `useUnreadCount()` con polling cada 30 segundos
+- [x] Implementar dropdown `NotificationDropdown.tsx`
+- [x] Implementar component `NotificationItem.tsx` con variantes
+- [x] Click en notificación: marca como leída, navega, cierra dropdown
+- [x] Botón "Marcar todas como leídas"
 
 **Archivos a crear:**
 - `apps/web/src/features/social/components/notifications/NotificationBell.tsx`
@@ -1283,9 +1283,9 @@ interface Report {
 
 **Mini-objetivos:**
 
-- [ ] Agregar `NotificationBell` al header
-- [ ] Posicionar a la izquierda del avatar
-- [ ] Testear que no rompe layout en mobile
+- [x] Agregar `NotificationBell` al header
+- [x] Posicionar a la izquierda del avatar
+- [x] Testear que no rompe layout en mobile
 
 ### Testing Sprint 3
 
@@ -1300,12 +1300,11 @@ interface Report {
 
 **Criterios de completitud:**
 
-- [ ] Usuario puede likear autos ajenos
-- [ ] Contador se actualiza inmediatamente
+- [x] Usuario puede likear autos ajenos
+- [x] Contador se actualiza inmediatamente
 - [ ] Dueño del auto recibe notificación
 - [ ] NotificationBell muestra badge correcto
 - [ ] Click en notificación navega correctamente
-- [ ] Sección "Mis autos más populares" aparece en perfil
 
 ---
 

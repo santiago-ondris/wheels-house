@@ -4,6 +4,7 @@ import { X, Menu as MenuIcon, Home, Car, LogIn, UserPlus, Trophy, User, Gamepad2
 import { Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
+
 interface MobileMenuProps {
   onLoginClick: () => void;
 }

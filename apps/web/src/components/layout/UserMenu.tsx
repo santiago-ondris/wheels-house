@@ -22,7 +22,7 @@ export default function UserMenu() {
             </span>
           )}
         </div>
-        <span className="text-white text-sm hidden md:block">{user.username}</span>
+        <span className="text-white text-sm">{user.username}</span>
         <ChevronDown className="w-4 h-4 text-white/60" />
       </Menu.Button>
 

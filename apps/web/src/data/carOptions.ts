@@ -14,6 +14,7 @@ export const manufacturers = [
     "Matchbox",
     "Tomica",
     "Majorette",
+    "Kaido House",
     "Greenlight",
     "Auto World",
     "M2 Machines",
@@ -96,6 +97,7 @@ export const brands = [
     "Saab",
     "Shelby",
     "Subaru",
+    "Studebaker",
     "Suzuki",
     "Tesla",
     "Toyota",
@@ -178,14 +180,14 @@ export const carConditions = [
     "Ambos"
 ];
 
-// Display labels for collection (what you HAVE)
+// Display labels for collection
 export const conditionDisplayCollection: Record<string, string> = {
     "Abierto": "Abierto",
     "Cerrado / En blister": "Cerrado / En blister",
     "Ambos": "Abierto y Cerrado"
 };
 
-// Display labels for wishlist (what you're LOOKING FOR)
+// Display labels for wishlist
 export const conditionDisplayWishlist: Record<string, string> = {
     "Abierto": "Abierto",
     "Cerrado / En blister": "Cerrado / En blister",
@@ -265,6 +267,7 @@ export const brandNationalities: Record<string, string> = {
     "Volkswagen": "Alemania",
     "Volvo": "Suecia",
     "W Motors": "UAE",
+    "Studebaker": "USA",
 };
 
 // New car attributes
@@ -289,6 +292,7 @@ export const varieties = [
     "Car Culture",
     "Classics",
     "Collectors Convention",
+    "Fast & Furious",
     "Garage",
     "NFT",
     "Mystery Models",

@@ -1,0 +1,93 @@
+
+import { Inject, Injectable } from '@nestjs/common';
+import { desc, eq, and, sql } from 'drizzle-orm';
+import { db } from '../../../database';
+import * as schema from '../../../database/schema';
+
+@Injectable()
+export class NotificationsRepository {
+    private readonly db = db;
+
+    async create(data: typeof schema.notification.$inferInsert) {
+        return await this.db
+            .insert(schema.notification)
+            .values(data)
+            .returning();
+    }
+
+    async findByUser(userId: number, limit = 50) {
+        return await this.db
+            .select({
+                notificationId: schema.notification.notificationId,
+                userId: schema.notification.userId,
+                type: schema.notification.type,
+                actorId: schema.notification.actorId,
+                carId: schema.notification.carId,
+                groupId: schema.notification.groupId,
+                metadata: schema.notification.metadata,
+                read: schema.notification.read,
+                createdAt: schema.notification.createdAt,
+                actor: {
+                    userId: schema.user.userId,
+                    username: schema.user.username,
+                    picture: schema.user.picture,
+                }
+            })
+            .from(schema.notification)
+            .leftJoin(schema.user, eq(schema.notification.actorId, schema.user.userId))
+            .where(eq(schema.notification.userId, userId))
+            .orderBy(desc(schema.notification.createdAt))
+            .limit(limit);
+    }
+
+    async getUnreadCount(userId: number) {
+        const [result] = await this.db
+            .select({ count: sql<number>`count(*)` })
+            .from(schema.notification)
+            .where(
+                and(
+                    eq(schema.notification.userId, userId),
+                    eq(schema.notification.read, false)
+                )
+            );
+        return Number(result.count);
+    }
+
+    async markAsRead(notificationId: number, userId: number) {
+        return await this.db
+            .update(schema.notification)
+            .set({ read: true })
+            .where(
+                and(
+                    eq(schema.notification.notificationId, notificationId),
+                    eq(schema.notification.userId, userId)
+                )
+            )
+            .returning();
+    }
+
+    async markAllAsRead(userId: number) {
+        return await this.db
+            .update(schema.notification)
+            .set({ read: true })
+            .where(
+                and(
+                    eq(schema.notification.userId, userId),
+                    eq(schema.notification.read, false)
+                )
+            )
+            .returning();
+    }
+
+    async delete(notificationId: number, userId: number) {
+        return await this.db
+            .delete(schema.notification)
+            .where(
+                and(
+                    eq(schema.notification.notificationId, notificationId),
+                    eq(schema.notification.userId, userId)
+                )
+            )
+            .returning();
+    }
+}

@@ -16,6 +16,7 @@ export const manufacturers = [
     "Matchbox",
     "Tomica",
     "Majorette",
+    "Kaido House",
     "Greenlight",
     "Auto World",
     "M2 Machines",
@@ -104,7 +105,8 @@ export const brands = [
     "Lancia",
     "AMC",
     "Cupra",
-    "Fantasía"
+    "Fantasía",
+    "Studebaker"
 ];
 
 export const colors = [
@@ -168,6 +170,7 @@ export const varieties = [
     "Car Culture",
     "Classics",
     "Collectors Convention",
+    "Fast & Furious",
     "Garage",
     "NFT",
     "Mystery Models",
