@@ -1,6 +1,6 @@
 
 import { Inject, Injectable } from '@nestjs/common';
-import { desc, eq, and, sql } from 'drizzle-orm';
+import { desc, eq, and, sql, lt } from 'drizzle-orm';
 import { db } from '../../../database';
 import * as schema from '../../../database/schema';
 
@@ -15,7 +15,7 @@ export class NotificationsRepository {
             .returning();
     }
 
-    async findByUser(userId: number, limit = 50) {
+    async findByUser(userId: number, limit = 20, offset = 0) {
         return await this.db
             .select({
                 notificationId: schema.notification.notificationId,
@@ -37,7 +37,8 @@ export class NotificationsRepository {
             .leftJoin(schema.user, eq(schema.notification.actorId, schema.user.userId))
             .where(eq(schema.notification.userId, userId))
             .orderBy(desc(schema.notification.createdAt))
-            .limit(limit);
+            .limit(limit)
+            .offset(offset);
     }
 
     async getUnreadCount(userId: number) {
@@ -88,6 +89,13 @@ export class NotificationsRepository {
                     eq(schema.notification.userId, userId)
                 )
             )
+            .returning();
+    }
+
+    async deleteOldNotifications(olderThan: Date) {
+        return await this.db
+            .delete(schema.notification)
+            .where(lt(schema.notification.createdAt, olderThan))
             .returning();
     }
 }

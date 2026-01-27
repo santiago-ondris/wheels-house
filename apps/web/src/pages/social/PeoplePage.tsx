@@ -3,7 +3,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getFollowers, getFollowing } from "../../features/social/api/followsApi";
 import UserCard from "../../features/social/components/UserCard";
-import { Users, UserPlus, Loader2, ArrowLeft, Search, ShieldCheck } from "lucide-react";
+import { Users, UserPlus, Loader2, ArrowLeft, Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
@@ -56,14 +56,14 @@ export default function PeoplePage() {
             {/* Glossy Header Background */}
             <div className="fixed top-0 left-0 right-0 h-80 bg-gradient-to-b from-accent/5 via-accent/[0.02] to-transparent pointer-events-none z-0" />
 
-            <div className="container mx-auto px-6 pt-6 pb-24 relative z-10">
+            <div className="container mx-auto px-6 pt-3 pb-24 relative z-10">
                 <div className="max-w-5xl mx-auto">
                     {/* Navigation Breadcrumb */}
                     <motion.button
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         onClick={() => navigate(-1)}
-                        className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors mb-8 group"
+                        className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors mb-4 group"
                     >
                         <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
                         <span className="text-[10px] font-mono uppercase tracking-[0.2em]">Volver</span>
@@ -71,14 +71,6 @@ export default function PeoplePage() {
 
                     <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
                         <div className="space-y-2">
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 mb-2"
-                            >
-                                <ShieldCheck size={12} className="text-accent" />
-                                <span className="text-[10px] font-black text-accent uppercase tracking-widest">Espacio Privado</span>
-                            </motion.div>
                             <h1 className="text-6xl md:text-7xl font-black text-white tracking-tighter uppercase leading-[0.9]">
                                 Mi <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-white/40">Red</span>
                             </h1>

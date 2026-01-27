@@ -11,13 +11,9 @@ interface NotificationDropdownProps {
 }
 
 export default function NotificationDropdown({ onClose }: NotificationDropdownProps) {
-    const { notifications, isLoading, markAsRead, markAllAsRead, fetchNotifications } = useNotifications();
+    const { notifications, isLoading, markAsRead, markAllAsRead } = useNotifications(10);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
-
-    useEffect(() => {
-        fetchNotifications();
-    }, [fetchNotifications]);
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {

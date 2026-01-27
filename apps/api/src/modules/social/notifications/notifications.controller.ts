@@ -1,4 +1,4 @@
-import { Controller, Get, Put, Delete, Param, UseGuards, Request, ParseIntPipe, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Put, Delete, Param, UseGuards, Request, ParseIntPipe, HttpCode, HttpStatus, Query } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
 import { JwtAuthGuard } from 'src/validators/auth.validator';
 
@@ -9,8 +9,14 @@ export class NotificationsController {
     constructor(private readonly notificationsService: NotificationsService) { }
 
     @Get()
-    async getUserNotifications(@Request() req: any) {
-        return await this.notificationsService.getUserNotifications(req.user.userId);
+    async getUserNotifications(
+        @Request() req: any,
+        @Query('page') page?: string,
+        @Query('limit') limit?: string
+    ) {
+        const pageNum = page ? parseInt(page, 10) : 0;
+        const limitNum = limit ? parseInt(limit, 10) : 20;
+        return await this.notificationsService.getUserNotifications(req.user.userId, pageNum, limitNum);
     }
 
     @Get('unread-count')

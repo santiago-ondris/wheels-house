@@ -4,15 +4,31 @@ import { useNotifications } from "../features/social/hooks/useNotifications";
 import NotificationItem from "../features/social/components/notifications/NotificationItem";
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useInView } from "react-intersection-observer";
 import toast from "react-hot-toast";
 
 export default function NotificationsPage() {
     const navigate = useNavigate();
-    const { notifications, isLoading, markAsRead, markAllAsRead, fetchNotifications } = useNotifications();
+    const {
+        notifications,
+        isLoading,
+        isFetchingNextPage,
+        hasNextPage,
+        fetchNextPage,
+        markAsRead,
+        markAllAsRead
+    } = useNotifications();
+
+    const { ref, inView } = useInView({
+        threshold: 0,
+        rootMargin: '100px',
+    });
 
     useEffect(() => {
-        fetchNotifications();
-    }, [fetchNotifications]);
+        if (inView && hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+        }
+    }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
     const handleMarkAllRead = async () => {
         await markAllAsRead();
@@ -131,6 +147,22 @@ export default function NotificationsPage() {
                                             </motion.div>
                                         ))}
                                     </AnimatePresence>
+
+                                    {/* Scroll Observer / Infinite Loader */}
+                                    <div ref={ref} className="py-10 flex justify-center">
+                                        {isFetchingNextPage ? (
+                                            <div className="flex flex-col items-center gap-3">
+                                                <div className="w-6 h-6 border-2 border-accent/20 border-t-accent rounded-full animate-spin" />
+                                                <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-600">Cargando más...</span>
+                                            </div>
+                                        ) : hasNextPage ? (
+                                            <div className="h-4" />
+                                        ) : (
+                                            <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-700 pb-10">
+                                                Has llegado al final de tu historial
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
                             )}
                         </div>
