@@ -1,29 +1,38 @@
-import { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '../../../services/api';
+import { useEffect, useRef } from 'react';
 
 export function useUnreadCount(intervalMs = 30000) {
-    const [count, setCount] = useState(0);
+    const queryClient = useQueryClient();
+    const { data, refetch } = useQuery({
+        queryKey: ['notifications', 'unread-count'],
+        queryFn: async () => {
+            return await apiRequest<{ count: number }>('/social/notifications/unread-count');
+        },
+        refetchInterval: intervalMs,
+        staleTime: 1000 * 60, // 1 minute
+    });
 
-    const fetchCount = async () => {
-        try {
-            const data = await apiRequest<{ count: number }>('/social/notifications/unread-count');
-            setCount(data.count);
-        } catch (err) {
-            console.error('Failed to fetch unread count', err);
-        }
-    };
+    const count = data?.count ?? 0;
+    const prevCount = useRef(count);
 
     useEffect(() => {
-        fetchCount(); 
+        // Si el conteo aumenta, invalidamos las listas para que se refresquen al abrirse
+        if (count > prevCount.current) {
+            queryClient.invalidateQueries({
+                queryKey: ['notifications'],
+                exact: false,
+                predicate: (query) => query.queryKey[1] !== 'unread-count'
+            });
+        }
+        prevCount.current = count;
+    }, [count, queryClient]);
 
-        const intervalId = setInterval(fetchCount, intervalMs);
+    const refreshCount = () => refetch();
 
-        return () => clearInterval(intervalId);
-    }, [intervalMs]);
-
-    const refreshCount = fetchCount;
-
-    const resetCount = () => setCount(0);
+    const resetCount = () => {
+        // quedaria en desuso pero por ahora no lo voy a eliminar
+    };
 
     return { count, refreshCount, resetCount };
 }

@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, CheckCheck, Bell } from "lucide-react";
 import { useNotifications } from "../features/social/hooks/useNotifications";
+import { useUnreadCount } from "../features/social/hooks/useUnreadCount";
 import NotificationItem from "../features/social/components/notifications/NotificationItem";
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import toast from "react-hot-toast";
@@ -16,8 +17,32 @@ export default function NotificationsPage() {
         hasNextPage,
         fetchNextPage,
         markAsRead,
-        markAllAsRead
+        markAllAsRead,
+        refetch
     } = useNotifications();
+
+    const { count: unreadCount } = useUnreadCount();
+    const [showNewNotificationsBanner, setShowNewNotificationsBanner] = useState(false);
+    const prevUnreadCount = useRef(unreadCount);
+
+    useEffect(() => {
+        if (unreadCount > prevUnreadCount.current) {
+            setShowNewNotificationsBanner(true);
+            
+            const timer = setTimeout(() => {
+                setShowNewNotificationsBanner(false);
+            }, 8000);
+            
+            return () => clearTimeout(timer);
+        }
+        prevUnreadCount.current = unreadCount;
+    }, [unreadCount]);
+
+    const handleRefresh = async () => {
+        setShowNewNotificationsBanner(false);
+        await refetch();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     const { ref, inView } = useInView({
         threshold: 0,
@@ -94,7 +119,23 @@ export default function NotificationsPage() {
                         )}
                     </header>
 
-                    <div className="flex justify-center">
+                    <div className="flex justify-center relative">
+                        {/* New Notifications Banner (Floating) */}
+                        <AnimatePresence>
+                            {showNewNotificationsBanner && (
+                                <motion.button
+                                    initial={{ opacity: 0, y: -20, x: '-50%' }}
+                                    animate={{ opacity: 1, y: 0, x: '-50%' }}
+                                    exit={{ opacity: 0, y: -20, x: '-50%' }}
+                                    onClick={handleRefresh}
+                                    className="fixed top-24 left-1/2 z-50 bg-accent text-white px-4 py-2 rounded-full font-bold text-xs shadow-lg shadow-accent/20 border border-white/10 hover:scale-105 transition-transform flex items-center gap-2"
+                                >
+                                    <Bell className="w-3.5 h-3.5 animate-bounce" />
+                                    Nuevas notificaciones
+                                </motion.button>
+                            )}
+                        </AnimatePresence>
+
                         <div className="w-full max-w-2xl border-x border-white/5 bg-[#050505] min-h-[400px]">
                             {isLoading && notifications.length === 0 ? (
                                 <div className="py-24 text-center flex flex-col items-center">
@@ -148,7 +189,6 @@ export default function NotificationsPage() {
                                         ))}
                                     </AnimatePresence>
 
-                                    {/* Scroll Observer / Infinite Loader */}
                                     <div ref={ref} className="py-10 flex justify-center">
                                         {isFetchingNextPage ? (
                                             <div className="flex flex-col items-center gap-3">
@@ -159,7 +199,7 @@ export default function NotificationsPage() {
                                             <div className="h-4" />
                                         ) : (
                                             <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-700 pb-10">
-                                                Has llegado al final de tu historial
+                                                Llegaste al final de tu historial
                                             </p>
                                         )}
                                     </div>

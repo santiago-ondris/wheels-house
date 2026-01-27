@@ -18,7 +18,7 @@ export function useNotifications(limit = 20) {
         getNextPageParam: (lastPage, allPages) => {
             return lastPage.hasMore ? allPages.length : undefined;
         },
-        staleTime: 1000 * 60 * 5, // 5 minutes
+        staleTime: 1000 * 60, // 1 minute
     });
 
     const notifications = useMemo(() => {
@@ -41,7 +41,7 @@ export function useNotifications(limit = 20) {
         });
 
         // Update unread count cache
-        queryClient.setQueryData(['notifications-unread-count'], (old: any) => {
+        queryClient.setQueryData(['notifications', 'unread-count'], (old: any) => {
             if (typeof old?.count === 'number') {
                 return { count: Math.max(0, old.count - 1) };
             }
@@ -50,9 +50,10 @@ export function useNotifications(limit = 20) {
 
         try {
             await apiRequest(`/social/notifications/${notificationId}/read`, { method: 'PUT' });
+            queryClient.invalidateQueries({ queryKey: ['notifications'] });
         } catch (err) {
             console.error('Failed to mark notification as read', err);
-            queryClient.invalidateQueries({ queryKey });
+            queryClient.invalidateQueries({ queryKey: ['notifications'] });
         }
     }, [queryClient, queryKey]);
 
@@ -70,13 +71,14 @@ export function useNotifications(limit = 20) {
         });
 
         // Reset unread count
-        queryClient.setQueryData(['notifications-unread-count'], { count: 0 });
+        queryClient.setQueryData(['notifications', 'unread-count'], { count: 0 });
 
         try {
             await apiRequest('/social/notifications/read-all', { method: 'PUT' });
+            queryClient.invalidateQueries({ queryKey: ['notifications'] });
         } catch (err) {
             console.error('Failed to mark all as read', err);
-            queryClient.invalidateQueries({ queryKey });
+            queryClient.invalidateQueries({ queryKey: ['notifications'] });
         }
     }, [queryClient, queryKey]);
 
@@ -97,7 +99,7 @@ export function useNotifications(limit = 20) {
             await apiRequest(`/social/notifications/${notificationId}`, { method: 'DELETE' });
         } catch (err) {
             console.error('Failed to delete notification', err);
-            queryClient.invalidateQueries({ queryKey });
+            queryClient.invalidateQueries({ queryKey: ['notifications'] });
         }
     }, [queryClient, queryKey]);
 
