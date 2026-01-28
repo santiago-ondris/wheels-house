@@ -35,6 +35,8 @@ import ImportCarsPage from "../pages/import/ImportCarsPage";
 import AboutUsPage from "../pages/AboutUsPage";
 import WheelWordPage from "../pages/wheelword/WheelWordPage";
 import CommunityPage from "../pages/social/CommunityPage";
+import PeoplePage from "../pages/social/PeoplePage";
+import NotificationsPage from "../pages/NotificationsPage";
 
 // Components
 import ProtectedRoute from "../components/auth/ProtectedRoute";
@@ -88,6 +90,14 @@ export const router = createBrowserRouter([
             {
                 path: "import",
                 element: <ProtectedRoute><ImportCarsPage /></ProtectedRoute>
+            },
+            {
+                path: "people",
+                element: <ProtectedRoute><PeoplePage /></ProtectedRoute>
+            },
+            {
+                path: "notifications",
+                element: <ProtectedRoute><NotificationsPage /></ProtectedRoute>
             },
 
             // User collection routes (public viewing)

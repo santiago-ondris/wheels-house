@@ -14,6 +14,8 @@ export interface FeedItemDto {
     groupId?: number | null;
     metadata?: any;
     createdAt: string;
+    likesCount: number;
+    isLiked: boolean;
 }
 
 export interface FeedResponse {

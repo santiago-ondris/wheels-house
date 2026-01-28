@@ -1,13 +1,20 @@
 import { motion } from "framer-motion";
-import type { HotWheelMock } from "../../data/mockHotWheels";
+import { HotWheelMock } from "../../data/mockHotWheels";
+import { LikeButton } from "../../features/social/components/likes/LikeButton";
+
+interface ExtendedHotWheel extends HotWheelMock {
+  likesCount?: number;
+  isLiked?: boolean;
+}
 
 interface Props {
-  car: HotWheelMock;
+  car: ExtendedHotWheel;
   onClick?: () => void;
   selectable?: boolean;
   isSelected?: boolean;
   onSelect?: () => void;
 }
+
 
 export default function HotWheelCardList({ car, onClick, selectable, isSelected, onSelect }: Props) {
   const handleCardClick = () => {
@@ -80,9 +87,24 @@ export default function HotWheelCardList({ car, onClick, selectable, isSelected,
           </div>
         )}
 
+        {/* Like Button */}
+        {!selectable && (
+          <div className="mr-2">
+            <LikeButton
+              id={Number(car.id)}
+              initialIsLiked={car.isLiked || false}
+              initialLikesCount={car.likesCount || 0}
+              type="car"
+              showCount={true}
+              className="scale-90"
+            />
+          </div>
+        )}
+
         {/* Decorator */}
         <div className="flex gap-0.5">
           <div className="w-0.5 h-4 bg-white/10 group-hover:bg-accent/30 transition-colors" />
+
           <div className="w-0.5 h-4 bg-white/5" />
         </div>
       </div>

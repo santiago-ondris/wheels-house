@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Search } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
@@ -7,28 +7,23 @@ import MobileMenu from "./layout/MobileMenu";
 import LoginModal from "./auth/LoginModal";
 import UserSearch from "./ui/UserSearch";
 import MobileUserSearch from "./ui/MobileUserSearch";
+import NotificationBell from "../features/social/components/notifications/NotificationBell";
 
-export default function Navbar() {
+interface NavbarProps {
+  isScrolled: boolean;
+}
+
+export default function Navbar({ isScrolled }: NavbarProps) {
   const { isAuthenticated, user } = useAuth();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   return (
     <>
       <nav
         className={`fixed top-0 w-full px-6 z-50 transition-all duration-500 ease-in-out flex items-center ${isScrolled
-            ? "bg-background/80 backdrop-blur-2xl border-b border-white/5 shadow-[0_8px_32px_rgba(0,0,0,0.3)] h-[72px]"
-            : "bg-transparent border-b border-transparent h-[88px]"
+          ? "bg-background/80 backdrop-blur-2xl border-b border-white/5 shadow-[0_8px_32px_rgba(0,0,0,0.3)] h-[72px]"
+          : "bg-transparent border-b border-transparent h-[88px]"
           }`}
       >
         <div className="container mx-auto flex items-center justify-between">
@@ -51,6 +46,9 @@ export default function Navbar() {
                   <Link to="/community" className="text-white/70 hover:text-white transition-colors">
                     Comunidad
                   </Link>
+                  <Link to="/people" className="text-white/70 hover:text-white transition-colors">
+                    Personas
+                  </Link>
                   <Link to={`/collection/${user?.username}`} className="text-white/70 hover:text-white transition-colors">
                     Mi Colección
                   </Link>
@@ -59,11 +57,13 @@ export default function Navbar() {
                   </div>
                 </div>
 
-                <div className="hidden md:block">
+                <div className="hidden md:flex items-center gap-4">
+                  <NotificationBell />
                   <UserMenu />
                 </div>
 
                 <div className="flex items-center gap-2 md:hidden">
+                  <NotificationBell />
                   <button
                     onClick={() => setIsSearchOpen(true)}
                     className="p-2 text-white/70 hover:text-white transition-colors"

@@ -1,7 +1,8 @@
-import { Controller, Get, Query, Request } from '@nestjs/common';
+import { Controller, Get, Query, Request, UseGuards } from '@nestjs/common';
 import { FeedService } from './feed.service';
 import { FeedQueryDto, FeedResponseDto, FeedItemDto } from './dto/feed.dto';
 import type { FeedEventWithUser } from './feed.repository';
+import { OptionalJwtAuthGuard } from 'src/validators/auth.validator';
 
 interface AuthenticatedRequest extends Request {
     user?: {
@@ -14,6 +15,7 @@ interface AuthenticatedRequest extends Request {
 export class FeedController {
     constructor(private readonly feedService: FeedService) { }
 
+    @UseGuards(OptionalJwtAuthGuard)
     @Get()
     async getFeed(
         @Query() query: FeedQueryDto,
@@ -28,10 +30,18 @@ export class FeedController {
         let result: { items: FeedEventWithUser[]; hasMore: boolean };
 
         if (tab === 'following' && req.user) {
-            result = await this.feedService.getFeedFollowing(req.user.userId, page, limit, { type, targetUserId });
+            result = await this.feedService.getFeedFollowing(req.user.userId, page, limit, {
+                type,
+                targetUserId,
+                viewerId: req.user.userId
+            });
         } else {
             // Default to explore (global)
-            result = await this.feedService.getFeedGlobal(page, limit, { type, targetUserId });
+            result = await this.feedService.getFeedGlobal(page, limit, {
+                type,
+                targetUserId,
+                viewerId: req.user?.userId
+            });
         }
 
         // Map to DTO
@@ -47,7 +57,10 @@ export class FeedController {
             groupId: item.groupId,
             metadata: item.metadata,
             createdAt: item.createdAt.toISOString(),
+            likesCount: item.likesCount,
+            isLiked: item.isLiked,
         }));
+
 
         return {
             items,

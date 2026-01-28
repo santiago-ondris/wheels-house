@@ -40,8 +40,10 @@ export async function getGroupsFromUserId(userId: number) {
         picture: group.picture,
         featured: group.featured,
         order: group.order,
+        likesCount: group.likesCount,
     }).from(group).where(eq(group.userId, userId)).orderBy(desc(group.featured), desc(group.groupId));
 }
+
 
 export async function getFeaturedGroupsFromUserId(userId: number) {
     return await db.select({
@@ -51,8 +53,10 @@ export async function getFeaturedGroupsFromUserId(userId: number) {
         picture: group.picture,
         featured: group.featured,
         order: group.order,
+        likesCount: group.likesCount,
     }).from(group).where(and(eq(group.userId, userId), eq(group.featured, true))).orderBy(desc(group.groupId));
 }
+
 
 export async function countFeaturedGroupsFromUserId(userId: number) {
     const result = await db.select({ count: count() }).from(group).where(and(eq(group.userId, userId), eq(group.featured, true)));
@@ -73,10 +77,12 @@ export async function getGroupsFromCarId(carId: number) {
         picture: group.picture,
         featured: group.featured,
         order: group.order,
+        likesCount: group.likesCount,
     }).from(groupedCar).where(eq(groupedCar.carId, carId)).innerJoin(group, eq(group.groupId, groupedCar.groupId));
 
     return groups;
 }
+
 
 export async function getCarsFromGroupId(groupId: number) {
     const cars = await db.select({
@@ -91,6 +97,7 @@ export async function getCarsFromGroupId(groupId: number) {
         series: car.series,
         country: car.country,
         condition: car.condition,
+        likesCount: car.likesCount,
     }).from(groupedCar).where(eq(groupedCar.groupId, groupId)).innerJoin(car, eq(groupedCar.carId, car.carId));
 
     return cars;

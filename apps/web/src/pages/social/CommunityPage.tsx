@@ -6,8 +6,10 @@ import LeftSidebar from "../../components/social/LeftSidebar";
 import RightSidebar from "../../components/social/RightSidebar";
 import MobileFeedFilters from "../../components/social/MobileFeedFilters";
 import { useFeedRefresh } from "../../hooks/useSocialFeed";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function CommunityPage() {
+    const { isAuthenticated } = useAuth();
     const [activeTab, setActiveTab] = useState<'explore' | 'following'>('explore');
     const [selectedType, setSelectedType] = useState<string>('all');
     const [selectedUser, setSelectedUser] = useState<{ userId: number, username: string } | null>(null);
@@ -31,7 +33,7 @@ export default function CommunityPage() {
     return (
         <div className="min-h-screen bg-[#050505]">
             {/* Ultra Minimalist Header - Integrated with page background */}
-            <div className="sticky top-[72px] z-30 bg-[#050505]/80 backdrop-blur-md border-b border-white/5">
+            <div className="sticky top-[var(--navbar-height)] z-30 bg-[#050505]/80 backdrop-blur-md border-b border-white/5 transition-[top] duration-500">
                 <div className="max-w-2xl mx-auto px-4 lg:px-0 flex items-center justify-between h-14">
                     <div className="flex items-center gap-2">
                         <h1 className="text-sm font-black text-white uppercase tracking-[0.2em]">
@@ -64,21 +66,23 @@ export default function CommunityPage() {
                                 <motion.div layoutId="activeUnderline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent" />
                             )}
                         </button>
-                        <button
-                            onClick={() => handleTabClick('following')}
-                            className={`relative px-4 flex items-center text-[10px] font-mono tracking-[0.1em] uppercase transition-colors ${activeTab === 'following' ? 'text-white' : 'text-zinc-600 hover:text-zinc-400'
-                                }`}
-                        >
-                            <span className="relative">
-                                Siguiendo
-                                {followingHasUnread && (
-                                    <span className="absolute -top-1 -right-2 w-1.5 h-1.5 bg-accent rounded-full shadow-[0_0_8px_rgba(255,255,255,0.4)]" />
+                        {isAuthenticated && (
+                            <button
+                                onClick={() => handleTabClick('following')}
+                                className={`relative px-4 flex items-center text-[10px] font-mono tracking-[0.1em] uppercase transition-colors ${activeTab === 'following' ? 'text-white' : 'text-zinc-600 hover:text-zinc-400'
+                                    }`}
+                            >
+                                <span className="relative">
+                                    Siguiendo
+                                    {followingHasUnread && (
+                                        <span className="absolute -top-1 -right-2 w-1.5 h-1.5 bg-accent rounded-full shadow-[0_0_8px_rgba(255,255,255,0.4)]" />
+                                    )}
+                                </span>
+                                {activeTab === 'following' && (
+                                    <motion.div layoutId="activeUnderline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent" />
                                 )}
-                            </span>
-                            {activeTab === 'following' && (
-                                <motion.div layoutId="activeUnderline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent" />
-                            )}
-                        </button>
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>

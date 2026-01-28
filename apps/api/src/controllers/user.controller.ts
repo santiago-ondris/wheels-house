@@ -4,10 +4,14 @@ import { RegisterDTO, LoginDTO, UpdateUserProfileDTO, UpdatePasswordDTO, ResetPa
 import { loginValidator, registerValidator, forgotPasswordValidator, resetPasswordValidator, updatePasswordValidator, updateUserValidator } from '../validators/user.validator'
 import { JwtAuthGuard, JwtRefreshGuard } from 'src/validators/auth.validator';
 import { ThrottlerGuard } from '@nestjs/throttler';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller()
 export class UserController {
-    constructor(private readonly userService: UserService) { }
+    constructor(
+        private readonly userService: UserService,
+        private readonly jwtService: JwtService
+    ) { }
 
     @Post('/register')
     async register(@Body() registerData: RegisterDTO) {
@@ -30,8 +34,26 @@ export class UserController {
     }
 
     @Get('/profile/:username')
-    async getPublicProfile(@Param('username') username: string) {
-        return await this.userService.getPublicProfileService(username);
+    async getPublicProfile(@Param('username') username: string, @Request() req) {
+        let currentUserId: number | undefined;
+
+        // Manually check for token to support optional auth without throwing
+        const authHeader = req.headers.authorization;
+
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            try {
+                const token = authHeader.split(' ')[1];
+                const decoded = this.jwtService.decode(token) as any;
+
+                if (decoded && decoded.userId) {
+                    currentUserId = decoded.userId;
+                }
+            } catch (e) {
+                // Ignore invalid tokens for public profile view
+            }
+        }
+
+        return await this.userService.getPublicProfileService(username, currentUserId);
     }
 
     @Get('/search')

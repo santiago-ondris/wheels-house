@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Param, UseGuards, Request, Put, Delete } from '@nestjs/common';
 import { GroupService } from 'src/services/group.service';
-import { JwtAuthGuard } from 'src/validators/auth.validator';
+import { JwtAuthGuard, OptionalJwtAuthGuard } from 'src/validators/auth.validator';
 import { CreateGroupDTO, UpdateGroupDTO } from 'src/dto/group.dto';
 import { createGroupValidator, deleteGroupValidator, getGroupValidator, listGroupsValidator, updateGroupValidator } from 'src/validators/group.validator';
 
@@ -16,33 +16,38 @@ export class GroupController {
         return await this.groupService.createGroupService(groupData, req.user);
     }
 
+    @UseGuards(OptionalJwtAuthGuard)
     @Get('info/:groupId')
-    async getGroup(@Param('groupId') groupId: number) {
+    async getGroup(@Request() req, @Param('groupId') groupId: number) {
         await getGroupValidator(groupId);
 
-        return await this.groupService.getGroupService(groupId);
+        return await this.groupService.getGroupService(groupId, req.user?.userId);
     }
 
+    @UseGuards(OptionalJwtAuthGuard)
     @Get('by-name/:username/:groupName')
-    async getGroupByName(@Param('username') username: string, @Param('groupName') groupName: string) {
+    async getGroupByName(@Request() req, @Param('username') username: string, @Param('groupName') groupName: string) {
         // Decode URL-encoded group name
         const decodedName = decodeURIComponent(groupName);
-        return await this.groupService.getGroupByNameService(username, decodedName);
+        return await this.groupService.getGroupByNameService(username, decodedName, req.user?.userId);
     }
 
+    @UseGuards(OptionalJwtAuthGuard)
     @Get('list/:username')
-    async listGroups(@Param('username') username: string) {
+    async listGroups(@Request() req, @Param('username') username: string) {
         await listGroupsValidator(username);
 
-        return await this.groupService.listGroupsService(username);
+        return await this.groupService.listGroupsService(username, req.user?.userId);
     }
 
+    @UseGuards(OptionalJwtAuthGuard)
     @Get('featured/:username')
-    async listFeaturedGroups(@Param('username') username: string) {
+    async listFeaturedGroups(@Request() req, @Param('username') username: string) {
         await listGroupsValidator(username);
 
-        return await this.groupService.listFeaturedGroupsService(username);
+        return await this.groupService.listFeaturedGroupsService(username, req.user?.userId);
     }
+
 
     @UseGuards(JwtAuthGuard)
     @Put('update/:groupId')

@@ -23,8 +23,8 @@ export class UploadService {
   }
 
   /**
-   * Generates a signature for direct frontend uploads to Cloudinary.
-   * The signature is valid for ~1 hour (based on timestamp).
+   * Genera una firma para subir imágenes directamente a Cloudinary.
+   * La firma es válida por ~1 hora (basada en timestamp).
    */
   generateSignature(): CloudinarySignature {
     const timestamp = Math.round(Date.now() / 1000);
@@ -32,10 +32,8 @@ export class UploadService {
     const eager = 'w_1200,c_limit/q_auto/f_auto';
     const apiSecret = this.configService.get<string>('CLOUDINARY_API_SECRET')!;
 
-    // Build the string to sign (alphabetical order of params)
     const paramsToSign = `eager=${eager}&folder=${folder}&timestamp=${timestamp}`;
 
-    // Generate SHA-1 signature
     const signature = crypto
       .createHash('sha1')
       .update(paramsToSign + apiSecret)
@@ -55,13 +53,12 @@ export class UploadService {
     filePath: string,
   ): Promise<{ url: string; publicId: string }> {
     try {
-      // Upload to Cloudinary with transformations
       const result = await cloudinary.uploader.upload(filePath, {
         folder: 'wheels-house/cars',
         transformation: [
-          { width: 1200, crop: 'limit' }, // Max width 1200px
-          { quality: 'auto' }, // Auto quality optimization
-          { fetch_format: 'auto' }, // Auto format (webp for modern browsers)
+          { width: 1200, crop: 'limit' },
+          { quality: 'auto' },
+          { fetch_format: 'auto' },
         ],
       });
 

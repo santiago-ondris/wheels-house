@@ -10,9 +10,11 @@ export const group = pgTable("group", {
     picture: text("picture"),
     featured: boolean("featured").default(false),
     order: integer("order"),
+    likesCount: integer("likesCount").notNull().default(0),
 }, (t) => [
     unique().on(t.name, t.userId)
 ]);
+
 
 export const groupedCar = pgTable("groupedCar", {
     groupedCarId: serial("groupedCarId").primaryKey(),

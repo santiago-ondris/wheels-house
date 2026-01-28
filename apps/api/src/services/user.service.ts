@@ -10,10 +10,14 @@ import {
     updatePasswordFromReset,
     deleteSearchHistoryFromUserId,
     getFounders,
-    deleteFeedEventsFromUserId
+    deleteFeedEventsFromUserId,
+    deleteUserGameAttemptsFromUserId
 } from 'src/database/crud/user.crud';
-import { deleteAllCarPictures, deleteCarsFromUserId, getCarsFromUserId, getPicturesFromCar } from 'src/database/crud/car.crud';
-import { deleteGroupedCarsFromCarId, deleteGroupedCarsFromGroupId, deleteGroupsFromUserId, getGroupsFromUserId } from 'src/database/crud/group.crud';
+import { deleteAllCarPictures, deleteCarsFromUserId, deleteFeedEventsFromCarId, getCarsFromUserId, getPicturesFromCar } from 'src/database/crud/car.crud';
+import { deleteFeedEventsFromGroupId, deleteGroupedCarsFromCarId, deleteGroupedCarsFromGroupId, deleteGroupsFromUserId, getGroupsFromUserId } from 'src/database/crud/group.crud';
+import * as FollowsRepository from '../modules/social/follows/follows.repository';
+import * as likesRepository from '../modules/social/likes/likes.repository';
+import { NotificationsRepository } from '../modules/social/notifications/notifications.repository';
 import { ERROR_CREATING_USER, ERROR_DELETING_USER, ERROR_SENDING_EMAIL, ERROR_UPDATING_USER, INEXISTENT_USER } from 'src/utils/user.utils';
 import bcrypt from "bcrypt";
 import { randomBytes } from 'crypto';
@@ -28,7 +32,8 @@ export class UserService {
         private readonly jwtService: JwtService,
         private readonly uploadService: UploadService,
         private readonly configService: ConfigService,
-        private readonly emailService: EmailService
+        private readonly emailService: EmailService,
+        private readonly notificationsRepository: NotificationsRepository
     ) { }
 
     async registerService(registerData: RegisterDTO) {
@@ -92,7 +97,7 @@ export class UserService {
         return { accessToken };
     }
 
-    async getPublicProfileService(username: string): Promise<PublicProfileDTO> {
+    async getPublicProfileService(username: string, currentUserId?: number): Promise<PublicProfileDTO> {
         const userData = await getPublicProfileByUsername(username);
 
         if (!userData) {
@@ -104,6 +109,24 @@ export class UserService {
 
         // Fetch a los grupos del usuario.
         const groupsFromDB = await getGroupsFromUserId(userData.userId);
+
+        // Social stats
+        let followersCount: number | undefined;
+        let followingCount: number | undefined;
+        let isFollowing = false;
+        let isFollower = false;
+
+        const isOwner = currentUserId === userData.userId;
+
+        if (isOwner) {
+            followersCount = await FollowsRepository.countFollowers(userData.userId);
+            followingCount = await FollowsRepository.countFollowing(userData.userId);
+        }
+
+        if (currentUserId && !isOwner) {
+            isFollowing = await FollowsRepository.isFollowing(currentUserId, userData.userId);
+            isFollower = await FollowsRepository.isFollowing(userData.userId, currentUserId);
+        }
 
         const cars: PublicCarDTO[] = [];
         for (const car of carsFromDB) {
@@ -126,16 +149,21 @@ export class UserService {
         }
 
         return new PublicProfileDTO(
+            userData.userId,
             userData.username,
             userData.firstName,
             userData.lastName,
             cars.length,
             groupsFromDB.length,
             cars,
+            followersCount,
+            followingCount,
             userData.picture ?? undefined,
             userData.createdDate ?? undefined,
             userData.biography ?? undefined,
-            userData.defaultSortPreference ?? 'id:desc'
+            userData.defaultSortPreference ?? 'id:desc',
+            isFollowing,
+            isFollower
         );
     }
 
@@ -218,11 +246,17 @@ export class UserService {
         }
 
         for (const car of cars) {
+            await likesRepository.deleteCarLikes(car.carId);
+            await this.notificationsRepository.deleteByCarId(car.carId);
+            await deleteFeedEventsFromCarId(car.carId);
             await deleteGroupedCarsFromCarId(car.carId);
             await deleteAllCarPictures(car.carId);
         }
 
         for (const group of groups) {
+            await likesRepository.deleteGroupLikes(group.groupId);
+            await this.notificationsRepository.deleteByGroupId(group.groupId);
+            await deleteFeedEventsFromGroupId(group.groupId);
             await deleteGroupedCarsFromGroupId(group.groupId);
         }
 
@@ -238,7 +272,14 @@ export class UserService {
 
         const deletedSearchHistory = await deleteSearchHistoryFromUserId(user.userId);
         const deletedFeedEvents = await deleteFeedEventsFromUserId(user.userId);
-        if (!deletedSearchHistory || !deletedFeedEvents) {
+        const deletedGameAttempts = await deleteUserGameAttemptsFromUserId(user.userId);
+
+        // Social cleanup
+        await likesRepository.deleteUserLikes(user.userId);
+        await FollowsRepository.deleteUserFollows(user.userId);
+        await this.notificationsRepository.deleteByUserId(user.userId);
+
+        if (!deletedSearchHistory || !deletedFeedEvents || !deletedGameAttempts) {
             throw ERROR_DELETING_USER;
         }
 

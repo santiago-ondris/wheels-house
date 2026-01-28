@@ -201,9 +201,12 @@ export default function CollectionSection({
         year: 0,
         series: car.series || undefined,
         manufacturer: car.manufacturer || undefined,
+        likesCount: car.likesCount || 0,
+        isLiked: car.isLiked || false,
         image: car.pictures && car.pictures.length > 0
             ? car.pictures[0]
             : "https://placehold.co/400x300/1A1B4B/D9731A?text=No+Image"
+
     }));
 
     const defaultFilters = {

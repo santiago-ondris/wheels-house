@@ -1,9 +1,9 @@
-import { HttpException, HttpStatus  } from "@nestjs/common";
+import { HttpException, HttpStatus } from "@nestjs/common";
 
 export const ERROR_CREATING_CAR = new HttpException(
     {
         status: HttpStatus.INTERNAL_SERVER_ERROR,
-        error: 'Error while creating the car.' 
+        error: 'Error while creating the car.'
     },
     HttpStatus.INTERNAL_SERVER_ERROR
 );
@@ -11,7 +11,7 @@ export const ERROR_CREATING_CAR = new HttpException(
 export const CAR_NAME_ALREADY_IN_USE = new HttpException(
     {
         status: HttpStatus.CONFLICT,
-        error: 'Car name already in use.' 
+        error: 'Car name already in use.'
     },
     HttpStatus.CONFLICT
 );
@@ -19,7 +19,7 @@ export const CAR_NAME_ALREADY_IN_USE = new HttpException(
 export const INEXISTENT_CAR = new HttpException(
     {
         status: HttpStatus.NOT_FOUND,
-        error: 'Inexistent car.' 
+        error: 'Inexistent car.'
     },
     HttpStatus.NOT_FOUND
 );
@@ -35,7 +35,7 @@ export const CAR_DO_NOT_BELONG_TO_USER = new HttpException(
 export const ERROR_UPDATING_CAR = new HttpException(
     {
         status: HttpStatus.INTERNAL_SERVER_ERROR,
-        error: 'Error while updating the car.' 
+        error: 'Error while updating the car.'
     },
     HttpStatus.INTERNAL_SERVER_ERROR
 );
@@ -43,7 +43,7 @@ export const ERROR_UPDATING_CAR = new HttpException(
 export const ERROR_DELETING_CAR = new HttpException(
     {
         status: HttpStatus.INTERNAL_SERVER_ERROR,
-        error: 'Error while deleting the car.' 
+        error: 'Error while deleting the car.'
     },
     HttpStatus.INTERNAL_SERVER_ERROR
 );
@@ -51,7 +51,7 @@ export const ERROR_DELETING_CAR = new HttpException(
 export const NO_FIELDS_UPDATED = new HttpException(
     {
         status: HttpStatus.BAD_REQUEST,
-        error: 'No fields updated.' 
+        error: 'No fields updated.'
     },
     HttpStatus.BAD_REQUEST
 );
@@ -59,7 +59,7 @@ export const NO_FIELDS_UPDATED = new HttpException(
 export const MAX_CARS_PICTURES_LIMIT = new HttpException(
     {
         status: HttpStatus.BAD_REQUEST,
-        error: 'You can not upload more than 10 pictures.' 
+        error: 'You can not upload more than 10 pictures.'
     },
     HttpStatus.BAD_REQUEST
 );
@@ -67,7 +67,7 @@ export const MAX_CARS_PICTURES_LIMIT = new HttpException(
 export const CAR_PICTURE_FORMAT_NOT_VALID = new HttpException(
     {
         status: HttpStatus.BAD_REQUEST,
-        error: 'Picture format not valid.' 
+        error: 'Picture format not valid.'
     },
     HttpStatus.BAD_REQUEST
 );
@@ -75,7 +75,7 @@ export const CAR_PICTURE_FORMAT_NOT_VALID = new HttpException(
 export const CAR_INFO_NOT_VALID = new HttpException(
     {
         status: HttpStatus.BAD_REQUEST,
-        error: 'Car info not valid.' 
+        error: 'Car info not valid.'
     },
     HttpStatus.BAD_REQUEST
 );
@@ -83,7 +83,7 @@ export const CAR_INFO_NOT_VALID = new HttpException(
 export const CAR_ALREADY_OWNED = new HttpException(
     {
         status: HttpStatus.CONFLICT,
-        error: 'This car is already in your collection.' 
+        error: 'This car is already in your collection.'
     },
     HttpStatus.CONFLICT
 );
@@ -91,13 +91,13 @@ export const CAR_ALREADY_OWNED = new HttpException(
 export const WISHED_CAR_CAN_NOT_BE_IN_GROUP = new HttpException(
     {
         status: HttpStatus.CONFLICT,
-        error: 'Wished car can not be in group.' 
+        error: 'Wished car can not be in group.'
     },
     HttpStatus.CONFLICT
 );
 
 export function validCarPicture(url: string): boolean {
-    const cloudinaryRegex = /^https:\/\/res\.cloudinary\.com\/dyx7kjnjq\/image\/upload\/v\d+\/wheels-house\/cars\/[a-zA-Z0-9_-]+\.(jpg|jpeg|png|webp)$/;
-    
+    const cloudinaryRegex = /^https:\/\/res\.cloudinary\.com\/dyx7kjnjq\/image\/upload\/(?:[^\/]+\/)*wheels-house\/cars\/[a-zA-Z0-9_-]+\.(jpg|jpeg|png|webp)$/;
+
     return cloudinaryRegex.test(url);
 }

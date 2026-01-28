@@ -26,6 +26,11 @@ export const EVENTS = {
     CAR_LIKED: 'car.liked',
     /** Se emite cuando un usuario le quita like a un auto */
     CAR_UNLIKED: 'car.unliked',
+    /** Se emite cuando un usuario le da like a un grupo */
+    GROUP_LIKED: 'group.liked',
+    /** Se emite cuando un usuario le quita like a un grupo */
+    GROUP_UNLIKED: 'group.unliked',
+
 
     // ==================== Post Events ====================
     /** Se emite cuando un usuario crea un post de busqueda o oferta */
@@ -96,6 +101,13 @@ export interface CarLikedPayload {
     carId: number;
     ownerId: number;
 }
+
+export interface GroupLikedPayload {
+    userId: number;
+    groupId: number;
+    ownerId: number;
+}
+
 
 export interface MilestoneReachedPayload {
     userId: number;

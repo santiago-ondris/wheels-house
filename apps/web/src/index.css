@@ -21,7 +21,7 @@
 
 @layer components {
   .blueprint-card {
-    @apply relative overflow-hidden transition-all duration-300;
+    @apply relative overflow-hidden transition-all duration-500;
     background-color: #050a0a;
     background-image:
       linear-gradient(color-mix(in srgb, var(--color-blueprint) 3%, transparent) 1px, transparent 1px),
@@ -73,4 +73,17 @@ button {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-accent);
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }

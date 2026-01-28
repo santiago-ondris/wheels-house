@@ -8,8 +8,15 @@ import type {
     MilestoneReachedPayload,
     UserFollowedPayload,
     CarLikedPayload,
+    GroupLikedPayload,
 } from './event-types';
 import { FeedService } from '../feed/feed.service';
+import { NotificationsService } from '../notifications/notifications.service';
+import {
+    getCarById,
+    getPicturesFromCar
+} from '../../../database/crud/car.crud';
+import { getGroupFromId } from '../../../database/crud/group.crud';
 
 /**
  * EventsSubscriber - Escucha eventos y crea entradas en el feed
@@ -21,7 +28,10 @@ import { FeedService } from '../feed/feed.service';
 export class EventsSubscriber {
     private readonly logger = new Logger(EventsSubscriber.name);
 
-    constructor(private readonly feedService: FeedService) { }
+    constructor(
+        private readonly feedService: FeedService,
+        private readonly notificationsService: NotificationsService,
+    ) { }
 
     // ==================== Car Events ====================
 
@@ -64,18 +74,18 @@ export class EventsSubscriber {
     async handleGroupCreated(payload: GroupCreatedPayload): Promise<void> {
         // Solo crear evento si el grupo tiene 5+ autos (según spec)
         // if (payload.carCount >= 5) {
-            this.logger.log(`📁 Group created: User ${payload.userId} created "${payload.groupName}" with ${payload.carCount} cars`);
+        this.logger.log(`📁 Group created: User ${payload.userId} created "${payload.groupName}" with ${payload.carCount} cars`);
 
-            await this.feedService.createEvent({
-                type: 'group_created',
-                userId: payload.userId,
-                groupId: payload.groupId,
-                metadata: {
-                    groupName: payload.groupName,
-                    groupImage: payload.groupImage,
-                    carCount: payload.carCount
-                }
-            });
+        await this.feedService.createEvent({
+            type: 'group_created',
+            userId: payload.userId,
+            groupId: payload.groupId,
+            metadata: {
+                groupName: payload.groupName,
+                groupImage: payload.groupImage,
+                carCount: payload.carCount
+            }
+        });
         // }
     }
 
@@ -90,6 +100,13 @@ export class EventsSubscriber {
             userId: payload.userId,
             metadata: { milestone: payload.milestone }
         });
+
+        // Crear notificación para el usuario
+        await this.notificationsService.create({
+            userId: payload.userId,
+            type: 'milestone_reached',
+            metadata: { milestone: payload.milestone },
+        });
     }
 
     // ==================== Social Events ====================
@@ -98,13 +115,60 @@ export class EventsSubscriber {
     async handleUserFollowed(payload: UserFollowedPayload): Promise<void> {
         this.logger.log(`👥 User followed: User ${payload.followerId} followed user ${payload.followedId}`);
 
-        // TODO: Implementar cuando tengamos NotificationsService
+        await this.notificationsService.create({
+            userId: payload.followedId,
+            type: 'new_follower',
+            actorId: payload.followerId,
+        });
     }
 
     @OnEvent(EVENTS.CAR_LIKED)
     async handleCarLiked(payload: CarLikedPayload): Promise<void> {
         this.logger.log(`❤️ Car liked: User ${payload.userId} liked car ${payload.carId} (owner: ${payload.ownerId})`);
 
-        // TODO: Implementar cuando tengamos NotificationsService
+        if (payload.userId === payload.ownerId) return;
+
+        try {
+            const car = await getCarById(payload.carId);
+            const pictures = await getPicturesFromCar(payload.carId);
+            const carImage = pictures.length > 0 ? pictures[0].url : undefined;
+
+            await this.notificationsService.create({
+                userId: payload.ownerId,
+                type: 'car_liked',
+                actorId: payload.userId,
+                carId: payload.carId,
+                metadata: {
+                    carName: car?.name,
+                    carImage: carImage
+                }
+            });
+        } catch (error) {
+            this.logger.error(`Error handling car liked: ${error.message}`);
+        }
+    }
+
+    @OnEvent(EVENTS.GROUP_LIKED)
+    async handleGroupLiked(payload: GroupLikedPayload): Promise<void> {
+        this.logger.log(`❤️ Group liked: User ${payload.userId} liked group ${payload.groupId} (owner: ${payload.ownerId})`);
+
+        if (payload.userId === payload.ownerId) return;
+
+        try {
+            const group = await getGroupFromId(payload.groupId);
+
+            await this.notificationsService.create({
+                userId: payload.ownerId,
+                type: 'group_liked',
+                actorId: payload.userId,
+                groupId: payload.groupId,
+                metadata: {
+                    groupName: group?.name,
+                    groupImage: group?.picture || undefined
+                }
+            });
+        } catch (error) {
+            this.logger.error(`Error handling group liked: ${error.message}`);
+        }
     }
 }

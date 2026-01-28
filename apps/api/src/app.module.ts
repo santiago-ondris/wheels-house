@@ -25,6 +25,7 @@ import { EmailService } from './services/email.service';
 import { WheelwordController } from './controllers/wheelword.controller';
 import { WheelwordService } from './services/wheelword.service';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ScheduleModule } from '@nestjs/schedule';
 import { SocialModule } from './modules/social/social.module';
 
 
@@ -33,7 +34,7 @@ import { SocialModule } from './modules/social/social.module';
     SentryModule.forRoot(),
     ThrottlerModule.forRoot([{
       ttl: 60000, // Time to live in milliseconds (1 minute)
-      limit: 3,   // Max 3 requests per minute
+      limit: 30,  // Max 30 requests per minute
     }]),
     PassportModule,
     ConfigModule.forRoot({
@@ -44,6 +45,7 @@ import { SocialModule } from './modules/social/social.module';
       // Expiration set per token type in UserService
     }),
     EventEmitterModule.forRoot(),
+    ScheduleModule.forRoot(),
     SocialModule,
   ],
   controllers: [UserController, CarController, UploadController, GroupController, StatsController, SearchHistoryController, ImportController, HealthController, WheelwordController],

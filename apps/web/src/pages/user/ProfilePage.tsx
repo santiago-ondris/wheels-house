@@ -73,6 +73,7 @@ export default function ProfilePage() {
             className="container mx-auto px-4 pb-20"
         >
             <ProfileHero
+                userId={profile.userId}
                 username={profile.username}
                 firstName={profile.firstName}
                 lastName={profile.lastName}
@@ -81,6 +82,11 @@ export default function ProfilePage() {
                 createdDate={profile.createdDate}
                 totalCars={profile.totalCars}
                 totalGroups={profile.totalGroups}
+                followersCount={profile.followersCount}
+                followingCount={profile.followingCount}
+                isFollowing={profile.isFollowing}
+                isFollower={profile.isFollower}
+                isOwner={isOwner}
             />
 
             <GroupsSection

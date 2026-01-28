@@ -1,5 +1,5 @@
 import { db } from '../../../database';
-import { feedEvent, user } from '../../../database/schema';
+import { car, feedEvent, group, user } from '../../../database/schema';
 import { eq, desc, inArray, and, gte, sql } from 'drizzle-orm';
 import type { FeedEventMetadata } from '../../../database/schema';
 
@@ -28,7 +28,10 @@ export interface FeedEventWithUser {
         lastName: string;
         picture: string | null;
     };
+    likesCount: number;
+    isLiked: boolean;
 }
+
 
 export interface FeedQueryOptions {
     targetUserId?: number; // Para el feed de un usuario específico
@@ -37,7 +40,9 @@ export interface FeedQueryOptions {
     type?: FeedEventType;
     userIds?: number[]; // Para filtrar por usuarios que sigo
     daysBack?: number; // Ventana temporal (default 30 días)
+    viewerId?: number; // ID del usuario que ve el feed (para isLiked)
 }
+
 
 /**
  * FeedRepository - Operaciones de base de datos para feed_events
@@ -68,6 +73,7 @@ export async function getFeedGlobal(options: FeedQueryOptions = {}): Promise<Fee
         limit = 20,
         type,
         daysBack = 30,
+        viewerId,
     } = options;
 
     const daysAgo = new Date();
@@ -99,17 +105,32 @@ export async function getFeedGlobal(options: FeedQueryOptions = {}): Promise<Fee
                 firstName: user.firstName,
                 lastName: user.lastName,
                 picture: user.picture,
-            }
+            },
+            carLikesCount: car.likesCount,
+            groupLikesCount: group.likesCount,
+            isCarLiked: viewerId
+                ? sql<boolean>`EXISTS(SELECT 1 FROM "carLike" WHERE "userId" = ${viewerId} AND "carId" = ${feedEvent.carId})`
+                : sql<boolean>`false`,
+            isGroupLiked: viewerId
+                ? sql<boolean>`EXISTS(SELECT 1 FROM "groupLike" WHERE "userId" = ${viewerId} AND "groupId" = ${feedEvent.groupId})`
+                : sql<boolean>`false`,
         })
         .from(feedEvent)
         .innerJoin(user, eq(feedEvent.userId, user.userId))
+        .leftJoin(car, eq(feedEvent.carId, car.carId))
+        .leftJoin(group, eq(feedEvent.groupId, group.groupId))
         .where(and(...conditions))
         .orderBy(desc(feedEvent.createdAt))
         .limit(limit)
         .offset(page * limit);
 
-    return events as FeedEventWithUser[];
+    return (events as any[]).map(event => ({
+        ...event,
+        likesCount: event.carId ? (event.carLikesCount || 0) : (event.groupLikesCount || 0),
+        isLiked: event.carId ? !!event.isCarLiked : !!event.isGroupLiked,
+    })) as FeedEventWithUser[];
 }
+
 
 /**
  * Obtiene el feed personalizado (solo usuarios que sigo)
@@ -123,6 +144,7 @@ export async function getFeedFollowing(
         limit = 20,
         type,
         daysBack = 30,
+        viewerId,
     } = options;
 
     if (followedUserIds.length === 0) {
@@ -159,17 +181,32 @@ export async function getFeedFollowing(
                 firstName: user.firstName,
                 lastName: user.lastName,
                 picture: user.picture,
-            }
+            },
+            carLikesCount: car.likesCount,
+            groupLikesCount: group.likesCount,
+            isCarLiked: viewerId
+                ? sql<boolean>`EXISTS(SELECT 1 FROM "carLike" WHERE "userId" = ${viewerId} AND "carId" = ${feedEvent.carId})`
+                : sql<boolean>`false`,
+            isGroupLiked: viewerId
+                ? sql<boolean>`EXISTS(SELECT 1 FROM "groupLike" WHERE "userId" = ${viewerId} AND "groupId" = ${feedEvent.groupId})`
+                : sql<boolean>`false`,
         })
         .from(feedEvent)
         .innerJoin(user, eq(feedEvent.userId, user.userId))
+        .leftJoin(car, eq(feedEvent.carId, car.carId))
+        .leftJoin(group, eq(feedEvent.groupId, group.groupId))
         .where(and(...conditions))
         .orderBy(desc(feedEvent.createdAt))
         .limit(limit)
         .offset(page * limit);
 
-    return events as FeedEventWithUser[];
+    return (events as any[]).map(event => ({
+        ...event,
+        likesCount: event.carId ? (event.carLikesCount || 0) : (event.groupLikesCount || 0),
+        isLiked: event.carId ? !!event.isCarLiked : !!event.isGroupLiked,
+    })) as FeedEventWithUser[];
 }
+
 
 /**
  * Obtiene eventos de un usuario específico
@@ -178,7 +215,7 @@ export async function getFeedByUserId(
     userId: number,
     options: FeedQueryOptions = {}
 ): Promise<FeedEventWithUser[]> {
-    const { page = 0, limit = 20 } = options;
+    const { page = 0, limit = 20, viewerId } = options;
 
     const events = await db
         .select({
@@ -194,17 +231,32 @@ export async function getFeedByUserId(
                 firstName: user.firstName,
                 lastName: user.lastName,
                 picture: user.picture,
-            }
+            },
+            carLikesCount: car.likesCount,
+            groupLikesCount: group.likesCount,
+            isCarLiked: viewerId
+                ? sql<boolean>`EXISTS(SELECT 1 FROM "carLike" WHERE "userId" = ${viewerId} AND "carId" = ${feedEvent.carId})`
+                : sql<boolean>`false`,
+            isGroupLiked: viewerId
+                ? sql<boolean>`EXISTS(SELECT 1 FROM "groupLike" WHERE "userId" = ${viewerId} AND "groupId" = ${feedEvent.groupId})`
+                : sql<boolean>`false`,
         })
         .from(feedEvent)
         .innerJoin(user, eq(feedEvent.userId, user.userId))
+        .leftJoin(car, eq(feedEvent.carId, car.carId))
+        .leftJoin(group, eq(feedEvent.groupId, group.groupId))
         .where(eq(feedEvent.userId, userId))
         .orderBy(desc(feedEvent.createdAt))
         .limit(limit)
         .offset(page * limit);
 
-    return events as FeedEventWithUser[];
+    return (events as any[]).map(event => ({
+        ...event,
+        likesCount: event.carId ? (event.carLikesCount || 0) : (event.groupLikesCount || 0),
+        isLiked: event.carId ? !!event.isCarLiked : !!event.isGroupLiked,
+    })) as FeedEventWithUser[];
 }
+
 
 /**
  * Cuenta total de eventos (para paginación)
@@ -225,6 +277,10 @@ export async function countFeedEvents(options: FeedQueryOptions = {}): Promise<n
 
     if (options.targetUserId) {
         conditions.push(eq(feedEvent.userId, options.targetUserId));
+    }
+
+    if (options.userIds && options.userIds.length > 0) {
+        conditions.push(inArray(feedEvent.userId, options.userIds));
     }
 
     const result = await db

@@ -39,6 +39,7 @@ export class PublicCarDTO {
 }
 
 export class PublicProfileDTO {
+    userId: number;
     username: string;
     firstName: string;
     lastName: string;
@@ -49,19 +50,29 @@ export class PublicProfileDTO {
     cars: PublicCarDTO[];
     biography?: string;
     defaultSortPreference?: string;
+    followersCount?: number;
+    followingCount?: number;
+    isFollowing?: boolean;
+    isFollower?: boolean;
 
     constructor(
+        userId: number,
         username: string,
         firstName: string,
         lastName: string,
         totalCars: number,
         totalGroups: number,
         cars: PublicCarDTO[],
+        followersCount?: number,
+        followingCount?: number,
         picture?: string,
         createdDate?: Date,
         biography?: string,
-        defaultSortPreference?: string
+        defaultSortPreference?: string,
+        isFollowing?: boolean,
+        isFollower?: boolean
     ) {
+        this.userId = userId;
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -72,5 +83,9 @@ export class PublicProfileDTO {
         this.cars = cars;
         this.biography = biography;
         this.defaultSortPreference = defaultSortPreference;
+        this.followersCount = followersCount;
+        this.followingCount = followingCount;
+        this.isFollowing = isFollowing;
+        this.isFollower = isFollower;
     }
 }

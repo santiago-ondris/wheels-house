@@ -10,7 +10,10 @@ export interface GroupData {
     featured?: boolean;
     order?: number | null;
     cars?: CarData[];
+    likesCount?: number;
+    isLiked?: boolean;
 }
+
 
 export interface GroupBasicInfo {
     groupId: number;
@@ -20,7 +23,10 @@ export interface GroupBasicInfo {
     picture?: string;
     featured: boolean;
     order?: number | null;
+    likesCount?: number;
+    isLiked?: boolean;
 }
+
 
 export interface CreateGroupData {
     name: string;
@@ -45,20 +51,33 @@ export async function createGroup(data: CreateGroupData): Promise<boolean> {
 }
 
 export async function getGroup(groupId: number | string): Promise<GroupData> {
-    return apiRequest<GroupData>(`/group/info/${groupId}`);
+    const token = localStorage.getItem("auth_token");
+    return apiRequest<GroupData>(`/group/info/${groupId}`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    });
 }
 
 export async function getGroupByName(username: string, groupName: string): Promise<GroupData> {
-    return apiRequest<GroupData>(`/group/by-name/${username}/${encodeURIComponent(groupName)}`);
+    const token = localStorage.getItem("auth_token");
+    return apiRequest<GroupData>(`/group/by-name/${username}/${encodeURIComponent(groupName)}`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    });
 }
 
 export async function listGroups(username: string): Promise<GroupBasicInfo[]> {
-    return apiRequest<GroupBasicInfo[]>(`/group/list/${username}`);
+    const token = localStorage.getItem("auth_token");
+    return apiRequest<GroupBasicInfo[]>(`/group/list/${username}`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    });
 }
 
 export async function listFeaturedGroups(username: string): Promise<GroupBasicInfo[]> {
-    return apiRequest<GroupBasicInfo[]>(`/group/featured/${username}`);
+    const token = localStorage.getItem("auth_token");
+    return apiRequest<GroupBasicInfo[]>(`/group/featured/${username}`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    });
 }
+
 
 export async function updateGroup(groupId: number, data: UpdateGroupData): Promise<boolean> {
     const token = localStorage.getItem("auth_token");

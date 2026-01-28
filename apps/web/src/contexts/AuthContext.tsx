@@ -5,6 +5,7 @@ import { login as loginService } from "../services/auth.service";
 import { getPublicProfile } from "../services/profile.service";
 
 interface User {
+  userId: number;
   username: string;
   picture?: string;
   defaultSortPreference?: string;
@@ -18,11 +19,15 @@ interface AuthContextType {
   logout: () => void;
   updatePicture: (newPicture: string) => void;
   updateDefaultSort: (newSort: string) => void;
+  isLoginModalOpen: boolean;
+  loginModalMessage: string;
+  openLoginModal: (message?: string) => void;
+  closeLoginModal: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-function decodeToken(token: string): { username: string } {
+function decodeToken(token: string): { username: string, userId: number } {
   const payload = token.split('.')[1];
   const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
   return JSON.parse(atob(base64));
@@ -31,6 +36,8 @@ function decodeToken(token: string): { username: string } {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [loginModalMessage, setLoginModalMessage] = useState("");
   const navigate = useNavigate();
 
   const logout = useCallback(() => {
@@ -84,9 +91,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const decoded = decodeToken(token);
           try {
             const profile = await getPublicProfile(decoded.username);
-            setUser({ username: decoded.username, picture: profile.picture, defaultSortPreference: profile.defaultSortPreference });
+            setUser({
+              username: decoded.username,
+              userId: decoded.userId,
+              picture: profile.picture,
+              defaultSortPreference: profile.defaultSortPreference
+            });
           } catch {
-            setUser({ username: decoded.username, defaultSortPreference: 'id:desc' });
+            setUser({
+              username: decoded.username,
+              userId: decoded.userId,
+              defaultSortPreference: 'id:desc'
+            });
           }
         } catch {
           localStorage.removeItem("auth_token");
@@ -111,9 +127,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Fetch user picture from profile
     try {
       const profile = await getPublicProfile(decoded.username);
-      setUser({ username: decoded.username, picture: profile.picture, defaultSortPreference: profile.defaultSortPreference });
+      setUser({
+        username: decoded.username,
+        userId: decoded.userId,
+        picture: profile.picture,
+        defaultSortPreference: profile.defaultSortPreference
+      });
     } catch {
-      setUser({ username: decoded.username, defaultSortPreference: 'id:desc' });
+      setUser({
+        username: decoded.username,
+        userId: decoded.userId,
+        defaultSortPreference: 'id:desc'
+      });
     }
   };
 
@@ -139,6 +164,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logout,
         updatePicture,
         updateDefaultSort,
+        isLoginModalOpen,
+        loginModalMessage,
+        openLoginModal: (message = "") => {
+          setLoginModalMessage(message);
+          setIsLoginModalOpen(true);
+        },
+        closeLoginModal: () => {
+          setIsLoginModalOpen(false);
+          setLoginModalMessage("");
+        },
       }}
     >
       {children}

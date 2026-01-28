@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
-import { User, LogOut, ChevronDown } from "lucide-react";
+import { User, LogOut, ChevronDown, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -22,7 +22,7 @@ export default function UserMenu() {
             </span>
           )}
         </div>
-        <span className="text-white text-sm hidden md:block">{user.username}</span>
+        <span className="text-white text-sm">{user.username}</span>
         <ChevronDown className="w-4 h-4 text-white/60" />
       </Menu.Button>
 
@@ -41,6 +41,19 @@ export default function UserMenu() {
           </div>
 
           <div className="p-1">
+            <Menu.Item>
+              {({ active }) => (
+                <button
+                  onClick={() => navigate("/people")}
+                  className={`${active ? "bg-white/10" : ""
+                    } flex items-center gap-2 w-full px-3 py-2 rounded-lg text-white text-sm transition-colors`}
+                >
+                  <Users className="w-4 h-4" />
+                  Personas
+                </button>
+              )}
+            </Menu.Item>
+
             <Menu.Item>
               {({ active }) => (
                 <button

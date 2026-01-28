@@ -2,7 +2,7 @@ import { Controller, Get, Post, Put, Body, UseGuards, Request, Param, Delete, Qu
 import { CarUpdateDTO, CreateCarDTO } from 'src/dto/car.dto';
 import { CollectionQueryDTO, BulkAddToGroupDTO } from 'src/dto/collection-query.dto';
 import { CarService } from 'src/services/car.service';
-import { JwtAuthGuard } from 'src/validators/auth.validator';
+import { JwtAuthGuard, OptionalJwtAuthGuard } from 'src/validators/auth.validator';
 import { bulkAddToGroupValidator, createCarValidator, deleteCarValidator, getCarValidator, getWishlistValidator, listCarsValidator, updateCarGroupsValidator, updateCarValidator, wishedCarToCollectionValidator } from 'src/validators/car.validator';
 
 @Controller('car')
@@ -17,18 +17,22 @@ export class CarController {
         return await this.carService.createCarService(carData, req.user);
     }
 
-    // @UseGuards(JwtAuthGuard)
+    @UseGuards(OptionalJwtAuthGuard)
     @Get('list/:username')
     async listCars(@Request() req, @Param('username') username) {
         await listCarsValidator(req.user, username);
 
-        return await this.carService.listCarsService(username);
+        return await this.carService.listCarsService(username, req.user?.userId);
     }
 
+
     // Paginated list with filtering and sorting
+    @UseGuards(OptionalJwtAuthGuard)
     @Get('collection/:username')
     async listCarsPaginated(
+        @Request() req,
         @Param('username') username: string,
+
         @Query('page') page?: string,
         @Query('limit') limit?: string,
         @Query('sortBy') sortBy?: string,
@@ -67,16 +71,18 @@ export class CarController {
             groupId: groupId ? parseInt(groupId) : undefined,
         };
 
-        return await this.carService.listCarsPaginatedService(username, query);
+        return await this.carService.listCarsPaginatedService(username, query, req.user?.userId);
     }
 
-    // @UseGuards(JwtAuthGuard)
+
+    @UseGuards(OptionalJwtAuthGuard)
     @Get('info/:carId')
     async getCar(@Request() req, @Param('carId') carId) {
         await getCarValidator(req.user, carId);
 
-        return await this.carService.getCarService(carId);
+        return await this.carService.getCarService(carId, req.user?.userId);
     }
+
 
     @UseGuards(JwtAuthGuard)
     @Put('update-info/:carId')
@@ -113,10 +119,12 @@ export class CarController {
         return await this.carService.getSuggestionsService(req.user);
     }
 
+    @UseGuards(OptionalJwtAuthGuard)
     @Get('featured')
-    async getFeaturedCar() {
-        return await this.carService.getFeaturedCarService();
+    async getFeaturedCar(@Request() req) {
+        return await this.carService.getFeaturedCarService(req.user?.userId);
     }
+
 
     @UseGuards(JwtAuthGuard)
     @Post('bulk/add-to-group')
@@ -139,10 +147,12 @@ export class CarController {
         return await this.carService.wishedCarToCollectionService(carId, carChanges);
     }
 
+    @UseGuards(OptionalJwtAuthGuard)
     @Get('wishlist/:username')
-    async getWishlist(@Param('username') username: string) {
+    async getWishlist(@Request() req, @Param('username') username: string) {
         await getWishlistValidator(username);
 
-        return await this.carService.getWishlistService(username);
+        return await this.carService.getWishlistService(username, req.user?.userId);
     }
+
 }

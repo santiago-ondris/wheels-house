@@ -1,13 +1,20 @@
 import { motion } from "framer-motion";
-import type { HotWheelMock } from "../../data/mockHotWheels";
+import { HotWheelMock } from "../../data/mockHotWheels";
+import { LikeButton } from "../../features/social/components/likes/LikeButton";
+
+interface ExtendedHotWheel extends HotWheelMock {
+  likesCount?: number;
+  isLiked?: boolean;
+}
 
 interface Props {
-  car: HotWheelMock;
+  car: ExtendedHotWheel;
   onClick?: () => void;
   selectable?: boolean;
   isSelected?: boolean;
   onSelect?: () => void;
 }
+
 
 export default function HotWheelCardGrid({ car, onClick, selectable, isSelected, onSelect }: Props) {
   const handleCardClick = () => {
@@ -56,11 +63,26 @@ export default function HotWheelCardGrid({ car, onClick, selectable, isSelected,
       </div>
 
       {/* Info panel */}
-      <div className="p-3 space-y-1.5 border-t border-white/5">
+      <div className="p-3 space-y-1.5 border-t border-white/5 relative">
+        {/* Like Button overlay (small) */}
+        {!selectable && (
+          <div className="absolute top-2 right-2 z-10">
+            <LikeButton
+              id={Number(car.id)}
+              initialIsLiked={car.isLiked || false}
+              initialLikesCount={car.likesCount || 0}
+              type="car"
+              showCount={true}
+              className="scale-75 origin-top-right"
+            />
+          </div>
+        )}
+
         {/* Name */}
-        <h3 className="text-white text-sm font-mono font-bold uppercase tracking-tight truncate">
+        <h3 className="text-white text-sm font-mono font-bold uppercase tracking-tight truncate pr-12">
           {car.name}
         </h3>
+
 
         {/* Tech labels row */}
         <div className="flex items-center gap-2 text-[10px] font-mono">

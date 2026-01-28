@@ -97,7 +97,7 @@ export const ERROR_DELETING_GROUP = new HttpException(
 
 export function validGroupPicture(url: string): boolean {
     if (url == '') return true;
-    const cloudinaryRegex = /^https:\/\/res\.cloudinary\.com\/dyx7kjnjq\/image\/upload\/v\d+\/wheels-house\/cars\/[a-zA-Z0-9_-]+\.(jpg|jpeg|png|webp)$/;
+    const cloudinaryRegex = /^https:\/\/res\.cloudinary\.com\/dyx7kjnjq\/image\/upload\/(?:[^\/]+\/)*wheels-house\/cars\/[a-zA-Z0-9_-]+\.(jpg|jpeg|png|webp)$/;
 
     return cloudinaryRegex.test(url);
 }

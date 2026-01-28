@@ -8,11 +8,11 @@ interface RightSidebarProps {
     setSelectedUser: (user: { userId: number, username: string } | null) => void;
 }
 
-export default function RightSidebar({ 
-    activeType, 
-    setSelectedType, 
-    selectedUser, 
-    setSelectedUser 
+export default function RightSidebar({
+    activeType,
+    setSelectedType,
+    selectedUser,
+    setSelectedUser
 }: RightSidebarProps) {
     const contentTypes = [
         { id: "all", label: "Todo" },
@@ -23,13 +23,13 @@ export default function RightSidebar({
     ];
 
     return (
-        <aside className="w-full flex flex-col gap-8 py-6 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto custom-scrollbar pl-4">
+        <aside className="w-full flex flex-col gap-8 py-6 sticky top-[calc(var(--navbar-height)+3.5rem)] h-[calc(100vh-var(--navbar-height)-3.5rem)] overflow-y-auto scrollbar-hide pl-4 transition-[top,height] duration-500">
             {/* Search - Replaced with UserSearch for filtering */}
             <div className="flex flex-col gap-4">
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600 px-1">
                     Buscar Usuario
                 </p>
-                <FeedUserSearch 
+                <FeedUserSearch
                     selectedUser={selectedUser}
                     onSelectUser={setSelectedUser}
                 />
@@ -45,18 +45,16 @@ export default function RightSidebar({
                         <button
                             key={type.id}
                             onClick={() => setSelectedType(type.id)}
-                            className={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-all ${
-                                activeType === type.id 
-                                    ? "bg-accent/10 text-white" 
-                                    : "text-zinc-500 hover:text-zinc-300 hover:bg-white/5"
-                            }`}
+                            className={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-all ${activeType === type.id
+                                ? "bg-accent/10 text-white"
+                                : "text-zinc-500 hover:text-zinc-300 hover:bg-white/5"
+                                }`}
                         >
                             <span className="text-xs font-bold tracking-tight">{type.label}</span>
-                            <div className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                                activeType === type.id 
-                                    ? "bg-accent scale-100 shadow-[0_0_10px_rgba(255,255,255,0.4)]" 
-                                    : "bg-zinc-800 scale-75"
-                            }`} />
+                            <div className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${activeType === type.id
+                                ? "bg-accent scale-100 shadow-[0_0_10px_rgba(255,255,255,0.4)]"
+                                : "bg-zinc-800 scale-75"
+                                }`} />
                         </button>
                     ))}
                 </div>

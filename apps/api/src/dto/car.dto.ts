@@ -123,12 +123,15 @@ export class CarPictureToDB {
 
 export class CarInfo extends CreateCarDTO {
     carId: number;
-    condition: string;
+    likesCount: number = 0;
+    isLiked: boolean = false;
     constructor(
+
         carId: number, name: string, color: string, brand: string, scale: string,
         manufacturer: string, condition: string, wished: boolean = false, description: string | null = '',
         designer: string | null = '', series: string | null = '', pictures: string[] | null = [],
-        country: string | null = '', rarity: string | null = '', quality: string | null = '', variety: string | null = '', finish: string | null = ''
+        country: string | null = '', rarity: string | null = '', quality: string | null = '', variety: string | null = '', finish: string | null = '',
+        likesCount: number = 0, isLiked: boolean = false
     ) {
         super();
         this.carId = carId, this.name = name, this.color = color;
@@ -140,7 +143,10 @@ export class CarInfo extends CreateCarDTO {
         this.quality = quality;
         this.variety = variety;
         this.finish = finish;
+        this.likesCount = likesCount;
+        this.isLiked = isLiked;
     }
+
 }
 
 export class CarInfoWithOwner extends CarInfo {
@@ -149,11 +155,13 @@ export class CarInfoWithOwner extends CarInfo {
         carId: number, name: string, color: string, brand: string, scale: string,
         manufacturer: string, condition: string, wished: boolean = false, ownerUsername: string,
         description: string | null = '', designer: string | null = '', series: string | null = '',
-        pictures: string[] | null = [], country: string | null = '', rarity: string | null = '', quality: string | null = '', variety: string | null = '', finish: string | null = ''
+        pictures: string[] | null = [], country: string | null = '', rarity: string | null = '', quality: string | null = '', variety: string | null = '', finish: string | null = '',
+        likesCount: number = 0, isLiked: boolean = false
     ) {
-        super(carId, name, color, brand, scale, manufacturer, condition, wished, description, designer, series, pictures, country, rarity, quality, variety, finish);
+        super(carId, name, color, brand, scale, manufacturer, condition, wished, description, designer, series, pictures, country, rarity, quality, variety, finish, likesCount, isLiked);
         this.ownerUsername = ownerUsername;
     }
+
 }
 
 export class CarUpdateDTO {

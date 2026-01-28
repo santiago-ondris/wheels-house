@@ -2,6 +2,7 @@ import { apiRequest } from "./api";
 import { CarData } from "./car.service";
 
 export interface PublicProfile {
+    userId: number;
     username: string;
     firstName: string;
     lastName: string;
@@ -12,6 +13,10 @@ export interface PublicProfile {
     totalGroups: number;
     cars: CarData[];
     defaultSortPreference?: string;
+    followersCount?: number;
+    followingCount?: number;
+    isFollowing?: boolean;
+    isFollower?: boolean;
 }
 
 export interface DistributionItem {

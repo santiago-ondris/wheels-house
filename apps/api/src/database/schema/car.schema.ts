@@ -19,6 +19,7 @@ export const car = pgTable("car", {
     quality: text("quality"),
     variety: text("variety"),
     finish: text("finish"),
+    likesCount: integer("likesCount").notNull().default(0),
 });
 
 export const carPicture = pgTable("carPicture", {
