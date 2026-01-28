@@ -44,13 +44,11 @@ export class FeedService {
     async getFeedFollowing(userId: number, page: number, limit: number, options: Partial<FeedQueryOptions> = {}): Promise<{ items: FeedEventWithUser[]; hasMore: boolean }> {
         const followedIds = await this.getCachedFollowedIds(userId);
 
-        if (followedIds.length === 0) {
-            return { items: [], hasMore: false };
-        }
+        const allRelevantIds = [...followedIds, userId];
 
         const queryOptions: FeedQueryOptions = { page, limit, ...options };
-        const items = await FeedRepository.getFeedFollowing(followedIds, queryOptions);
-        const total = await FeedRepository.countFeedEvents({ ...queryOptions, userIds: followedIds });
+        const items = await FeedRepository.getFeedFollowing(allRelevantIds, queryOptions);
+        const total = await FeedRepository.countFeedEvents({ ...queryOptions, userIds: allRelevantIds });
 
         return {
             items,

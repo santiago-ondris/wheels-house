@@ -15,6 +15,8 @@ import {
 import { deleteAllCarPictures, deleteCarsFromUserId, getCarsFromUserId, getPicturesFromCar } from 'src/database/crud/car.crud';
 import { deleteGroupedCarsFromCarId, deleteGroupedCarsFromGroupId, deleteGroupsFromUserId, getGroupsFromUserId } from 'src/database/crud/group.crud';
 import * as FollowsRepository from '../modules/social/follows/follows.repository';
+import * as likesRepository from '../modules/social/likes/likes.repository';
+import { NotificationsRepository } from '../modules/social/notifications/notifications.repository';
 import { ERROR_CREATING_USER, ERROR_DELETING_USER, ERROR_SENDING_EMAIL, ERROR_UPDATING_USER, INEXISTENT_USER } from 'src/utils/user.utils';
 import bcrypt from "bcrypt";
 import { randomBytes } from 'crypto';
@@ -29,7 +31,8 @@ export class UserService {
         private readonly jwtService: JwtService,
         private readonly uploadService: UploadService,
         private readonly configService: ConfigService,
-        private readonly emailService: EmailService
+        private readonly emailService: EmailService,
+        private readonly notificationsRepository: NotificationsRepository
     ) { }
 
     async registerService(registerData: RegisterDTO) {
@@ -262,6 +265,12 @@ export class UserService {
 
         const deletedSearchHistory = await deleteSearchHistoryFromUserId(user.userId);
         const deletedFeedEvents = await deleteFeedEventsFromUserId(user.userId);
+        
+        // Social cleanup
+        await likesRepository.deleteUserLikes(user.userId);
+        await FollowsRepository.deleteUserFollows(user.userId);
+        await this.notificationsRepository.deleteByUserId(user.userId);
+
         if (!deletedSearchHistory || !deletedFeedEvents) {
             throw ERROR_DELETING_USER;
         }

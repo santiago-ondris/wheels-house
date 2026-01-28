@@ -7,6 +7,6 @@ import { NotificationsTasks } from './notifications.tasks';
 @Module({
     controllers: [NotificationsController],
     providers: [NotificationsService, NotificationsRepository, NotificationsTasks],
-    exports: [NotificationsService],
+    exports: [NotificationsService, NotificationsRepository],
 })
 export class NotificationsModule { }

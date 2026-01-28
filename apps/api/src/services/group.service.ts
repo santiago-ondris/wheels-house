@@ -10,12 +10,14 @@ import { UploadService } from './upload.service';
 import { getPublicIdFromURL } from 'src/utils/upload.utils';
 import { EventsService } from '../modules/social/events/events.service';
 import * as likesRepository from '../modules/social/likes/likes.repository';
+import { NotificationsRepository } from '../modules/social/notifications/notifications.repository';
 
 @Injectable()
 export class GroupService {
     constructor(
         private readonly uploadService: UploadService,
-        private readonly eventsService: EventsService
+        private readonly eventsService: EventsService,
+        private readonly notificationsRepository: NotificationsRepository
     ) { }
 
     async createGroupService(groupData: CreateGroupDTO, userData: TokenData) {
@@ -183,10 +185,17 @@ export class GroupService {
             }
         }
 
+        // Eliminar los que sobraron en el set (fueron deseleccionados)
+        for (const carId of setGroupedCars) {
+            await deleteGroupedCarFromGroupIdAndCarId(groupId, carId);
+        }
+
         return true;
     }
 
     async deleteGroupService(groupId: number) {
+        await likesRepository.deleteGroupLikes(groupId);
+        await this.notificationsRepository.deleteByGroupId(groupId);
         if (!(await deleteGroupedCarsFromGroupId(groupId)) || !(await deleteFeedEventsFromGroupId(groupId))) {
             throw ERROR_DELETING_GROUP;
         }

@@ -12,6 +12,24 @@ export class NotificationsService {
 
     async create(data: CreateNotificationDto) {
         try {
+            // Check para ver si ya existe una notificación similar
+            const redundancyCheckTypes = ['car_liked', 'group_liked', 'new_follower'];
+
+            if (redundancyCheckTypes.includes(data.type)) {
+                const existing = await this.notificationsRepository.findPendingNotification({
+                    userId: data.userId,
+                    type: data.type,
+                    actorId: data.actorId,
+                    carId: data.carId,
+                    groupId: data.groupId
+                });
+
+                if (existing) {
+                    this.logger.log(`Skipping redundant ${data.type} notification for user ${data.userId} from actor ${data.actorId}`);
+                    return existing;
+                }
+            }
+
             const [notification] = await this.notificationsRepository.create(data);
             return notification;
         } catch (error) {

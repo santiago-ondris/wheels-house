@@ -16,12 +16,14 @@ import { UploadService } from './upload.service';
 import { getPublicIdFromURL } from 'src/utils/upload.utils';
 import { EventsService } from '../modules/social/events/events.service';
 import * as likesRepository from '../modules/social/likes/likes.repository';
+import { NotificationsRepository } from '../modules/social/notifications/notifications.repository';
 
 @Injectable()
 export class CarService {
     constructor(
         private readonly uploadService: UploadService,
-        private readonly eventsService: EventsService
+        private readonly eventsService: EventsService,
+        private readonly notificationsRepository: NotificationsRepository
     ) { }
 
     async createCarService(carData: CreateCarDTO, userData: TokenData) {
@@ -163,6 +165,8 @@ export class CarService {
     }
 
     async deleteCarService(carId: number) {
+        await likesRepository.deleteCarLikes(carId);
+        await this.notificationsRepository.deleteByCarId(carId);
         const groupedCarDeleted = await deleteGroupedCarsFromCarId(carId);
         const picturesDeleted = await deleteAllCarPictures(carId);
         const feedEventsDeleted = await deleteFeedEventsFromCarId(carId);

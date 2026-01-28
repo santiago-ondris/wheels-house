@@ -40,12 +40,12 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
             }}
             disabled={isLoading}
             className={cn(
-                "group flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-70 disabled:active:scale-100",
+                "group/like flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-70 disabled:active:scale-100",
                 className
             )}
             title={isLiked ? "Quitar me gusta" : "Me gusta"}
         >
-            <div className="relative flex items-center justify-center p-1.5 rounded-full transition-colors group-hover:bg-red-500/10 dark:group-hover:bg-red-500/20">
+            <div className="relative flex items-center justify-center p-1.5 rounded-full transition-colors group-hover/like:bg-red-500/10 dark:group-hover/like:bg-red-500/20">
                 <AnimatePresence mode="wait" initial={false}>
                     {isLiked ? (
                         <motion.div
@@ -72,14 +72,13 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
                             exit={{ scale: 0.5, opacity: 0 }}
                         >
                             <Heart
-                                className="w-5 h-5 text-neutral-500 group-hover:text-red-500 transition-colors"
+                                className="w-5 h-5 text-neutral-500 group-hover/like:text-red-500 transition-colors"
                                 strokeWidth={2}
                             />
                         </motion.div>
                     )}
                 </AnimatePresence>
 
-                {/* Micro-sparkles animation on like */}
                 {isLiked && !isLoading && (
                     <motion.div
                         className="absolute inset-0 z-[-1]"
@@ -107,7 +106,7 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
             {showCount && (
                 <span className={cn(
                     "text-[11px] font-mono font-bold leading-none transition-colors",
-                    isLiked ? "text-red-500" : "text-neutral-500 group-hover:text-red-500"
+                    isLiked ? "text-red-500" : "text-neutral-500 group-hover/like:text-red-500"
                 )}>
                     {likesCount > 0 ? String(likesCount).padStart(2, '0') : ''}
                 </span>

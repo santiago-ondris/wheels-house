@@ -195,3 +195,12 @@ export async function countFollowing(userId: number): Promise<number> {
 
     return Number(result[0].count);
 }
+/**
+ * Elimina todas las relaciones de seguimiento de un usuario (como seguidor o seguido)
+ */
+export async function deleteUserFollows(userId: number): Promise<void> {
+    await db.delete(userFollow)
+        .where(
+            sql`${userFollow.followerId} = ${userId} OR ${userFollow.followedId} = ${userId}`
+        );
+}

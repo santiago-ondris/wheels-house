@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Edit, Folder, Grid, ArrowLeft, Star } from "lucide-react";
 import { getGroupByName, GroupData } from "../../services/group.service";
 import { useAuth } from "../../contexts/AuthContext";
+import { useNavigateBack } from "../../hooks/useNavigateBack";
 import PageHeader from "../../components/ui/PageHeader";
 import CollectionSection from "../../components/user_profile/CollectionSection";
 import GroupNotFoundPage from "./GroupNotFoundPage";
@@ -41,8 +42,7 @@ export default function GroupDetailPage() {
         }
     };
 
-    // Always navigate to groups list, not browser history
-    const handleBack = () => navigate(`/collection/${username}/groups`);
+    const handleBack = useNavigateBack(`/collection/${username}/groups`);
 
     if (isLoading) {
         return (

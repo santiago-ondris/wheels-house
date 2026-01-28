@@ -203,3 +203,24 @@ export async function getGroupLikers(
 
     return data;
 }
+/**
+ * Elimina todos los likes de un auto (para limpieza al borrar auto)
+ */
+export async function deleteCarLikes(carId: number): Promise<void> {
+    await db.delete(carLike).where(eq(carLike.carId, carId));
+}
+
+/**
+ * Elimina todos los likes de un grupo (para limpieza al borrar grupo)
+ */
+export async function deleteGroupLikes(groupId: number): Promise<void> {
+    await db.delete(groupLike).where(eq(groupLike.groupId, groupId));
+}
+
+/**
+ * Elimina todos los likes otorgados por un usuario (para limpieza al borrar usuario)
+ */
+export async function deleteUserLikes(userId: number): Promise<void> {
+    await db.delete(carLike).where(eq(carLike.userId, userId));
+    await db.delete(groupLike).where(eq(groupLike.userId, userId));
+}

@@ -15,6 +15,32 @@ export class NotificationsRepository {
             .returning();
     }
 
+    async findPendingNotification(params: {
+        userId: number;
+        type: string;
+        actorId?: number;
+        carId?: number;
+        groupId?: number;
+    }) {
+        const conditions = [
+            eq(schema.notification.userId, params.userId),
+            eq(schema.notification.type, params.type as any),
+            eq(schema.notification.read, false),
+        ];
+
+        if (params.actorId) conditions.push(eq(schema.notification.actorId, params.actorId));
+        if (params.carId) conditions.push(eq(schema.notification.carId, params.carId));
+        if (params.groupId) conditions.push(eq(schema.notification.groupId, params.groupId));
+
+        const [existing] = await this.db
+            .select()
+            .from(schema.notification)
+            .where(and(...conditions))
+            .limit(1);
+
+        return existing;
+    }
+
     async findByUser(userId: number, limit = 20, offset = 0) {
         return await this.db
             .select({
@@ -90,6 +116,21 @@ export class NotificationsRepository {
                 )
             )
             .returning();
+    }
+
+    async deleteByCarId(carId: number) {
+        return await this.db.delete(schema.notification).where(eq(schema.notification.carId, carId));
+    }
+
+    async deleteByGroupId(groupId: number) {
+        return await this.db.delete(schema.notification).where(eq(schema.notification.groupId, groupId));
+    }
+
+    async deleteByUserId(userId: number) {
+        return await this.db.delete(schema.notification)
+            .where(
+                sql`${schema.notification.userId} = ${userId} OR ${schema.notification.actorId} = ${userId}`
+            );
     }
 
     async deleteOldNotifications(olderThan: Date) {
