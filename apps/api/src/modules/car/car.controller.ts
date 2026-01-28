@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Put, Body, UseGuards, Request, Param, Delete, Query } from '@nestjs/common';
 import { CarUpdateDTO, CreateCarDTO } from 'src/dto/car.dto';
 import { CollectionQueryDTO, BulkAddToGroupDTO } from 'src/dto/collection-query.dto';
-import { CarService } from 'src/services/car.service';
+import { CarService } from './car.service';
 import { JwtAuthGuard, OptionalJwtAuthGuard } from 'src/validators/auth.validator';
 import { bulkAddToGroupValidator, createCarValidator, deleteCarValidator, getCarValidator, getWishlistValidator, listCarsValidator, updateCarGroupsValidator, updateCarValidator, wishedCarToCollectionValidator } from 'src/validators/car.validator';
 

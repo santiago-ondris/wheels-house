@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { RegisterDTO, UserToDB, LoginDTO, TokenData, UpdateUserProfileDTO, UpdatePasswordDTO, ResetPasswordDTO, ForgotPasswordDTO } from '../dto/user.dto';
-import { PublicProfileDTO, PublicCarDTO } from '../dto/public-profile.dto';
+import { RegisterDTO, UserToDB, LoginDTO, TokenData, UpdateUserProfileDTO, UpdatePasswordDTO, ResetPasswordDTO, ForgotPasswordDTO } from '../../dto/user.dto';
+import { PublicProfileDTO, PublicCarDTO } from '../../dto/public-profile.dto';
 import {
     createUser, getUserFromUsernameOrEmail, getPublicProfileByUsername, searchUsers, updateUserFromUserId, getUserFromUsername,
     updatePasswordFromUserId, deleteUserFromUsername,
@@ -15,16 +15,16 @@ import {
 } from 'src/database/crud/user.crud';
 import { deleteAllCarPictures, deleteCarsFromUserId, deleteFeedEventsFromCarId, getCarsFromUserId, getPicturesFromCar } from 'src/database/crud/car.crud';
 import { deleteFeedEventsFromGroupId, deleteGroupedCarsFromCarId, deleteGroupedCarsFromGroupId, deleteGroupsFromUserId, getGroupsFromUserId } from 'src/database/crud/group.crud';
-import * as FollowsRepository from '../modules/social/follows/follows.repository';
-import * as likesRepository from '../modules/social/likes/likes.repository';
-import { NotificationsRepository } from '../modules/social/notifications/notifications.repository';
+import * as FollowsRepository from '../social/follows/follows.repository';
+import * as likesRepository from '../social/likes/likes.repository';
+import { NotificationsRepository } from '../social/notifications/notifications.repository';
 import { ERROR_CREATING_USER, ERROR_DELETING_USER, ERROR_SENDING_EMAIL, ERROR_UPDATING_USER, INEXISTENT_USER } from 'src/utils/user.utils';
 import bcrypt from "bcrypt";
 import { randomBytes } from 'crypto';
-import { UploadService } from './upload.service';
+import { UploadService } from '../../services/upload.service';
 import { getPublicIdFromURL } from 'src/utils/upload.utils';
 import { ConfigService } from '@nestjs/config';
-import { EmailService } from './email.service';
+import { EmailService } from '../../services/email.service';
 
 @Injectable()
 export class UserService {

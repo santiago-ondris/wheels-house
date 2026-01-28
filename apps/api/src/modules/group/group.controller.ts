@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Param, UseGuards, Request, Put, Delete } from '@nestjs/common';
-import { GroupService } from 'src/services/group.service';
+import { GroupService } from './group.service';
 import { JwtAuthGuard, OptionalJwtAuthGuard } from 'src/validators/auth.validator';
 import { CreateGroupDTO, UpdateGroupDTO } from 'src/dto/group.dto';
 import { createGroupValidator, deleteGroupValidator, getGroupValidator, listGroupsValidator, updateGroupValidator } from 'src/validators/group.validator';
