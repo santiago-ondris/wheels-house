@@ -262,4 +262,5 @@ export const brandNationalities: Record<string, string> = {
     "Lancia": "Italia",
     "AMC": "USA",
     "Cupra": "España",
+    "Studebaker": "USA"
 };

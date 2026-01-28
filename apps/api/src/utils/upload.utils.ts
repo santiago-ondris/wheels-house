@@ -1,12 +1,14 @@
 import { validCarPicture } from "./car.utils";
 
 export function getPublicIdFromURL(url: string): string {
-    if(!validCarPicture(url) || url == '') return '';
+    if (!url || url === '') return '';
 
-    const urlSplit = url.split('/');
+    const regex = /(wheels-house\/[^\.]+)/;
+    const match = url.match(regex);
 
-    const publicId = urlSplit[urlSplit.length-1].split('.')[0];
+    if (match && match[1]) {
+        return match[1];
+    }
 
-    // The prefix could be part of .env for privacy. (possible fix).
-    return 'wheels-house/cars/' + publicId;
+    return '';
 }

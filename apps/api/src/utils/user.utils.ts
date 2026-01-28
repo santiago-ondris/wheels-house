@@ -115,7 +115,7 @@ export function isValidEmail(email: string): boolean {
     return pattern.test(email);
 }
 
-export function isValidUsername(username: string) : boolean {
+export function isValidUsername(username: string): boolean {
     const pattern = /^[a-zA-Z0-9._]+$/;
     return pattern.test(username);
 }
@@ -143,7 +143,7 @@ export async function verifyTokenValidator(tokenValidator: string, hashedTokenVa
 export function validUserPicture(url: string): boolean {
     if (url.length == 0) return true;
 
-    const cloudinaryRegex = /^https:\/\/res\.cloudinary\.com\/dyx7kjnjq\/image\/upload\/v\d+\/wheels-house\/cars\/[a-zA-Z0-9_-]+\.(jpg|jpeg|png|webp)$/;
+    const cloudinaryRegex = /^https:\/\/res\.cloudinary\.com\/dyx7kjnjq\/image\/upload\/(?:[^\/]+\/)*wheels-house\/cars\/[a-zA-Z0-9_-]+\.(jpg|jpeg|png|webp)$/;
 
     return cloudinaryRegex.test(url);
 }

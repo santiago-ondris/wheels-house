@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Bell } from 'lucide-react';
 import NotificationDropdown from './NotificationDropdown';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export default function NotificationBell() {
     const [isOpen, setIsOpen] = useState(false);
+    const triggerRef = useRef<HTMLButtonElement>(null);
     const { count } = useUnreadCount();
     const navigate = useNavigate();
 
@@ -21,6 +22,7 @@ export default function NotificationBell() {
     return (
         <div className="relative">
             <motion.button
+                ref={triggerRef}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleToggle}
@@ -60,7 +62,10 @@ export default function NotificationBell() {
 
             <AnimatePresence>
                 {isOpen && (
-                    <NotificationDropdown onClose={() => setIsOpen(false)} />
+                    <NotificationDropdown 
+                        onClose={() => setIsOpen(false)} 
+                        triggerRef={triggerRef}
+                    />
                 )}
             </AnimatePresence>
         </div>

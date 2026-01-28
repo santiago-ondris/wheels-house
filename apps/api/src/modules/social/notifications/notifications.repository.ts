@@ -41,6 +41,32 @@ export class NotificationsRepository {
         return existing;
     }
 
+    async findExistingNotification(params: {
+        userId: number;
+        type: string;
+        actorId?: number;
+        carId?: number;
+        groupId?: number;
+    }) {
+        const conditions = [
+            eq(schema.notification.userId, params.userId),
+            eq(schema.notification.type, params.type as any),
+        ];
+
+        if (params.actorId) conditions.push(eq(schema.notification.actorId, params.actorId));
+        if (params.carId) conditions.push(eq(schema.notification.carId, params.carId));
+        if (params.groupId) conditions.push(eq(schema.notification.groupId, params.groupId));
+
+        const [existing] = await this.db
+            .select()
+            .from(schema.notification)
+            .where(and(...conditions))
+            .orderBy(desc(schema.notification.createdAt))
+            .limit(1);
+
+        return existing;
+    }
+
     async findByUser(userId: number, limit = 20, offset = 0) {
         return await this.db
             .select({

@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, RefObject } from 'react';
 import { CheckCheck, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import NotificationItem from './NotificationItem';
@@ -8,22 +8,26 @@ import toast from 'react-hot-toast';
 
 interface NotificationDropdownProps {
     onClose: () => void;
+    triggerRef: RefObject<any>;
 }
 
-export default function NotificationDropdown({ onClose }: NotificationDropdownProps) {
+export default function NotificationDropdown({ onClose, triggerRef }: NotificationDropdownProps) {
     const { notifications, isLoading, markAsRead, markAllAsRead } = useNotifications(10);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+            const isClickInsideTrigger = triggerRef.current?.contains(event.target as Node);
+            const isClickInsideDropdown = dropdownRef.current?.contains(event.target as Node);
+
+            if (!isClickInsideTrigger && !isClickInsideDropdown) {
                 onClose();
             }
         }
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [onClose]);
+    }, [onClose, triggerRef]);
 
     const handleMarkAllRead = async () => {
         await markAllAsRead();

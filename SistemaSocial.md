@@ -1302,9 +1302,9 @@ interface Report {
 
 - [x] Usuario puede likear autos ajenos
 - [x] Contador se actualiza inmediatamente
-- [ ] Dueño del auto recibe notificación
-- [ ] NotificationBell muestra badge correcto
-- [ ] Click en notificación navega correctamente
+- [x] Dueño del auto recibe notificación
+- [x] NotificationBell muestra badge correcto
+- [x] Click en notificación navega correctamente
 
 ---
 

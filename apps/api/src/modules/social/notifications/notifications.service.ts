@@ -16,7 +16,8 @@ export class NotificationsService {
             const redundancyCheckTypes = ['car_liked', 'group_liked', 'new_follower'];
 
             if (redundancyCheckTypes.includes(data.type)) {
-                const existing = await this.notificationsRepository.findPendingNotification({
+                // Chequea si una notificación similar ya existe (leida o no leida)
+                const existing = await this.notificationsRepository.findExistingNotification({
                     userId: data.userId,
                     type: data.type,
                     actorId: data.actorId,
@@ -25,8 +26,15 @@ export class NotificationsService {
                 });
 
                 if (existing) {
-                    this.logger.log(`Skipping redundant ${data.type} notification for user ${data.userId} from actor ${data.actorId}`);
-                    return existing;
+                    if (!existing.read) {
+                        // Si no está leida, saltamos la creación de una nueva (evita spam)
+                        this.logger.log(`Skipping redundant ${data.type} notification for user ${data.userId} from actor ${data.actorId}`);
+                        return existing;
+                    } else {
+                        // Si está leida, eliminamos la vieja para que la nueva aparezca fresca arriba
+                        this.logger.log(`Deleting old read ${data.type} notification to bump new action for user ${data.userId}`);
+                        await this.notificationsRepository.delete(existing.notificationId, existing.userId);
+                    }
                 }
             }
 
