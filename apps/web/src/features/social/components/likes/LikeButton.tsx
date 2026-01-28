@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Heart } from 'lucide-react';
 import { useLike } from '../../hooks/useLike';
 import { cn } from '../../../../lib/utils';
+import { useAuth } from '../../../../contexts/AuthContext';
 
 interface LikeButtonProps {
     id: number;
@@ -31,11 +32,17 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
         onLikeChange
     });
 
+    const { isAuthenticated, openLoginModal } = useAuth();
+
     return (
         <button
             onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                if (!isAuthenticated) {
+                    openLoginModal('para dar me gusta');
+                    return;
+                }
                 toggleLike();
             }}
             disabled={isLoading}

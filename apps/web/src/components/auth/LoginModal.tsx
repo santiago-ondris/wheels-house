@@ -5,9 +5,10 @@ import LoginForm from "./LoginForm";
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
+  message?: string;
 }
 
-export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
+export default function LoginModal({ isOpen, onClose, message }: LoginModalProps) {
   const navigate = useNavigate();
 
   const handleLoginSuccess = () => {
@@ -28,6 +29,13 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Iniciar sesión">
+      {message && (
+        <div className="mb-6 px-4 py-3 bg-accent/10 border border-accent/20 rounded-xl">
+          <p className="text-accent text-sm font-bold text-center">
+            Inicia sesión {message}
+          </p>
+        </div>
+      )}
       <LoginForm onSuccess={handleLoginSuccess} />
 
       <div className="mt-6 text-center">

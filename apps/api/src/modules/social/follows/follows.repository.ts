@@ -197,10 +197,30 @@ export async function countFollowing(userId: number): Promise<number> {
 }
 /**
  * Elimina todas las relaciones de seguimiento de un usuario (como seguidor o seguido)
+ * Y sincroniza los contadores de seguidores/seguidos de los otros usuarios afectados
  */
 export async function deleteUserFollows(userId: number): Promise<void> {
-    await db.delete(userFollow)
-        .where(
-            sql`${userFollow.followerId} = ${userId} OR ${userFollow.followedId} = ${userId}`
-        );
+    await db.transaction(async (tx) => {
+        // 1. Obtener a quién sigue el usuario (para bajarles sus followersCount)
+        const following = await tx.select({ followedId: userFollow.followedId }).from(userFollow).where(eq(userFollow.followerId, userId));
+        for (const f of following) {
+            await tx.update(user)
+                .set({ followersCount: sql`GREATEST(0, ${user.followersCount} - 1)` })
+                .where(eq(user.userId, f.followedId));
+        }
+
+        // 2. Obtener quién sigue al usuario (para bajarles sus followingCount)
+        const followers = await tx.select({ followerId: userFollow.followerId }).from(userFollow).where(eq(userFollow.followedId, userId));
+        for (const f of followers) {
+            await tx.update(user)
+                .set({ followingCount: sql`GREATEST(0, ${user.followingCount} - 1)` })
+                .where(eq(user.userId, f.followerId));
+        }
+
+        // 3. Eliminar los registros de follow
+        await tx.delete(userFollow)
+            .where(
+                sql`${userFollow.followerId} = ${userId} OR ${userFollow.followedId} = ${userId}`
+            );
+    });
 }

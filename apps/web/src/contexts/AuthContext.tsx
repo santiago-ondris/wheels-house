@@ -19,6 +19,10 @@ interface AuthContextType {
   logout: () => void;
   updatePicture: (newPicture: string) => void;
   updateDefaultSort: (newSort: string) => void;
+  isLoginModalOpen: boolean;
+  loginModalMessage: string;
+  openLoginModal: (message?: string) => void;
+  closeLoginModal: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -32,6 +36,8 @@ function decodeToken(token: string): { username: string, userId: number } {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [loginModalMessage, setLoginModalMessage] = useState("");
   const navigate = useNavigate();
 
   const logout = useCallback(() => {
@@ -158,6 +164,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logout,
         updatePicture,
         updateDefaultSort,
+        isLoginModalOpen,
+        loginModalMessage,
+        openLoginModal: (message = "") => {
+          setLoginModalMessage(message);
+          setIsLoginModalOpen(true);
+        },
+        closeLoginModal: () => {
+          setIsLoginModalOpen(false);
+          setLoginModalMessage("");
+        },
       }}
     >
       {children}

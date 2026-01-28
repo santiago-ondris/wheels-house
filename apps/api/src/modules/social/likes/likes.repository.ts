@@ -1,5 +1,5 @@
 import { db } from '../../../database';
-import { carLike, groupLike, user } from '../../../database/schema';
+import { carLike, groupLike, user, car, group } from '../../../database/schema';
 import { eq, and, sql, desc, gte } from 'drizzle-orm';
 
 export interface LikerUserInfo {
@@ -219,8 +219,32 @@ export async function deleteGroupLikes(groupId: number): Promise<void> {
 
 /**
  * Elimina todos los likes otorgados por un usuario (para limpieza al borrar usuario)
+ * Y decrementa los contadores correspondientes
  */
 export async function deleteUserLikes(userId: number): Promise<void> {
-    await db.delete(carLike).where(eq(carLike.userId, userId));
-    await db.delete(groupLike).where(eq(groupLike.userId, userId));
+    await db.transaction(async (tx) => {
+        // 1. Obtener todos los IDs de autos que el usuario likeó
+        const likedCars = await tx.select({ carId: carLike.carId }).from(carLike).where(eq(carLike.userId, userId));
+
+        // 2. Decrementar likesCount para esos autos
+        for (const liked of likedCars) {
+            await tx.update(car)
+                .set({ likesCount: sql`GREATEST(0, ${car.likesCount} - 1)` })
+                .where(eq(car.carId, liked.carId));
+        }
+
+        // 3. Obtener todos los IDs de grupos que el usuario likeó
+        const likedGroups = await tx.select({ groupId: groupLike.groupId }).from(groupLike).where(eq(groupLike.userId, userId));
+
+        // 4. Decrementar likesCount para esos grupos
+        for (const liked of likedGroups) {
+            await tx.update(group)
+                .set({ likesCount: sql`GREATEST(0, ${group.likesCount} - 1)` })
+                .where(eq(group.groupId, liked.groupId));
+        }
+
+        // 5. Eliminar los registros de likes
+        await tx.delete(carLike).where(eq(carLike.userId, userId));
+        await tx.delete(groupLike).where(eq(groupLike.userId, userId));
+    });
 }

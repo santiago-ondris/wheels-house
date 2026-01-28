@@ -832,19 +832,6 @@ export const FollowButton: React.FC<FollowButtonProps> = ({...}) => {
 - [x] Implementar empty state: "No sigues a nadie aún. Empieza a seguir desde Explorar"
 - [x] Cuando usuario está en tab "Siguiendo", pasar `tab=following` al hook
 
-### Testing Sprint 2
-
-**Mini-objetivos:**
-
-- [ ] Backend: Testear `POST /users/:id/follow` crea registro y actualiza contadores
-- [ ] Backend: Testear `DELETE /users/:id/unfollow` elimina y decrementa
-- [ ] Backend: Testear constraint único previene duplicados
-- [ ] Backend: Testear no permite self-follow
-- [ ] Backend: Testear throttling funciona
-- [ ] Backend: Testear feed personalizado filtra correctamente
-- [ ] Frontend: Verificar FollowButton cambia estado correctamente
-- [ ] Frontend: Verificar optimistic update funciona
-- [ ] Frontend: Verificar listas de followers/following cargan
 
 ### Validación Sprint 2
 
@@ -1222,7 +1209,7 @@ interface Report {
 - [x] Crear `NotificationsRepository` con métodos CRUD
 - [x] Crear `NotificationsService` con lógica de negocio
 - [x] Crear `NotificationsController` con endpoints
-- [ ] Implementar cron job semanal para limpiar notificaciones antiguas
+- [x] Implementar cron job semanal para limpiar notificaciones antiguas
 
 **Archivos a crear:**
 - `apps/api/src/modules/social/notifications/entities/notification.entity.ts`
@@ -1286,15 +1273,6 @@ interface Report {
 - [x] Agregar `NotificationBell` al header
 - [x] Posicionar a la izquierda del avatar
 - [x] Testear que no rompe layout en mobile
-
-### Testing Sprint 3
-
-**Mini-objetivos:**
-
-- [ ] Backend: Testear endpoints de likes
-- [ ] Backend: Testear constraint único, throttling, eventos
-- [ ] Backend: Testear endpoints de notificaciones
-- [ ] Frontend: Verificar LikeButton, NotificationBell, animaciones
 
 ### Validación Sprint 3
 

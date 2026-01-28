@@ -1,7 +1,7 @@
 import { db } from '../index'
 import { UpdateUserProfileDTO, UserToDB } from 'src/dto/user.dto'
-import { car, feedEvent, searchHistory, user } from 'src/database/schema'
-import { eq, gt, ilike, and, sql, asc } from 'drizzle-orm';
+import { car, feedEvent, searchHistory, user, userGameAttempt } from 'src/database/schema'
+import { eq, gt, ilike, and, or, sql, asc } from 'drizzle-orm';
 import { PASSWORE_RESET_TIME_LIMIT } from 'src/utils/user.utils';
 
 // Create
@@ -180,7 +180,12 @@ export async function deleteUserFromUsername(username: string) {
 
 export async function deleteSearchHistoryFromUserId(userId: number) {
     try {
-        await db.delete(searchHistory).where(eq(searchHistory.userId, userId));
+        await db.delete(searchHistory).where(
+            or(
+                eq(searchHistory.userId, userId),
+                eq(searchHistory.searchedUserId, userId)
+            )
+        );
         return true;
     } catch {
         return false;
@@ -190,6 +195,15 @@ export async function deleteSearchHistoryFromUserId(userId: number) {
 export async function deleteFeedEventsFromUserId(userId: number) {
     try {
         await db.delete(feedEvent).where(eq(feedEvent.userId, userId));
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+export async function deleteUserGameAttemptsFromUserId(userId: number) {
+    try {
+        await db.delete(userGameAttempt).where(eq(userGameAttempt.userId, userId));
         return true;
     } catch {
         return false;

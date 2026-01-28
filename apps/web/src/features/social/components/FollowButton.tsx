@@ -19,7 +19,7 @@ export default function FollowButton({
     className = "",
     onFollowChange
 }: FollowButtonProps) {
-    const { user } = useAuth();
+    const { user, isAuthenticated, openLoginModal } = useAuth();
 
     const isSelf = user?.userId === userId;
 
@@ -53,7 +53,13 @@ export default function FollowButton({
 
     return (
         <button
-            onClick={() => toggleFollow()}
+            onClick={() => {
+                if (!isAuthenticated) {
+                    openLoginModal('para seguir a este usuario');
+                    return;
+                }
+                toggleFollow();
+            }}
             disabled={isLoading}
             className={`
                 flex items-center justify-center rounded-full transition-all duration-300

@@ -10,7 +10,8 @@ import {
     updatePasswordFromReset,
     deleteSearchHistoryFromUserId,
     getFounders,
-    deleteFeedEventsFromUserId
+    deleteFeedEventsFromUserId,
+    deleteUserGameAttemptsFromUserId
 } from 'src/database/crud/user.crud';
 import { deleteAllCarPictures, deleteCarsFromUserId, deleteFeedEventsFromCarId, getCarsFromUserId, getPicturesFromCar } from 'src/database/crud/car.crud';
 import { deleteFeedEventsFromGroupId, deleteGroupedCarsFromCarId, deleteGroupedCarsFromGroupId, deleteGroupsFromUserId, getGroupsFromUserId } from 'src/database/crud/group.crud';
@@ -247,7 +248,7 @@ export class UserService {
         for (const car of cars) {
             await likesRepository.deleteCarLikes(car.carId);
             await this.notificationsRepository.deleteByCarId(car.carId);
-            await deleteFeedEventsFromCarId(car.carId); 
+            await deleteFeedEventsFromCarId(car.carId);
             await deleteGroupedCarsFromCarId(car.carId);
             await deleteAllCarPictures(car.carId);
         }
@@ -255,7 +256,7 @@ export class UserService {
         for (const group of groups) {
             await likesRepository.deleteGroupLikes(group.groupId);
             await this.notificationsRepository.deleteByGroupId(group.groupId);
-            await deleteFeedEventsFromGroupId(group.groupId); 
+            await deleteFeedEventsFromGroupId(group.groupId);
             await deleteGroupedCarsFromGroupId(group.groupId);
         }
 
@@ -271,13 +272,14 @@ export class UserService {
 
         const deletedSearchHistory = await deleteSearchHistoryFromUserId(user.userId);
         const deletedFeedEvents = await deleteFeedEventsFromUserId(user.userId);
+        const deletedGameAttempts = await deleteUserGameAttemptsFromUserId(user.userId);
 
         // Social cleanup
         await likesRepository.deleteUserLikes(user.userId);
         await FollowsRepository.deleteUserFollows(user.userId);
         await this.notificationsRepository.deleteByUserId(user.userId);
 
-        if (!deletedSearchHistory || !deletedFeedEvents) {
+        if (!deletedSearchHistory || !deletedFeedEvents || !deletedGameAttempts) {
             throw ERROR_DELETING_USER;
         }
 
