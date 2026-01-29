@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { TokenData } from '../dto/user.dto';
+import { TokenData } from '../../dto/user.dto';
 import { getUserFromUsername } from 'src/database/crud/user.crud';
 import { CarInfo, CarInfoWithOwner, CarPictureToDB, CarToDB, CarUpdateDTO, CreateCarDTO } from 'src/dto/car.dto';
 import { ERROR_CREATING_CAR, ERROR_DELETING_CAR, ERROR_UPDATING_CAR } from 'src/utils/car.utils';
@@ -12,11 +12,11 @@ import {
 } from 'src/database/crud/car.crud';
 import { CollectionQueryDTO, PaginatedCarsResponse } from 'src/dto/collection-query.dto';
 import { createGroupedCars, deleteGroupedCarsFromCarId, getGroupsFromCarId, getGroupFromId, getGroupedCarsFromGroupId } from 'src/database/crud/group.crud';
-import { UploadService } from './upload.service';
+import { UploadService } from '../../services/upload.service';
 import { getPublicIdFromURL } from 'src/utils/upload.utils';
-import { EventsService } from '../modules/social/events/events.service';
-import * as likesRepository from '../modules/social/likes/likes.repository';
-import { NotificationsRepository } from '../modules/social/notifications/notifications.repository';
+import { EventsService } from '../social/events/events.service';
+import * as likesRepository from '../social/likes/likes.repository';
+import { NotificationsRepository } from '../social/notifications/notifications.repository';
 
 @Injectable()
 export class CarService {

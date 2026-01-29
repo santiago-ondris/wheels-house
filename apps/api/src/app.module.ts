@@ -4,15 +4,15 @@ import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
-import { UserController } from './controllers/user.controller';
-import { CarController } from './controllers/car.controller';
+
+
 import { UploadController } from './controllers/upload.controller';
-import { UserService } from './services/user.service';
-import { CarService } from './services/car.service';
+import { UserService } from './modules/user/user.service';
+
 import { UploadService } from './services/upload.service';
 import { JwtStrategy, JwtRefreshStrategy } from './validators/auth.validator';
-import { GroupController } from './controllers/group.controller';
-import { GroupService } from './services/group.service';
+
+
 import { ThrottlerModule } from '@nestjs/throttler';
 import { StatsController } from './controllers/stats.controller';
 import { StatsService } from './services/stats.service';
@@ -27,6 +27,9 @@ import { WheelwordService } from './services/wheelword.service';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { SocialModule } from './modules/social/social.module';
+import { GroupModule } from './modules/group/group.module';
+import { CarModule } from './modules/car/car.module';
+import { UserModule } from './modules/user/user.module';
 
 
 @Module({
@@ -47,13 +50,16 @@ import { SocialModule } from './modules/social/social.module';
     EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),
     SocialModule,
+    CarModule,
+    UserModule,
+    GroupModule,
   ],
-  controllers: [UserController, CarController, UploadController, GroupController, StatsController, SearchHistoryController, ImportController, HealthController, WheelwordController],
+  controllers: [UploadController, StatsController, SearchHistoryController, ImportController, HealthController, WheelwordController],
   providers: [
     {
       provide: APP_FILTER,
       useClass: SentryGlobalFilter,
     },
-    JwtStrategy, JwtRefreshStrategy, UserService, CarService, UploadService, GroupService, StatsService, SearchHistoryService, ImportService, EmailService, WheelwordService],
+    JwtStrategy, JwtRefreshStrategy, UploadService, StatsService, SearchHistoryService, ImportService, EmailService, WheelwordService],
 })
 export class AppModule { }
