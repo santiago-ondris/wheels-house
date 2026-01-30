@@ -45,3 +45,15 @@ export class UserStatsDTO {
         this.countryDistribution = countryDistribution;
     }
 }
+
+export class GlobalStatsDTO {
+    totalUsers: number;
+    totalCars: number;
+    totalPhotos: number;
+
+    constructor(totalUsers: number, totalCars: number, totalPhotos: number) {
+        this.totalUsers = totalUsers;
+        this.totalCars = totalCars;
+        this.totalPhotos = totalPhotos;
+    }
+}

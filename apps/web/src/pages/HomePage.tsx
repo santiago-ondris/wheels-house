@@ -1,32 +1,14 @@
 import { motion } from "framer-motion";
-import { Car, Layers, Star, ArrowRight } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useState } from "react";
 import LoginModal from "../components/auth/LoginModal";
 import { useAuth } from "../contexts/AuthContext";
 import FeaturedCar from "../components/home/FeaturedCar";
 import FeaturedCollections from "../components/home/FeaturedCollections";
-
-const features = [
-  {
-    icon: Car,
-    title: "Mi Colección",
-    description: "Todos tus vehículos en un solo lugar, organizados y con imágenes.",
-    route: "collection",
-  },
-  {
-    icon: Layers,
-    title: "Mis Grupos",
-    description: "Agrupa tus autos por series, colores, o como quieras.",
-    route: "groups",
-  },
-  {
-    icon: Star,
-    title: "Wishlist",
-    description: "Guarda los que te faltan y no pierdas el rastro.",
-    route: "wishlist",
-  },
-];
+import CommunityPulse from "../components/home/CommunityPulse";
+import ScaleAndTrust from "../components/home/ScaleAndTrust";
+import HallOfFame from "../components/home/HallOfFame";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -36,25 +18,6 @@ const fadeInUp = {
 export default function HomePage() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const { isAuthenticated, user } = useAuth();
-  const navigate = useNavigate();
-
-  const handleFeatureClick = (e: React.MouseEvent, route: string) => {
-    e.preventDefault();
-
-    if (!isAuthenticated) {
-      setIsLoginOpen(true);
-      return;
-    }
-
-    // Navigate to user-specific route
-    if (route === "collection") {
-      navigate(`/collection/${user?.username}`);
-    } else if (route === "groups") {
-      navigate(`/collection/${user?.username}/groups`);
-    } else if (route === "wishlist") {
-      navigate(`/wishlist/${user?.username}`);
-    }
-  };
 
   return (
     <div className="flex flex-col">
@@ -165,57 +128,12 @@ export default function HomePage() {
 
       <FeaturedCollections />
 
-      <section className="container mx-auto px-6 py-6">
-        <motion.div
-          variants={fadeInUp}
-          initial="initial"
-          whileInView="animate"
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="flex items-center justify-between mb-12"
-        >
-          <h2 className="text-3xl md:text-4xl font-bold text-white">
-            Explora tus
-            <br />
-            opciones
-          </h2>
-          <span className="text-accent uppercase tracking-widest text-sm">
-            01 / Features
-          </span>
-        </motion.div>
-
-
-        <div className="grid md:grid-cols-3 gap-6">
-          {features.map((feature, index) => (
-            <motion.div
-              key={feature.title}
-              variants={fadeInUp}
-              initial="initial"
-              whileInView="animate"
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-            >
-              <button
-                onClick={(e) => handleFeatureClick(e, feature.route)}
-                className="group block h-full w-full text-left bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-colors"
-              >
-                <span className="text-accent/60 text-sm">0{index + 1}</span>
-                <feature.icon className="w-10 h-10 text-accent mt-4" />
-                <h3 className="text-xl font-bold text-white mt-4">
-                  {feature.title}
-                </h3>
-                <p className="text-white/50 mt-2 text-sm">
-                  {feature.description}
-                </p>
-                <span className="inline-flex items-center gap-1 text-accent text-sm mt-4 group-hover:gap-2 transition-all">
-                  Explorar
-                  <ArrowRight className="w-4 h-4" />
-                </span>
-              </button>
-            </motion.div>
-          ))}
-        </div>
-      </section>
+      <div className="bg-background relative">
+        <div className="absolute inset-0 bg-linear-to-b from-transparent via-accent/5 to-transparent pointer-events-none" />
+        <CommunityPulse />
+        <ScaleAndTrust />
+        <HallOfFame />
+      </div>
 
       <FeaturedCar />
     </div>

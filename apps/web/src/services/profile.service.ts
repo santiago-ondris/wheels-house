@@ -37,6 +37,34 @@ export interface UserStats {
     countryDistribution: DistributionItem[];
 }
 
+export interface GlobalStats {
+    totalUsers: number;
+    totalCars: number;
+    totalPhotos: number;
+}
+
+export interface HallOfFameFlags {
+    isFounder: boolean;
+    isContributor: boolean;
+    isAmbassador: boolean;
+    isLegend: boolean;
+}
+
+export interface HallOfFameMember {
+    userId: number;
+    username: string;
+    firstName: string;
+    lastName: string;
+    picture: string | null;
+    hallOfFameTitle: string | null;
+    hallOfFameFlags: HallOfFameFlags;
+    carCount: number;
+    totalLikes: number;
+    showcaseCarImage: string | null;
+    showcaseCarName: string | null;
+    hallOfFameOrder: number | null;
+}
+
 export interface BasicUser {
     userId: number;
     username: string;
@@ -66,6 +94,18 @@ export async function searchUsers(query: string): Promise<BasicUser[]> {
 
 export async function getFounders(): Promise<Founder[]> {
     return apiRequest<Founder[]>('/founders');
+}
+
+export async function getGlobalStats(): Promise<GlobalStats> {
+    return apiRequest<GlobalStats>('/stats/global');
+}
+
+export async function getHoFMembers(category: string): Promise<HallOfFameMember[]> {
+    return apiRequest<HallOfFameMember[]>(`/stats/hall-of-fame/${category}`);
+}
+
+export async function getFeaturedHoFMembers(): Promise<HallOfFameMember[]> {
+    return apiRequest<HallOfFameMember[]>('/stats/hall-of-fame/featured');
 }
 
 export async function getSearchHistory(): Promise<BasicUser[]> {
