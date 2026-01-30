@@ -120,6 +120,71 @@ export async function getFounders(limit = 100) {
     return founders;
 }
 
+export async function getHoFMembers(flag: string) {
+    // flag can be isContributor, isAmbassador, isLegend
+    const carCountSubquery = db
+        .select({
+            userId: car.userId,
+            carCount: sql<number>`count(*)`.as('carCount')
+        })
+        .from(car)
+        .where(eq(car.wished, false))
+        .groupBy(car.userId)
+        .as('carCounts');
+
+    const members = await db
+        .select({
+            userId: user.userId,
+            username: user.username,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            picture: user.picture,
+            createdDate: user.createdDate,
+            hallOfFameTitle: user.hallOfFameTitle,
+            hallOfFameFlags: user.hallOfFameFlags,
+            hallOfFameOrder: user.hallOfFameOrder,
+            carCount: carCountSubquery.carCount
+        })
+        .from(user)
+        .innerJoin(carCountSubquery, eq(user.userId, carCountSubquery.userId))
+        .where(sql`${user.hallOfFameFlags}->>${flag} = 'true'`)
+        .orderBy(asc(user.userId));
+
+    return members;
+}
+
+export async function getFeaturedHoFMembersManual() {
+    const carCountSubquery = db
+        .select({
+            userId: car.userId,
+            carCount: sql<number>`count(*)`.as('carCount')
+        })
+        .from(car)
+        .where(eq(car.wished, false))
+        .groupBy(car.userId)
+        .as('carCounts');
+
+    const members = await db
+        .select({
+            userId: user.userId,
+            username: user.username,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            picture: user.picture,
+            createdDate: user.createdDate,
+            hallOfFameTitle: user.hallOfFameTitle,
+            hallOfFameFlags: user.hallOfFameFlags,
+            hallOfFameOrder: user.hallOfFameOrder,
+            carCount: carCountSubquery.carCount
+        })
+        .from(user)
+        .innerJoin(carCountSubquery, eq(user.userId, carCountSubquery.userId))
+        .where(sql`${user.hallOfFameOrder} IS NOT NULL`)
+        .orderBy(asc(user.hallOfFameOrder));
+
+    return members;
+}
+
 // Update
 
 export async function updateUserFromUserId(userId: number, userChanges: UpdateUserProfileDTO) {

@@ -1,10 +1,126 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { getCarsForStats, getTotalPhotosCount } from '../database/crud/stats.crud';
-import { getPublicProfileByUsername } from '../database/crud/user.crud';
-import { UserStatsDTO, DistributionItem } from '../dto/stats.dto';
+import { getCarsForStats, getTotalPhotosCount, getGlobalStatsCounts } from '../database/crud/stats.crud';
+import { getPublicProfileByUsername, getFounders, getHoFMembers, getFeaturedHoFMembersManual } from '../database/crud/user.crud';
+import { UserStatsDTO, DistributionItem, GlobalStatsDTO } from '../dto/stats.dto';
+import { HallOfFameMemberDTO } from '../dto/hallOfFame.dto';
+import { db } from '../database/index';
+import { car, carPicture, carLike } from '../database/schema';
+import { eq, sql, and, desc } from 'drizzle-orm';
 
 @Injectable()
 export class StatsService {
+    private globalStatsCache: { data: GlobalStatsDTO; expiry: number } | null = null;
+    private readonly CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+
+    async getGlobalStats(): Promise<GlobalStatsDTO> {
+        const now = Date.now();
+        if (this.globalStatsCache && now < this.globalStatsCache.expiry) {
+            return this.globalStatsCache.data;
+        }
+
+        const counts = await getGlobalStatsCounts();
+        const stats = new GlobalStatsDTO(counts.totalUsers, counts.totalCars, counts.totalPhotos);
+
+        this.globalStatsCache = {
+            data: stats,
+            expiry: now + this.CACHE_TTL
+        };
+
+        return stats;
+    }
+
+    async getHoFMembersByCategory(category: string): Promise<HallOfFameMemberDTO[]> {
+        let rawMembers;
+        if (category === 'founders') {
+            rawMembers = await getFounders(100);
+        } else {
+            const flagMap: Record<string, string> = {
+                'contributors': 'isContributor',
+                'ambassadors': 'isAmbassador',
+                'legends': 'isLegend'
+            };
+            const flag = flagMap[category];
+            if (!flag) return [];
+            rawMembers = await getHoFMembers(flag);
+        }
+
+        const membersWithShowcase = await Promise.all(rawMembers.map(async (m: any) => {
+            const [likesResult] = await db
+                .select({ count: sql<number>`cast(count(*) as int)` })
+                .from(carLike)
+                .innerJoin(car, eq(car.carId, carLike.carId))
+                .where(eq(car.userId, m.userId));
+
+            // Fetch a showcase car (the one with most likes)
+            const [showcaseCar] = await db
+                .select({
+                    name: car.name,
+                    image: carPicture.url
+                })
+                .from(car)
+                .leftJoin(carPicture, eq(car.carId, carPicture.carId))
+                .where(and(eq(car.userId, m.userId), eq(car.wished, false)))
+                .orderBy(desc(car.likesCount))
+                .limit(1);
+
+            return new HallOfFameMemberDTO(
+                m.userId,
+                m.username,
+                m.firstName,
+                m.lastName,
+                m.picture,
+                m.hallOfFameTitle || (category === 'founders' ? "Founding Member" : ""),
+                m.hallOfFameFlags || { isFounder: category === 'founders', isContributor: false, isAmbassador: false, isLegend: false },
+                m.carCount,
+                likesResult?.count || 0,
+                showcaseCar?.image || null,
+                showcaseCar?.name || null
+            );
+        }));
+
+        return membersWithShowcase;
+    }
+
+    async getFeaturedHoFMembers(): Promise<HallOfFameMemberDTO[]> {
+        const rawMembers = await getFeaturedHoFMembersManual();
+        
+        const featuredWithShowcase = await Promise.all(rawMembers.map(async (m: any) => {
+            const [likesResult] = await db
+                .select({ count: sql<number>`cast(count(*) as int)` })
+                .from(carLike)
+                .innerJoin(car, eq(car.carId, carLike.carId))
+                .where(eq(car.userId, m.userId));
+
+            const [showcaseCar] = await db
+                .select({
+                    name: car.name,
+                    image: carPicture.url
+                })
+                .from(car)
+                .innerJoin(carPicture, eq(car.carId, carPicture.carId))
+                .where(and(eq(car.userId, m.userId), eq(car.wished, false)))
+                .orderBy(desc(car.likesCount))
+                .limit(1);
+
+            return new HallOfFameMemberDTO(
+                m.userId,
+                m.username,
+                m.firstName,
+                m.lastName,
+                m.picture,
+                m.hallOfFameTitle,
+                m.hallOfFameFlags,
+                m.carCount,
+                likesResult?.count || 0,
+                showcaseCar?.image || null,
+                showcaseCar?.name || null,
+                m.hallOfFameOrder
+            );
+        }));
+
+        return featuredWithShowcase;
+    }
+
     async getUserStats(username: string): Promise<UserStatsDTO> {
         const userData = await getPublicProfileByUsername(username);
 

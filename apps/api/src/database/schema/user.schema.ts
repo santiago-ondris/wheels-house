@@ -1,4 +1,4 @@
-import { serial, text, integer, date, boolean, unique, pgTable, timestamp } from "drizzle-orm/pg-core";
+import { serial, text, integer, date, boolean, unique, pgTable, timestamp, jsonb } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
     userId: serial("userId").primaryKey(),
@@ -26,6 +26,12 @@ export const user = pgTable("user", {
     wheelwordMaxStreak: integer("wheelwordMaxStreak").default(0),
     wheelwordLastPlayedDate: date("wheelwordLastPlayedDate"),
     wheelwordWinDistribution: text("wheelwordWinDistribution").default("0,0,0,0,0,0"), // wins in 1,2,3,4,5,6 attempts
+
+    // Hall of Fame
+    hallOfFameFlags: jsonb("hallOfFameFlags").default({ isFounder: false, isContributor: false, isAmbassador: false, isLegend: false }),
+    hallOfFameTitle: text("hallOfFameTitle"),
+    hallOfFameOrder: integer("hallOfFameOrder"), // Posicion manual
+
     // for the future:
     // verificationCode: integer("verificationCode").notNull(),
     // verified: boolean("verified"),

@@ -169,6 +169,20 @@
       "when": 1769452109984,
       "tag": "0023_add_likes_and_notifications",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1769733912583,
+      "tag": "0024_normal_the_order",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1769735242629,
+      "tag": "0025_noisy_outlaw_kid",
+      "breakpoints": true
     }
   ]
 }

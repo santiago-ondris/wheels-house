@@ -34,6 +34,7 @@ export const manufacturers = [
     "Schuco",
     "Siku",
     "Corgi",
+    "PosterCars"
 ];
 
 export const brands = [

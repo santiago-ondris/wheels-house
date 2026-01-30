@@ -1,0 +1,2 @@
+ALTER TABLE "user" ADD COLUMN "hallOfFameFlags" jsonb DEFAULT '{"isFounder":false,"isContributor":false,"isAmbassador":false,"isLegend":false}'::jsonb;--> statement-breakpoint
+ALTER TABLE "user" ADD COLUMN "hallOfFameTitle" text;
