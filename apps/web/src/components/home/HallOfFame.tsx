@@ -133,7 +133,7 @@ export default function HallOfFame() {
 
                    <Link 
                       to={`/collection/${collector.username}`}
-                      className="mt-6 text-[10px] font-mono text-white/50 group-hover:text-accent border border-white/10 px-4 py-2 rounded-lg transition-colors"
+                      className="mt-6 text-[14px] font-mono text-white/50 group-hover:text-accent border border-white/10 px-4 py-2 rounded-lg transition-colors"
                    >
                     VER PERFIL COMPLETO
                    </Link>

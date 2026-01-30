@@ -96,12 +96,12 @@ export const CarDetailPage = () => {
     return (
         <div className="w-full min-h-screen bg-background text-white flex flex-col font-arvo">
             <section ref={galleryRef} className="w-full pt-6 md:pt-10 pb-10 px-4 md:px-10">
-                <div className="max-w-7xl mx-auto mb-6 flex justify-between items-end">
+                <div className="max-w-7xl mx-auto mb-6 flex flex-col gap-4 md:flex-row md:justify-between md:items-end">
                     <div>
                         <motion.div
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
-                            className="flex items-center gap-3 text-sm text-gray-400 mb-4"
+                            className="flex flex-wrap items-center gap-3 text-sm text-gray-400 mb-4"
                         >
                             <button
                                 onClick={handleBack}

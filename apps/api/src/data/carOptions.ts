@@ -107,7 +107,8 @@ export const brands = [
     "AMC",
     "Cupra",
     "Fantasía",
-    "Studebaker"
+    "Studebaker",
+    "Ducatti"
 ];
 
 export const colors = [
@@ -263,5 +264,6 @@ export const brandNationalities: Record<string, string> = {
     "Lancia": "Italia",
     "AMC": "USA",
     "Cupra": "España",
-    "Studebaker": "USA"
+    "Studebaker": "USA",
+    "Ducatti": "Italia"
 };

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getFeed, FeedItemDto } from "../../services/social.service";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
+import { Link } from "react-router-dom";
 
 const getActivityConfig = (type: string) => {
     switch (type) {
@@ -61,8 +62,8 @@ export default function CommunityPulse() {
 
     if (isLoading && activities.length === 0) return null;
 
-    const displayActivities = activities.length > 0 && activities.length < 6 
-        ? [...activities, ...activities, ...activities] 
+    const displayActivities = activities.length > 0 && activities.length < 6
+        ? [...activities, ...activities, ...activities]
         : [...activities, ...activities];
 
     return (
@@ -97,8 +98,10 @@ export default function CommunityPulse() {
                     <div className="absolute top-0 right-0 w-24 h-24 border-t-2 border-r-2 border-accent/20 rounded-tr-3xl pointer-events-none" />
                     <div className="absolute bottom-0 left-0 w-24 h-24 border-b-2 border-l-2 border-accent/20 rounded-bl-3xl pointer-events-none" />
 
+
+
                     {/* Feed Container */}
-                    <div className="relative h-[450px] overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a1a] shadow-2xl">
+                    <Link to="/community" className="block cursor-pointer relative h-[450px] overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a1a] shadow-2xl hover:border-accent/30 transition-colors">
                         {/* Scanline Effect */}
                         <div className="absolute inset-0 pointer-events-none z-20 opacity-20"
                             style={{
@@ -116,7 +119,7 @@ export default function CommunityPulse() {
                             {displayActivities.map((activity, index) => {
                                 const config = getActivityConfig(activity.type);
                                 const timeStr = formatDistanceToNow(new Date(activity.createdAt), { addSuffix: true, locale: es });
-                                
+
                                 // Logic for item name and image
                                 let itemName = "Actividad";
                                 let itemImage = null;
@@ -167,7 +170,7 @@ export default function CommunityPulse() {
                                 );
                             })}
                         </div>
-                    </div>
+                    </Link>
                 </div>
             </div>
         </section>

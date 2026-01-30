@@ -7,13 +7,14 @@ import { useAuth } from "../../contexts/AuthContext";
 
 interface MobileMenuProps {
   onLoginClick: () => void;
+  className?: string; // Add className prop
 }
 
-export default function MobileMenu({ onLoginClick }: MobileMenuProps) {
+export default function MobileMenu({ onLoginClick, className = "md:hidden" }: MobileMenuProps) {
   const { isAuthenticated, logout, user } = useAuth();
 
   return (
-    <Disclosure as="div" className="md:hidden">
+    <Disclosure as="div" className={className}>
       {({ open, close }) => (
         <>
           <Disclosure.Button className="p-2 text-white hover:bg-white/10 rounded-lg transition-colors">

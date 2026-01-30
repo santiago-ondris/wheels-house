@@ -105,6 +105,7 @@ export const brands = [
     "Volkswagen",
     "Volvo",
     "W Motors",
+    "Ducatti"
 ];
 
 export const colors = [
@@ -269,6 +270,7 @@ export const brandNationalities: Record<string, string> = {
     "Volvo": "Suecia",
     "W Motors": "UAE",
     "Studebaker": "USA",
+    "Ducatti": "Italia"
 };
 
 // New car attributes
