@@ -116,8 +116,23 @@ export default function CommunityPulse() {
                             {displayActivities.map((activity, index) => {
                                 const config = getActivityConfig(activity.type);
                                 const timeStr = formatDistanceToNow(new Date(activity.createdAt), { addSuffix: true, locale: es });
-                                const itemName = activity.metadata?.carName || activity.metadata?.groupName || "Objeto";
-                                const itemImage = activity.metadata?.carImage || activity.metadata?.groupImage;
+                                
+                                // Logic for item name and image
+                                let itemName = "Actividad";
+                                let itemImage = null;
+
+                                if (activity.type === 'car_added') {
+                                    itemName = activity.metadata?.carName || "Auto";
+                                    itemImage = activity.metadata?.carImage;
+                                } else if (activity.type === 'group_created') {
+                                    itemName = activity.metadata?.groupName || "Grupo";
+                                    itemImage = activity.metadata?.groupImage;
+                                } else if (activity.type === 'milestone_reached') {
+                                    itemName = `${activity.metadata?.milestone || activity.metadata?.carCount || '?'} AUTOS`;
+                                } else if (activity.type === 'wishlist_achieved') {
+                                    itemName = activity.metadata?.carName || "Auto";
+                                    itemImage = activity.metadata?.carImage;
+                                }
 
                                 return (
                                     <div key={`${activity.id}-${index}`}

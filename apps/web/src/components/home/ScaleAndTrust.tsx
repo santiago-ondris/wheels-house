@@ -3,8 +3,10 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getGlobalStats, GlobalStats } from "../../services/profile.service";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function ScaleAndTrust() {
+  const { isAuthenticated } = useAuth();
   const [stats, setStats] = useState<GlobalStats>({
     totalCars: 10420,
     totalUsers: 1250,
@@ -44,13 +46,15 @@ export default function ScaleAndTrust() {
                     <span className="text-accent underline decoration-white/20 underline-offset-8">DE TODOS PARA TODOS</span>
                 </h2>
             </div>
-             <Link
+             {!isAuthenticated && (
+              <Link
                 to="/register"
                 className="group inline-flex items-center gap-3 px-6 py-3 bg-accent text-white font-mono text-sm font-bold rounded-lg hover:bg-accent/80 transition-all border border-white/10"
               >
                 UNITE A NOSOTROS
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
+             )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-white/10">
