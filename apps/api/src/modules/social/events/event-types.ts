@@ -71,6 +71,13 @@ export interface CarDeletedPayload {
     carId: number;
 }
 
+export interface WishlistItemAddedPayload {
+    userId: number;
+    carId: number;
+    carName: string;
+    carImage?: string;
+}
+
 export interface WishlistItemAchievedPayload {
     userId: number;
     carId: number;

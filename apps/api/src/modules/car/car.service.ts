@@ -57,13 +57,22 @@ export class CarService {
         }
 
         // Emit social event
-        this.eventsService.emitCarAdded({
-            userId: user.userId,
-            carId: createdCar.carId,
-            carName: createdCar.name,
-            carImage: carData.pictures && carData.pictures.length > 0 ? carData.pictures[0] : undefined,
-            isFromWishlist: false
-        });
+        if (carData.wished) {
+            this.eventsService.emitWishlistItemAdded({
+                userId: user.userId,
+                carId: createdCar.carId,
+                carName: createdCar.name,
+                carImage: carData.pictures && carData.pictures.length > 0 ? carData.pictures[0] : undefined
+            });
+        } else {
+            this.eventsService.emitCarAdded({
+                userId: user.userId,
+                carId: createdCar.carId,
+                carName: createdCar.name,
+                carImage: carData.pictures && carData.pictures.length > 0 ? carData.pictures[0] : undefined,
+                isFromWishlist: false
+            });
+        }
 
         // Check for milestones
         this.checkAndEmitMilestone(user.userId);

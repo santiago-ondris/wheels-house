@@ -4,7 +4,7 @@ import { eq, desc, inArray, and, gte, sql } from 'drizzle-orm';
 import type { FeedEventMetadata } from '../../../database/schema';
 
 // Tipos para el feed
-export type FeedEventType = 'car_added' | 'milestone_reached' | 'wishlist_achieved' | 'group_created';
+export type FeedEventType = 'car_added' | 'milestone_reached' | 'wishlist_achieved' | 'group_created' | 'wishlist_added';
 
 export interface CreateFeedEventInput {
     type: FeedEventType;

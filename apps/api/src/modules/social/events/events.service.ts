@@ -4,6 +4,7 @@ import {
     EVENTS,
     CarAddedPayload,
     CarDeletedPayload,
+    WishlistItemAddedPayload,
     WishlistItemAchievedPayload,
     GroupCreatedPayload,
     UserFollowedPayload,
@@ -36,6 +37,10 @@ export class EventsService {
     }
 
     // ==================== Wishlist Events ====================
+    
+    emitWishlistItemAdded(payload: WishlistItemAddedPayload): void {
+        this.eventEmitter.emit(EVENTS.WISHLIST_ITEM_ADDED, payload);
+    }
 
     emitWishlistItemAchieved(payload: WishlistItemAchievedPayload): void {
         this.eventEmitter.emit(EVENTS.WISHLIST_ITEM_ACHIEVED, payload);

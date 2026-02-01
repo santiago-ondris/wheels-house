@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-    Star,
+    Target,
     Car,
     FileText,
     Tag,
@@ -122,18 +122,20 @@ export default function AddToWishlistPage() {
     return (
         <div className="min-h-screen pb-32 md:pb-8">
             <PageHeader
-                title="Agregar a Wishlist"
-                subtitle="Un vehículo que buscás"
-                icon={Star}
+                title="Nueva Búsqueda"
+                subtitle="Un vehículo que estás rastreando"
+                icon={Target}
                 onBack={handleCancel}
                 actions={
                     <button
                         onClick={handleSubmit}
                         disabled={isLoading}
-                        className="hidden md:flex items-center gap-2 px-5 py-2 bg-amber-500 hover:bg-amber-400 disabled:bg-amber-500/50 text-black text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all"
+                        className="hidden md:flex items-center gap-2 px-5 py-2 bg-amber-500 hover:bg-amber-400 disabled:bg-amber-500/50 text-black text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all -skew-x-12"
                     >
-                        <Save className="w-4 h-4" />
-                        {isLoading ? "Guardando..." : "Guardar"}
+                        <div className="skew-x-12 flex items-center gap-2">
+                            <Save className="w-4 h-4" />
+                            {isLoading ? "Guardando..." : "Guardar"}
+                        </div>
                     </button>
                 }
             />
@@ -145,15 +147,15 @@ export default function AddToWishlistPage() {
                 className="container mx-auto px-4 py-6"
             >
                 <form onSubmit={handleSubmit} className="max-w-5xl mx-auto">
-                    {/* Wishlist Notice */}
+                    {/* Hunt Notice */}
                     <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-start gap-3">
-                        <Star className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                        <Target className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
                         <div>
-                            <p className="text-amber-500 font-bold text-sm">
-                                Estás agregando a tu Wishlist
+                            <p className="text-amber-500 font-bold text-sm uppercase tracking-tight">
+                                Estás iniciando una cacería
                             </p>
                             <p className="text-amber-500/70 text-xs mt-1">
-                                Este auto se guardará como "buscado". Cuando lo consigas, podrás marcarlo y pasará a tu colección.
+                                Este auto se guardará como "en busca". Cuando lo consigas, podrás marcarlo y pasará a tu colección.
                             </p>
                         </div>
                     </div>
