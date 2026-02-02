@@ -44,6 +44,7 @@ export class PublicProfileDTO {
     firstName: string;
     lastName: string;
     picture?: string;
+    email?: string;
     createdDate?: Date;
     totalCars: number;
     totalGroups: number;
@@ -72,13 +73,15 @@ export class PublicProfileDTO {
         defaultSortPreference?: string,
         isFollowing?: boolean,
         isFollower?: boolean,
-        isAdmin?: boolean
+        isAdmin?: boolean,
+        email?: string
     ) {
         this.userId = userId;
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.picture = picture;
+        this.email = email;
         this.createdDate = createdDate;
         this.totalCars = totalCars;
         this.totalGroups = totalGroups;

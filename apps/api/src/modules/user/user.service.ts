@@ -164,7 +164,8 @@ export class UserService {
             userData.defaultSortPreference ?? 'id:desc',
             isFollowing,
             isFollower,
-            userData.isAdmin ?? false
+            userData.isAdmin ?? false,
+            isOwner ? userData.email : undefined
         );
     }
 

@@ -8,6 +8,7 @@ export interface PublicProfile {
     lastName: string;
     biography?: string;
     picture?: string;
+    email?: string;
     createdDate?: string;
     totalCars: number;
     totalGroups: number;

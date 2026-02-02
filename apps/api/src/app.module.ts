@@ -31,6 +31,7 @@ import { GroupModule } from './modules/group/group.module';
 import { CarModule } from './modules/car/car.module';
 import { UserModule } from './modules/user/user.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { ContactModule } from './modules/contact/contact.module';
 
 
 @Module({
@@ -53,8 +54,10 @@ import { AdminModule } from './modules/admin/admin.module';
     SocialModule,
     CarModule,
     UserModule,
+    UserModule,
     GroupModule,
     AdminModule,
+    ContactModule,
   ],
   controllers: [UploadController, StatsController, SearchHistoryController, ImportController, HealthController, WheelwordController],
   providers: [

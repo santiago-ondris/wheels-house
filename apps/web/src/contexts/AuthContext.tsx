@@ -8,6 +8,9 @@ interface User {
   userId: number;
   username: string;
   picture?: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
   defaultSortPreference?: string;
   isAdmin?: boolean;
 }
@@ -96,6 +99,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               username: decoded.username,
               userId: decoded.userId,
               picture: profile.picture,
+              email: profile.email,
+              firstName: profile.firstName,
+              lastName: profile.lastName,
               defaultSortPreference: profile.defaultSortPreference,
               isAdmin: profile.isAdmin
             });
@@ -133,6 +139,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         username: decoded.username,
         userId: decoded.userId,
         picture: profile.picture,
+        email: profile.email,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
         defaultSortPreference: profile.defaultSortPreference,
         isAdmin: profile.isAdmin
       });
