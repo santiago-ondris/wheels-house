@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { User, Car, Trophy, Star, Users, ArrowUpRight } from "lucide-react";
+import { User, Car, Trophy, Target, Users, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { FeedItemDto } from "../../services/social.service";
 import { LikeButton } from "../../features/social/components/likes/LikeButton";
@@ -36,9 +36,14 @@ export default function FeedItem({ item }: FeedItemProps) {
                 border: 'border-amber-400/20'
             };
             case 'wishlist_achieved': return {
-                icon: <Star size={14} />,
+                icon: <Target size={14} />,
                 color: 'text-emerald-400',
                 border: 'border-emerald-400/20'
+            };
+            case 'wishlist_added': return {
+                icon: <Target size={14} />,
+                color: 'text-amber-400',
+                border: 'border-amber-400/20'
             };
             case 'group_created': return {
                 icon: <Users size={14} />,
@@ -63,7 +68,9 @@ export default function FeedItem({ item }: FeedItemProps) {
             case 'milestone_reached':
                 return "Alcanzó un hito";
             case 'wishlist_achieved':
-                return "Consiguió de su wishlist";
+                return "Consiguió lo que buscaba";
+            case 'wishlist_added':
+                return "Está buscando";
             case 'group_created':
                 return "Creó un grupo";
             default:

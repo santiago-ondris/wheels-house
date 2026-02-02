@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Star, Plus, Check, Car, ImageOff, Pencil, Trash2 } from "lucide-react";
+import { Target, Plus, Check, Car, ImageOff, Pencil, Trash2 } from "lucide-react";
 import PageHeader from "../../components/ui/PageHeader";
 import { getWishlist, deleteCar, WishlistCarData } from "../../services/car.service";
 import { useAuth } from "../../contexts/AuthContext";
@@ -99,9 +99,9 @@ export default function WishlistPage() {
     return (
         <div className="min-h-screen pb-32 md:pb-8">
             <PageHeader
-                title="Wishlist"
-                subtitle={isOwner ? "Vehículos que buscás" : `Wishlist de @${username}`}
-                icon={Star}
+                title="En busca de"
+                subtitle={isOwner ? "Vehículos que estás buscando" : `Búsqueda de @${username}`}
+                icon={Target}
                 onBack={handleBack}
                 actions={
                     isOwner && (
@@ -128,23 +128,25 @@ export default function WishlistPage() {
                     </div>
                 ) : wishlist.length === 0 ? (
                     <div className="text-center py-20">
-                        <Star className="w-16 h-16 text-white/10 mx-auto mb-4" />
+                        <Target className="w-16 h-16 text-white/10 mx-auto mb-4" />
                         <h3 className="text-xl font-bold text-white/60 mb-2">
-                            {isOwner ? "Tu wishlist está vacía" : "Wishlist vacía"}
+                            {isOwner ? "No tenes búsquedas activas" : "Sin búsquedas"}
                         </h3>
                         <p className="text-white/40 text-sm mb-6">
                             {isOwner
-                                ? "Agregá los vehículos que estás buscando"
-                                : `@${username} aún no tiene vehículos en su wishlist`
+                                ? "Inicia tu búsqueda agregando los autos que quieras encontrar"
+                                : `@${username} aún no tiene vehículos en su lista de búsqueda`
                             }
                         </p>
                         {isOwner && (
                             <Link
                                 to="/wishlist/add"
-                                className="inline-flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-lg transition-all"
+                                className="inline-flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-400 text-black font-black rounded-lg transition-all -skew-x-12"
                             >
-                                <Plus className="w-5 h-5" />
-                                Agregar a Wishlist
+                                <div className="skew-x-12 flex items-center gap-2">
+                                    <Plus className="w-5 h-5" />
+                                    INICIAR BÚSQUEDA
+                                </div>
                             </Link>
                         )}
                     </div>
@@ -172,11 +174,11 @@ export default function WishlistPage() {
                                         </div>
                                     )}
 
-                                    {/* Wishlist Badge */}
-                                    <div className="absolute top-3 left-3 px-2 py-1 bg-amber-500/90 rounded-md flex items-center gap-1.5">
-                                        <Star className="w-3 h-3 text-black fill-black" />
-                                        <span className="text-[10px] font-bold text-black uppercase tracking-wider">
-                                            Buscando
+                                    {/* Hunt Badge */}
+                                    <div className="absolute top-3 left-3 px-2 py-1 bg-amber-500/90 rounded-sm flex items-center gap-1.5 border border-black/10">
+                                        <Target className="w-3 h-3 text-black" />
+                                        <span className="text-[10px] font-black text-black uppercase tracking-tighter">
+                                            EN BUSCA
                                         </span>
                                     </div>
                                 </Link>

@@ -1,6 +1,6 @@
 import { apiRequest } from "./api";
 
-export type FeedEventType = 'car_added' | 'milestone_reached' | 'wishlist_achieved' | 'group_created';
+export type FeedEventType = 'car_added' | 'milestone_reached' | 'wishlist_achieved' | 'group_created' | 'wishlist_added';
 
 export interface FeedItemDto {
     id: number;

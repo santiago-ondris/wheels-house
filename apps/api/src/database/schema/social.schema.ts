@@ -8,7 +8,7 @@ export const feedEvent = pgTable("feedEvent", {
 
     // Tipo de evento
     type: text("type", {
-        enum: ['car_added', 'milestone_reached', 'wishlist_achieved', 'group_created']
+        enum: ['car_added', 'milestone_reached', 'wishlist_achieved', 'group_created', 'wishlist_added']
     }).notNull(),
 
     // Usuario que generó el evento

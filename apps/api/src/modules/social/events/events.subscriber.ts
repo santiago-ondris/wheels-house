@@ -3,6 +3,7 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { EVENTS } from './event-types';
 import type {
     CarAddedPayload,
+    WishlistItemAddedPayload,
     WishlistItemAchievedPayload,
     GroupCreatedPayload,
     MilestoneReachedPayload,
@@ -52,6 +53,21 @@ export class EventsSubscriber {
     }
 
     // ==================== Wishlist Events ====================
+
+    @OnEvent(EVENTS.WISHLIST_ITEM_ADDED)
+    async handleWishlistItemAdded(payload: WishlistItemAddedPayload): Promise<void> {
+        this.logger.log(`🎯 Wishlist item added: User ${payload.userId} added ${payload.carName} to wishlist`);
+
+        await this.feedService.createEvent({
+            type: 'wishlist_added',
+            userId: payload.userId,
+            carId: payload.carId,
+            metadata: {
+                carName: payload.carName,
+                carImage: payload.carImage
+            }
+        });
+    }
 
     @OnEvent(EVENTS.WISHLIST_ITEM_ACHIEVED)
     async handleWishlistItemAchieved(payload: WishlistItemAchievedPayload): Promise<void> {

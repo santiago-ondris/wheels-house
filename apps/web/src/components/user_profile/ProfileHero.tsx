@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Calendar, BarChart2, Star } from "lucide-react";
+import { Calendar, BarChart2, Target } from "lucide-react";
 import { Link } from "react-router-dom";
 import FollowButton from "../../features/social/components/FollowButton";
 
@@ -78,22 +78,28 @@ export default function ProfileHero({
                                 </span>
                             )}
                         </div>
-                        <div className="text-white/40 font-mono text-sm tracking-widest uppercase flex items-center gap-2">
-                            <span className="text-accent">@</span>{username}
-                            <div className="flex items-center gap-4 ml-4">
+                        <div className="flex items-center gap-4 text-white/40 font-mono text-sm tracking-widest uppercase">
+                            <div><span className="text-accent">@</span>{username}</div>
+                            
+                            {/* Profile Action Buttons - Desktop */}
+                            <div className="flex items-center gap-4 ml-2">
                                 <Link
                                     to={`/collection/${username}/stats`}
-                                    className="flex items-center gap-2 text-[14px] text-emerald-400 font-bold transition-colors border-b border-emerald-400/20 hover:border-emerald-400"
+                                    className="group relative flex items-center gap-2 px-4 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-black font-black text-[12px] tracking-tight -skew-x-12 transition-all hover:scale-105 active:scale-95"
                                 >
-                                    <BarChart2 size={14} />
-                                    VER_ESTADÍSTICAS
+                                    <div className="skew-x-12 flex items-center gap-2">
+                                        <BarChart2 size={14} strokeWidth={3} />
+                                        ESTADÍSTICAS
+                                    </div>
                                 </Link>
                                 <Link
                                     to={`/wishlist/${username}`}
-                                    className="flex items-center gap-2 text-[14px] text-amber-400 font-bold transition-colors border-b border-amber-400/20 hover:border-amber-400"
+                                    className="group relative flex items-center gap-2 px-4 py-1.5 bg-amber-500 hover:bg-amber-400 text-black font-black text-[12px] tracking-tight -skew-x-12 transition-all hover:scale-105 active:scale-95"
                                 >
-                                    <Star size={14} />
-                                    VER_WISHLIST
+                                    <div className="skew-x-12 flex items-center gap-2">
+                                        <Target size={14} strokeWidth={3} />
+                                        EN BUSCA DE
+                                    </div>
                                 </Link>
                             </div>
                         </div>
@@ -101,7 +107,7 @@ export default function ProfileHero({
                             <p className="mt-4 text-white/60 font-mono text-sm max-w-xl leading-relaxed">
                                 {biography}
                             </p>
-                        )}
+                        ) || <div className="mt-4 h-5" />}
 
                         {!isOwner && (
                             <div className="mt-4">
@@ -196,18 +202,24 @@ export default function ProfileHero({
                             </div>
                         )}
 
-                        <div className="flex items-center gap-4 mt-3">
+                        <div className="flex items-center gap-2 mt-2 w-full">
                             <Link
                                 to={`/collection/${username}/stats`}
-                                className="text-[10px] text-emerald-400 font-mono tracking-tighter uppercase hover:text-white transition-colors"
+                                className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-emerald-500 text-black font-black font-mono text-[10px] tracking-tight -skew-x-12 active:scale-95 transition-all"
                             >
-                                [ ESTADÍSTICAS ]
+                                <div className="skew-x-12 flex items-center gap-2">
+                                    <BarChart2 size={14} strokeWidth={3} />
+                                    ESTADÍSTICAS
+                                </div>
                             </Link>
                             <Link
                                 to={`/wishlist/${username}`}
-                                className="text-[10px] text-amber-400 font-mono tracking-tighter uppercase hover:text-white transition-colors"
+                                className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-amber-500 text-black font-black font-mono text-[10px] tracking-tight -skew-x-12 active:scale-95 transition-all"
                             >
-                                [ WISHLIST ]
+                                <div className="skew-x-12 flex items-center gap-2">
+                                    <Target size={14} strokeWidth={3} />
+                                    EN BUSCA DE
+                                </div>
                             </Link>
                         </div>
                     </div>
