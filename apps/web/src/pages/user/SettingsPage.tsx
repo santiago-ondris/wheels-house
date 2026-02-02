@@ -413,7 +413,7 @@ export default function SettingsPage() {
                                                     maxLength={200}
                                                     rows={4}
                                                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent/40 font-mono transition-colors resize-none lg:text-sm"
-                                                    placeholder="Cuenta algo sobre tu pasión por los Hot Wheels..."
+                                                    placeholder="Conta literalmente lo que quieras"
                                                 />
                                             </div>
 

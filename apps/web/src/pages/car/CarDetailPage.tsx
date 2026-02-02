@@ -51,7 +51,7 @@ export const CarDetailPage = () => {
         try {
             await deleteCar(car.carId);
             toast.success(car.wished ? "Auto eliminado de la wishlist" : "Auto eliminado correctamente");
-            navigate(car.wished ? `/wishlist/${car.ownerUsername}` : `/collection/${car.ownerUsername}`);
+            handleBack();
         } catch (error) {
             console.error("Error deleting car:", error);
             toast.error("Error al eliminar el auto");

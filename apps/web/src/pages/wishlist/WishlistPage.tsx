@@ -100,7 +100,7 @@ export default function WishlistPage() {
         <div className="min-h-screen pb-32 md:pb-8">
             <PageHeader
                 title="En busca de"
-                subtitle={isOwner ? "Vehículos que estás rastreando" : `Búsqueda de @${username}`}
+                subtitle={isOwner ? "Vehículos que estás buscando" : `Búsqueda de @${username}`}
                 icon={Target}
                 onBack={handleBack}
                 actions={
@@ -130,11 +130,11 @@ export default function WishlistPage() {
                     <div className="text-center py-20">
                         <Target className="w-16 h-16 text-white/10 mx-auto mb-4" />
                         <h3 className="text-xl font-bold text-white/60 mb-2">
-                            {isOwner ? "No tienes búsquedas activas" : "Sin búsquedas"}
+                            {isOwner ? "No tenes búsquedas activas" : "Sin búsquedas"}
                         </h3>
                         <p className="text-white/40 text-sm mb-6">
                             {isOwner
-                                ? "Inicia tu cacería agregando los autos que te faltan"
+                                ? "Inicia tu búsqueda agregando los autos que quieras encontrar"
                                 : `@${username} aún no tiene vehículos en su lista de búsqueda`
                             }
                         </p>
@@ -145,7 +145,7 @@ export default function WishlistPage() {
                             >
                                 <div className="skew-x-12 flex items-center gap-2">
                                     <Plus className="w-5 h-5" />
-                                    INICIAR CACERÍA
+                                    INICIAR BÚSQUEDA
                                 </div>
                             </Link>
                         )}

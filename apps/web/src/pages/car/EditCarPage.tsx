@@ -103,6 +103,10 @@ export default function EditCarPage() {
         }
     };
 
+    // Safe back navigation with fallback
+    const handleCancel = useNavigateBack(`/collection/${user?.username || ''}`);
+    const goBack = useNavigateBack(`/car/${carId}`);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setErrors({});
@@ -127,8 +131,7 @@ export default function EditCarPage() {
                 await updateCar(Number(carId), result.data);
                 await updateCarGroups(Number(carId), selectedGroups);
                 toast.success("¡Auto actualizado con éxito!");
-                // Navigate back to the previous page (likely car detail or collection)
-                navigate(-1);
+                goBack();
             }
         } catch (error: any) {
             toast.error("Error al actualizar el auto. Intentá de nuevo.");
@@ -137,9 +140,6 @@ export default function EditCarPage() {
             setIsLoading(false);
         }
     };
-
-    // Safe back navigation with fallback
-    const handleCancel = useNavigateBack(`/collection/${user?.username || ''}`);
 
     const updateField = (field: keyof CarFormData, value: string) => {
         setFormData((prev) => {

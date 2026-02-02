@@ -14,9 +14,9 @@ export const roadmapData: {
 } = {
     inDevelopment: [
         {
-            id: 'feed-social',
-            title: 'Feed de Actividad Global',
-            description: 'Enterate cuando alguien agrega un nuevo vehículo a su colección. La base de nuestra comunidad.',
+            id: 'match-search',
+            title: 'Matcheo de Búsquedas',
+            description: 'Queremos que la comunidad se ayude. Si vos tenés o sabés dónde hay un auto que otro busca, se van a poder avisar',
             badge: '🔄',
             statusLabel: 'EN_CONSTRUCCION',
             statusType: 'DEVELOPMENT'
@@ -32,18 +32,18 @@ export const roadmapData: {
     ],
     upcoming: [
         {
-            id: 'follow-system',
-            title: 'Seguir Coleccionistas',
-            description: 'Seguí a tus amigos y personaliza tu inicio para ver solo las colecciones que elijas.',
-            badge: '👥',
+            id: 'gallery-artist',
+            title: 'Galeria artistica',
+            description: 'Un espacio para mostrar tus autos de forma mas cuidada y profesional. Sección dedicada para imagenes artisticas de tu colección.',
+            badge: '🎨',
             statusLabel: 'PLANEADO',
             statusType: 'UPCOMING'
         },
         {
-            id: 'likes-favs',
-            title: 'Likes y Favoritos',
-            description: 'Dale amor a los autos que más te gusten y ayuda a destacar lo mejor de la comunidad.',
-            badge: '❤️',
+            id: 'customs-section',
+            title: 'Seccion para customs',
+            description: 'Sabemos que el mundo custom es muy importante para la comunidad, por eso estamos planeando una sección para mostrar tus customs en un lugar dedicado.',
+            badge: '🔧',
             statusLabel: 'PLANEADO',
             statusType: 'UPCOMING'
         },
@@ -66,9 +66,9 @@ export const roadmapData: {
             statusType: 'CONCEPT'
         },
         {
-            id: 'groups-events',
-            title: 'Grupos y Eventos Temáticos',
-            description: 'Herramientas para organizar juntas, grupos de marcas específicas y eventos locales.',
+            id: 'giveaways',
+            title: 'Sorteos',
+            description: 'Si tenemos la dicha de que la comunidad crezca, nos gustaria poder hacer sorteos propios de Wheels House para la comunidad.',
             badge: '🏁',
             statusLabel: 'IDEA',
             statusType: 'CONCEPT'
