@@ -9,6 +9,7 @@ interface User {
   username: string;
   picture?: string;
   defaultSortPreference?: string;
+  isAdmin?: boolean;
 }
 
 interface AuthContextType {
@@ -95,7 +96,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               username: decoded.username,
               userId: decoded.userId,
               picture: profile.picture,
-              defaultSortPreference: profile.defaultSortPreference
+              defaultSortPreference: profile.defaultSortPreference,
+              isAdmin: profile.isAdmin
             });
           } catch {
             setUser({
@@ -131,7 +133,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         username: decoded.username,
         userId: decoded.userId,
         picture: profile.picture,
-        defaultSortPreference: profile.defaultSortPreference
+        defaultSortPreference: profile.defaultSortPreference,
+        isAdmin: profile.isAdmin
       });
     } catch {
       setUser({

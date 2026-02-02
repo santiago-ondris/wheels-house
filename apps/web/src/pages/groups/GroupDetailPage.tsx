@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Edit, Folder, Grid, ArrowLeft, Star } from "lucide-react";
+import { Edit, Folder, Grid, ArrowLeft, Star, Shield } from "lucide-react";
 import { getGroupByName, GroupData } from "../../services/group.service";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigateBack } from "../../hooks/useNavigateBack";
@@ -9,6 +9,8 @@ import PageHeader from "../../components/ui/PageHeader";
 import CollectionSection from "../../components/user_profile/CollectionSection";
 import GroupNotFoundPage from "./GroupNotFoundPage";
 import { LikeButton } from "../../features/social/components/likes/LikeButton";
+import HideContentModal from "../../features/admin/components/HideContentModal";
+import toast from "react-hot-toast";
 
 
 export default function GroupDetailPage() {
@@ -19,6 +21,7 @@ export default function GroupDetailPage() {
     const [group, setGroup] = useState<GroupData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [notFound, setNotFound] = useState(false);
+    const [isHideModalOpen, setIsHideModalOpen] = useState(false);
 
     const isOwner = user?.username === username;
 
@@ -111,6 +114,15 @@ export default function GroupDetailPage() {
                                     </button>
                                 </>
                             )}
+                            {user?.isAdmin && (
+                                <button
+                                    onClick={() => setIsHideModalOpen(true)}
+                                    className="p-2.5 bg-red-500/20 hover:bg-red-500/40 backdrop-blur-xl text-red-200 border border-red-500/30 rounded-full transition-all active:scale-90"
+                                    title="Admin: Ocultar Grupo"
+                                >
+                                    <Shield className="w-5 h-5" />
+                                </button>
+                            )}
                         </div>
 
                     </div>
@@ -186,6 +198,15 @@ export default function GroupDetailPage() {
                                     </button>
                                 </>
                             )}
+                            {user?.isAdmin && (
+                                <button
+                                    onClick={() => setIsHideModalOpen(true)}
+                                    className="flex items-center gap-2 px-4 py-2 border border-red-500/30 text-red-400 hover:text-red-300 hover:bg-red-500/10 text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all"
+                                >
+                                    <Shield className="w-4 h-4" />
+                                    <span className="hidden md:inline">Ocultar</span>
+                                </button>
+                            )}
                         </div>
                     }
 
@@ -219,6 +240,19 @@ export default function GroupDetailPage() {
                         defaultSortPreference={user?.defaultSortPreference}
                     />
                 </div>
+            )}
+
+            {group.groupId && (
+                <HideContentModal
+                    isOpen={isHideModalOpen}
+                    onClose={() => setIsHideModalOpen(false)}
+                    entityId={group.groupId}
+                    entityType="group"
+                    onSuccess={() => {
+                        toast.success("Grupo ocultado correctamente");
+                        navigate("/");
+                    }}
+                />
             )}
         </div>
     );

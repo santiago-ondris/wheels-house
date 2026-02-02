@@ -14,6 +14,7 @@ export const user = pgTable("user", {
     resetPasswordHashedValidator: text("resetPasswordHashedValidator"),
     resetPasswordTokenExpires: timestamp("resetPasswordTokenExpires", { withTimezone: true }),
     defaultSortPreference: text("defaultSortPreference").default("id:desc"),
+    isAdmin: boolean("isAdmin").default(false),
 
     // Social Stats
     followersCount: integer("followersCount").default(0),

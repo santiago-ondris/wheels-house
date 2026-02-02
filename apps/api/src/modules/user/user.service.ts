@@ -163,7 +163,8 @@ export class UserService {
             userData.biography ?? undefined,
             userData.defaultSortPreference ?? 'id:desc',
             isFollowing,
-            isFollower
+            isFollower,
+            userData.isAdmin ?? false
         );
     }
 

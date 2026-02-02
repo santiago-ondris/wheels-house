@@ -17,6 +17,7 @@ export interface PublicProfile {
     followingCount?: number;
     isFollowing?: boolean;
     isFollower?: boolean;
+    isAdmin?: boolean;
 }
 
 export interface DistributionItem {

@@ -22,6 +22,8 @@
 
 ## Scripts naz
 
+pnpm --filter @wheels/api test
+
 | Comando | Descripción |
 |---------|-------------|
 | `pnpm dev` | Corre frontend y backend |

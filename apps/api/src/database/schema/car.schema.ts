@@ -1,4 +1,4 @@
-import { serial, text, integer, boolean, unique, pgTable } from "drizzle-orm/pg-core";
+import { serial, text, integer, boolean, unique, pgTable, timestamp } from "drizzle-orm/pg-core";
 import { user } from "./user.schema";
 
 export const car = pgTable("car", {
@@ -20,6 +20,11 @@ export const car = pgTable("car", {
     variety: text("variety"),
     finish: text("finish"),
     likesCount: integer("likesCount").notNull().default(0),
+
+    hidden: boolean("hidden").default(false).notNull(),
+    hiddenReason: text("hiddenReason"),
+    hiddenAt: timestamp("hiddenAt", { withTimezone: true }),
+    hiddenBy: integer("hiddenBy").references(() => user.userId),
 });
 
 export const carPicture = pgTable("carPicture", {

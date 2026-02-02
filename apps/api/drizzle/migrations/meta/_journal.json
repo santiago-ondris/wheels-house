@@ -183,6 +183,13 @@
       "when": 1769735242629,
       "tag": "0025_noisy_outlaw_kid",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1770047138138,
+      "tag": "0026_add_moderation_fields_and_admin_role",
+      "breakpoints": true
     }
   ]
 }

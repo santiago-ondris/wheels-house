@@ -54,6 +54,7 @@ export class PublicProfileDTO {
     followingCount?: number;
     isFollowing?: boolean;
     isFollower?: boolean;
+    isAdmin?: boolean;
 
     constructor(
         userId: number,
@@ -70,7 +71,8 @@ export class PublicProfileDTO {
         biography?: string,
         defaultSortPreference?: string,
         isFollowing?: boolean,
-        isFollower?: boolean
+        isFollower?: boolean,
+        isAdmin?: boolean
     ) {
         this.userId = userId;
         this.username = username;
@@ -87,5 +89,6 @@ export class PublicProfileDTO {
         this.followingCount = followingCount;
         this.isFollowing = isFollowing;
         this.isFollower = isFollower;
+        this.isAdmin = isAdmin;
     }
 }
