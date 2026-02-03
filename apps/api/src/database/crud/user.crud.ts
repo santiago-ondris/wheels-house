@@ -15,6 +15,15 @@ export async function createUser(newUser: UserToDB) {
     }
 }
 
+export async function countUsers() {
+    try {
+        const result = await db.select({ count: sql<number>`count(*)` }).from(user);
+        return Number(result[0].count);
+    } catch {
+        return 0;
+    }
+}
+
 // Read
 
 export async function getUserFromUsername(username: string) {

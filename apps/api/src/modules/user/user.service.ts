@@ -10,6 +10,7 @@ import {
     updatePasswordFromReset,
     deleteSearchHistoryFromUserId,
     getFounders,
+    countUsers,
     deleteFeedEventsFromUserId,
     deleteUserGameAttemptsFromUserId
 } from 'src/database/crud/user.crud';
@@ -53,6 +54,16 @@ export class UserService {
             throw ERROR_CREATING_USER;
         }
 
+        // Check if user is among founders (first 100)
+        try {
+            const userCount = await countUsers();
+            if (userCount <= 100) {
+                await this.emailService.sendWelcomeEmail(registerData.email, registerData.username, userCount);
+            }
+        } catch (e) {
+            console.error("[Register] Error sending welcome email:", e);
+        }
+
         return true;
     }
 
@@ -62,7 +73,7 @@ export class UserService {
         // Verify password
         const isPasswordValid = await bcrypt.compare(loginData.password, user.hashedPassword);
         if (!isPasswordValid) {
-            throw new Error('Invalid credentials'); 
+            throw new Error('Invalid credentials');
         }
 
         // Payload for access token (short-lived)
@@ -79,12 +90,12 @@ export class UserService {
             tokenType: 'refresh',
         };
 
-        const accessToken: string = await this.jwtService.signAsync(accessPayload, { 
+        const accessToken: string = await this.jwtService.signAsync(accessPayload, {
             expiresIn: '15m',
             secret: this.configService.get<string>('JWT_SECRET')
         });
-        
-        const refreshToken: string = await this.jwtService.signAsync(refreshPayload, { 
+
+        const refreshToken: string = await this.jwtService.signAsync(refreshPayload, {
             expiresIn: '14d',
             secret: this.configService.get<string>('JWT_REFRESH_SECRET')
         });
@@ -110,12 +121,12 @@ export class UserService {
             tokenType: 'refresh',
         };
 
-        const accessToken: string = await this.jwtService.signAsync(accessPayload, { 
+        const accessToken: string = await this.jwtService.signAsync(accessPayload, {
             expiresIn: '15m',
             secret: this.configService.get<string>('JWT_SECRET')
         });
 
-        const refreshToken: string = await this.jwtService.signAsync(refreshPayload, { 
+        const refreshToken: string = await this.jwtService.signAsync(refreshPayload, {
             expiresIn: '14d',
             secret: this.configService.get<string>('JWT_REFRESH_SECRET')
         });
