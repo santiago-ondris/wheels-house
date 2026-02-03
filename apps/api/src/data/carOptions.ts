@@ -175,6 +175,7 @@ export const varieties = [
     "Fast & Furious",
     "Garage",
     "NFT",
+    "Neon Speeders",
     "Mystery Models",
     "Pop Culture",
     "Speed Machines",
