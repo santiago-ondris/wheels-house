@@ -59,6 +59,12 @@ export class UserService {
     async loginService(loginData: LoginDTO) {
         const user = await getUserFromUsernameOrEmail(loginData.usernameOrEmail);
 
+        // Verify password
+        const isPasswordValid = await bcrypt.compare(loginData.password, user.hashedPassword);
+        if (!isPasswordValid) {
+            throw new Error('Invalid credentials'); 
+        }
+
         // Payload for access token (short-lived)
         const accessPayload = {
             username: user.username,
@@ -73,8 +79,15 @@ export class UserService {
             tokenType: 'refresh',
         };
 
-        const accessToken: string = await this.jwtService.signAsync(accessPayload, { expiresIn: '15m' });
-        const refreshToken: string = await this.jwtService.signAsync(refreshPayload, { expiresIn: '14d' });
+        const accessToken: string = await this.jwtService.signAsync(accessPayload, { 
+            expiresIn: '15m',
+            secret: this.configService.get<string>('JWT_SECRET')
+        });
+        
+        const refreshToken: string = await this.jwtService.signAsync(refreshPayload, { 
+            expiresIn: '14d',
+            secret: this.configService.get<string>('JWT_REFRESH_SECRET')
+        });
 
         return {
             accessToken,
@@ -83,7 +96,6 @@ export class UserService {
     }
 
     async refreshTokenService(username: string) {
-        // Necesitamos obtener el userId también
         const user = await getUserFromUsername(username);
 
         const accessPayload = {
@@ -92,9 +104,23 @@ export class UserService {
             tokenType: 'access',
         };
 
-        const accessToken: string = await this.jwtService.signAsync(accessPayload, { expiresIn: '15m' });
+        const refreshPayload = {
+            username,
+            userId: user.userId,
+            tokenType: 'refresh',
+        };
 
-        return { accessToken };
+        const accessToken: string = await this.jwtService.signAsync(accessPayload, { 
+            expiresIn: '15m',
+            secret: this.configService.get<string>('JWT_SECRET')
+        });
+
+        const refreshToken: string = await this.jwtService.signAsync(refreshPayload, { 
+            expiresIn: '14d',
+            secret: this.configService.get<string>('JWT_REFRESH_SECRET')
+        });
+
+        return { accessToken, refreshToken };
     }
 
     async getPublicProfileService(username: string, currentUserId?: number): Promise<PublicProfileDTO> {
@@ -163,7 +189,9 @@ export class UserService {
             userData.biography ?? undefined,
             userData.defaultSortPreference ?? 'id:desc',
             isFollowing,
-            isFollower
+            isFollower,
+            userData.isAdmin ?? false,
+            isOwner ? userData.email : undefined
         );
     }
 
@@ -219,7 +247,7 @@ export class UserService {
     async updatePasswordService(userData: TokenData, updatePasswordData: UpdatePasswordDTO) {
         const user = await getUserFromUsername(userData.username);
 
-        const hashedPassword = await bcrypt.hash(updatePasswordData.newPassword, 10);
+        const hashedPassword = await bcrypt.hash(updatePasswordData.newPassword, Number(this.configService.get<string>('HASH_SALT')!));
 
         const passwordUpdated = await updatePasswordFromUserId(user.userId, hashedPassword);
 

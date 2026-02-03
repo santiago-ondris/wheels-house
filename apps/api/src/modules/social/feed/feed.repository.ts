@@ -1,6 +1,6 @@
 import { db } from '../../../database';
 import { car, feedEvent, group, user } from '../../../database/schema';
-import { eq, desc, inArray, and, gte, sql } from 'drizzle-orm';
+import { eq, desc, inArray, and, gte, sql, or, isNull } from 'drizzle-orm';
 import type { FeedEventMetadata } from '../../../database/schema';
 
 // Tipos para el feed
@@ -81,6 +81,8 @@ export async function getFeedGlobal(options: FeedQueryOptions = {}): Promise<Fee
 
     const conditions = [
         gte(feedEvent.createdAt, daysAgo),
+        or(eq(car.hidden, false), isNull(car.hidden)),
+        or(eq(group.hidden, false), isNull(group.hidden)),
     ];
 
     if (type) {
@@ -157,6 +159,8 @@ export async function getFeedFollowing(
     const conditions = [
         inArray(feedEvent.userId, followedUserIds),
         gte(feedEvent.createdAt, daysAgo),
+        or(eq(car.hidden, false), isNull(car.hidden)),
+        or(eq(group.hidden, false), isNull(group.hidden)),
     ];
 
     if (type) {
@@ -245,7 +249,12 @@ export async function getFeedByUserId(
         .innerJoin(user, eq(feedEvent.userId, user.userId))
         .leftJoin(car, eq(feedEvent.carId, car.carId))
         .leftJoin(group, eq(feedEvent.groupId, group.groupId))
-        .where(eq(feedEvent.userId, userId))
+        .leftJoin(group, eq(feedEvent.groupId, group.groupId))
+        .where(and(
+            eq(feedEvent.userId, userId),
+            or(eq(car.hidden, false), isNull(car.hidden)),
+            or(eq(group.hidden, false), isNull(group.hidden))
+        ))
         .orderBy(desc(feedEvent.createdAt))
         .limit(limit)
         .offset(page * limit);
@@ -269,6 +278,8 @@ export async function countFeedEvents(options: FeedQueryOptions = {}): Promise<n
 
     const conditions = [
         gte(feedEvent.createdAt, daysAgo),
+        or(eq(car.hidden, false), isNull(car.hidden)),
+        or(eq(group.hidden, false), isNull(group.hidden)),
     ];
 
     if (type) {
@@ -286,6 +297,8 @@ export async function countFeedEvents(options: FeedQueryOptions = {}): Promise<n
     const result = await db
         .select({ count: sql<number>`count(*)` })
         .from(feedEvent)
+        .leftJoin(car, eq(feedEvent.carId, car.carId))
+        .leftJoin(group, eq(feedEvent.groupId, group.groupId))
         .where(and(...conditions));
 
     return Number(result[0].count);

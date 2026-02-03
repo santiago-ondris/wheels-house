@@ -8,6 +8,7 @@ export interface PublicProfile {
     lastName: string;
     biography?: string;
     picture?: string;
+    email?: string;
     createdDate?: string;
     totalCars: number;
     totalGroups: number;
@@ -17,6 +18,7 @@ export interface PublicProfile {
     followingCount?: number;
     isFollowing?: boolean;
     isFollower?: boolean;
+    isAdmin?: boolean;
 }
 
 export interface DistributionItem {

@@ -18,6 +18,7 @@ import {
   getPublicProfile,
   PublicProfile,
 } from "../../services/profile.service";
+import { getOptimizedUrl } from "../../lib/cloudinary";
 
 export default function LeftSidebar() {
   const { user, isAuthenticated } = useAuth();
@@ -58,7 +59,7 @@ export default function LeftSidebar() {
             <div className="w-12 h-12 rounded-full overflow-hidden border border-white/10 bg-zinc-800 flex items-center justify-center shrink-0">
               {user.picture ? (
                 <img
-                  src={user.picture}
+                  src={getOptimizedUrl(user.picture, 'avatar')}
                   alt={user.username}
                   className="w-full h-full object-cover"
                 />

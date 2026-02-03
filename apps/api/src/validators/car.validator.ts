@@ -14,8 +14,6 @@ import { INEXISTENT_USER } from "src/utils/user.utils";
 export async function createCarValidator(carData: CreateCarDTO, userData: TokenData) {
     // did not define a uniqueness constraint yet.
 
-    console.log(carData);
-
     if (carData.pictures!.length > 10) {
         throw MAX_CARS_PICTURES_LIMIT;
     }

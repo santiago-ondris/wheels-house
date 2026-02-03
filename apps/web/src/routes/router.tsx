@@ -3,7 +3,7 @@ import RootLayout from "./RootLayout";
 
 // Pages
 import HomePage from "../pages/HomePage";
-import NotFoundPage from "../pages/NotFoundPage";
+import NotFoundPage from "../pages/errors/NotFoundPage";
 import ProfilePage from "../pages/user/ProfilePage";
 import StatsPage from "../pages/user/StatsPage";
 import SettingsPage from "../pages/user/SettingsPage";
@@ -37,9 +37,11 @@ import WheelWordPage from "../pages/wheelword/WheelWordPage";
 import CommunityPage from "../pages/social/CommunityPage";
 import PeoplePage from "../pages/social/PeoplePage";
 import NotificationsPage from "../pages/NotificationsPage";
+import AdminContactPage from "../pages/admin/AdminContactPage";
 
 // Components
 import ProtectedRoute from "../components/auth/ProtectedRoute";
+import AdminRoute from "../components/auth/AdminRoute";
 
 export const router = createBrowserRouter([
     {
@@ -98,6 +100,12 @@ export const router = createBrowserRouter([
             {
                 path: "notifications",
                 element: <ProtectedRoute><NotificationsPage /></ProtectedRoute>
+            },
+
+            // Admin routes
+            {
+                path: "admin/contact",
+                element: <AdminRoute><AdminContactPage /></AdminRoute>
             },
 
             // User collection routes (public viewing)

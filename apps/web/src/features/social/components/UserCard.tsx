@@ -3,6 +3,7 @@ import { User } from "lucide-react";
 import FollowButton from "./FollowButton";
 import { FollowUserInfo } from "../api/followsApi";
 import { motion } from "framer-motion";
+import { getOptimizedUrl } from "../../../lib/cloudinary";
 
 interface UserCardProps {
     user: FollowUserInfo;
@@ -23,9 +24,10 @@ export default function UserCard({ user, onFollowChange }: UserCardProps) {
                     <div className="w-14 h-14 rounded-2xl bg-zinc-900 border border-white/10 overflow-hidden flex-shrink-0 group-hover/info:border-accent/50 transition-colors">
                         {user.picture ? (
                             <img
-                                src={user.picture}
+                                src={getOptimizedUrl(user.picture, 'avatar')}
                                 alt={user.username}
                                 className="w-full h-full object-cover group-hover/info:scale-110 transition-transform duration-500"
+                                loading="lazy"
                             />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center bg-zinc-900">

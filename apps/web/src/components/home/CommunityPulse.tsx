@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { User, Car, Heart, Layers, Trophy } from "lucide-react";
+import { User, Car, Heart, Layers, Trophy, ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getFeed, FeedItemDto } from "../../services/social.service";
 import { formatDistanceToNow } from "date-fns";
@@ -90,6 +90,22 @@ export default function CommunityPulse() {
                     <p className="text-white/60 text-lg max-w-md leading-relaxed border-l-2 border-accent/30 pl-6 py-2">
                         Hicimos un feed para que puedas ir viendo que están haciendo los demás coleccionistas en tiempo real.
                     </p>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.3, duration: 0.6 }}
+                        className="mt-8 flex justify-start"
+                    >
+                        <Link
+                            to="/community"
+                            className="group inline-flex items-center gap-3 px-8 py-3 bg-white/5 hover:bg-accent hover:text-white text-white font-bold rounded-xl transition-all border border-white/10 hover:border-accent shadow-xl"
+                        >
+                            <span>Ver feed completo</span>
+                            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                    </motion.div>
                 </motion.div>
 
                 <div className="relative group">

@@ -52,7 +52,9 @@ export async function getPublicProfileByUsername(username: string) {
         picture: user.picture,
         createdDate: user.createdDate,
         biography: user.biography,
-        defaultSortPreference: user.defaultSortPreference
+        defaultSortPreference: user.defaultSortPreference,
+        isAdmin: user.isAdmin,
+        email: user.email,
     }).from(user).where(eq(user.username, username));
 
     return userObject[0] || null;

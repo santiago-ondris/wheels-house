@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
     Send,
     MessageSquare,
@@ -7,29 +7,26 @@ import {
     AlertCircle,
     CheckCircle2,
     ArrowRight,
-    Loader2
+    Loader2,
+    User,
+    Mail as MailIcon
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import { contactService } from "../services/contact.service";
+import { contactSchema, ContactFormData } from "../lib/validations/contact";
 import toast from "react-hot-toast";
-
-type ContactReason = "BUG" | "SUGGESTION" | "GENERAL";
-
-interface ContactForm {
-    name: string;
-    email: string;
-    reason: ContactReason;
-    message: string;
-}
 
 export default function ContactPage() {
     const { user } = useAuth();
-    const [formData, setFormData] = useState<ContactForm>({
-        name: "",
-        email: "",
+    const [formData, setFormData] = useState<ContactFormData>({
+        name: user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : "",
+        email: user?.email || "",
         reason: "GENERAL",
-        message: ""
+        message: "",
+        honeypot: ""
     });
 
+    const [errors, setErrors] = useState<Partial<Record<keyof ContactFormData, string>>>({});
     const [status, setStatus] = useState<"IDLE" | "SENDING" | "SUCCESS" | "ERROR">("IDLE");
 
     useEffect(() => {
@@ -37,41 +34,44 @@ export default function ContactPage() {
     }, []);
 
     useEffect(() => {
-        if (user?.username) {
-
+        if (user) {
+            setFormData(prev => ({
+                ...prev,
+                name: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : prev.name,
+                email: user.email || prev.email
+            }));
         }
     }, [user]);
 
-    const validateForm = () => {
-        if (!formData.name.trim()) return "El nombre es obligatorio";
-        if (!formData.email.trim() || !/^\S+@\S+\.\S+$/.test(formData.email)) return "Email inválido";
-        if (formData.message.trim().length < 10) return "El mensaje debe tener al menos 10 caracteres";
-        return null;
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setErrors({});
 
-        const error = validateForm();
-        if (error) {
-            toast.error(error);
+        const result = contactSchema.safeParse(formData);
+        if (!result.success) {
+            const fieldErrors: Partial<Record<keyof ContactFormData, string>> = {};
+            result.error.issues.forEach((err) => {
+                if (err.path[0]) {
+                    fieldErrors[err.path[0] as keyof ContactFormData] = err.message;
+                }
+            });
+            setErrors(fieldErrors);
             return;
         }
 
         setStatus("SENDING");
 
-        // Mock Submission (1.5s delay)
         try {
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            console.log("Contact Data Received:", formData);
+            await contactService.sendMessage(formData);
 
             setStatus("SUCCESS");
             toast.success("Mensaje enviado con éxito");
             setFormData({
-                name: "",
-                email: "",
+                name: user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : "",
+                email: user?.email || "",
                 reason: "GENERAL",
-                message: ""
+                message: "",
+                honeypot: ""
             });
         } catch (err) {
             console.error("Submission error:", err);
@@ -142,56 +142,76 @@ export default function ContactPage() {
                         {/* Decorative Corner */}
                         <div className="absolute top-0 right-0 w-16 h-16 border-t-2 border-r-2 border-accent/30 rounded-tr-2xl" />
 
-                        <form onSubmit={handleSubmit} className="space-y-6">
+                        <form onSubmit={handleSubmit} noValidate className="space-y-6">
+                            {/* Honeypot Field */}
+                            <input
+                                type="text"
+                                className="hidden"
+                                value={formData.honeypot}
+                                onChange={(e) => setFormData({ ...formData, honeypot: e.target.value })}
+                                autoComplete="off"
+                            />
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-[10px] font-mono font-black text-white/30 uppercase tracking-[0.2em] mb-2">TU_NOMBRE</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        value={formData.name}
-                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm font-mono focus:border-accent/50 focus:ring-1 focus:ring-accent/50 outline-none transition-all placeholder:text-white/10"
-                                        placeholder="EJ: NICOLAS_ABATI"
-                                    />
+                                    <div className="relative">
+                                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20" />
+                                        <input
+                                            type="text"
+                                            value={formData.name}
+                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                            className={`w-full bg-white/[0.03] border rounded-xl pl-11 pr-4 py-3 text-sm font-mono focus:ring-1 outline-none transition-all placeholder:text-white/10 ${errors.name ? 'border-red-500/50 focus:ring-red-500/50' : 'border-white/10 focus:border-accent/50 focus:ring-accent/50'}`}
+                                            placeholder="EJ: NICOLAS_ABATI"
+                                        />
+                                    </div>
+                                    {errors.name && <p className="text-red-500 text-[10px] font-mono mt-1 ml-1 uppercase">{errors.name}</p>}
                                 </div>
 
                                 <div>
                                     <label className="block text-[10px] font-mono font-black text-white/30 uppercase tracking-[0.2em] mb-2">TU_EMAIL</label>
-                                    <input
-                                        type="email"
-                                        required
-                                        value={formData.email}
-                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm font-mono focus:border-accent/50 focus:ring-1 focus:ring-accent/50 outline-none transition-all placeholder:text-white/10"
-                                        placeholder="EJ: NICO@WHEELSHOUSE.COM"
-                                    />
+                                    <div className="relative">
+                                        <MailIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20" />
+                                        <input
+                                            type="email"
+                                            value={formData.email}
+                                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                            className={`w-full bg-white/[0.03] border rounded-xl pl-11 pr-4 py-3 text-sm font-mono focus:ring-1 outline-none transition-all placeholder:text-white/10 ${errors.email ? 'border-red-500/50 focus:ring-red-500/50' : 'border-white/10 focus:border-accent/50 focus:ring-accent/50'}`}
+                                            placeholder="EJ: NICO@WHEELSHOUSE.COM"
+                                        />
+                                    </div>
+                                    {errors.email && <p className="text-red-500 text-[10px] font-mono mt-1 ml-1 uppercase">{errors.email}</p>}
                                 </div>
 
                                 <div>
                                     <label className="block text-[10px] font-mono font-black text-white/30 uppercase tracking-[0.2em] mb-2">MOTIVO_CONTACTO</label>
-                                    <select
-                                        value={formData.reason}
-                                        onChange={(e) => setFormData({ ...formData, reason: e.target.value as ContactReason })}
-                                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm font-mono focus:border-accent/50 outline-none transition-all appearance-none cursor-pointer"
-                                    >
-                                        <option value="GENERAL" className="bg-[#0a0a0b]">CONSULTA GENERAL</option>
-                                        <option value="BUG" className="bg-[#0a0a0b]">REPORTAR UN PROBLEMA (BUG)</option>
-                                        <option value="SUGGESTION" className="bg-[#0a0a0b]">SUGERENCIA O IDEA</option>
-                                    </select>
+                                    <div className="relative">
+                                        <Terminal className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20" />
+                                        <select
+                                            value={formData.reason}
+                                            onChange={(e) => setFormData({ ...formData, reason: e.target.value as any })}
+                                            className={`w-full bg-[#0f0f11] border rounded-xl pl-11 pr-4 py-3 text-sm font-mono focus:ring-1 outline-none transition-all appearance-none cursor-pointer ${errors.reason ? 'border-red-500/50 focus:ring-red-500/50' : 'border-white/10 focus:border-accent/50 focus:ring-accent/50'}`}
+                                        >
+                                            <option value="GENERAL" className="bg-[#0a0a0b]">CONSULTA GENERAL</option>
+                                            <option value="BUG" className="bg-[#0a0a0b]">REPORTAR UN PROBLEMA (BUG)</option>
+                                            <option value="SUGGESTION" className="bg-[#0a0a0b]">SUGERENCIA O IDEA</option>
+                                        </select>
+                                    </div>
+                                    {errors.reason && <p className="text-red-500 text-[10px] font-mono mt-1 ml-1 uppercase">{errors.reason}</p>}
                                 </div>
 
                                 <div>
                                     <label className="block text-[10px] font-mono font-black text-white/30 uppercase tracking-[0.2em] mb-2">DETALLE_MENSAJE (MIN. 10 CAR.)</label>
-                                    <textarea
-                                        required
-                                        minLength={10}
-                                        rows={4}
-                                        value={formData.message}
-                                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm font-mono focus:border-accent/50 focus:ring-1 focus:ring-accent/50 outline-none transition-all placeholder:text-white/10 resize-none"
-                                        placeholder="ESCRIBÍ ACÁ TU CONSULTA..."
-                                    />
+                                    <div className="relative">
+                                        <MessageSquare className="absolute left-3 top-4 w-5 h-5 text-white/20" />
+                                        <textarea
+                                            rows={4}
+                                            value={formData.message}
+                                            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                                            className={`w-full bg-white/[0.03] border rounded-xl pl-11 pr-4 py-3 text-sm font-mono focus:ring-1 outline-none transition-all placeholder:text-white/10 resize-none ${errors.message ? 'border-red-500/50 focus:ring-red-500/50' : 'border-white/10 focus:border-accent/50 focus:ring-accent/50'}`}
+                                            placeholder="ESCRIBÍ ACÁ TU CONSULTA..."
+                                        />
+                                    </div>
+                                    {errors.message && <p className="text-red-500 text-[10px] font-mono mt-1 ml-1 uppercase">{errors.message}</p>}
                                 </div>
                             </div>
 
@@ -220,27 +240,31 @@ export default function ContactPage() {
                         </form>
 
                         {/* Status Messages */}
-                        {status === "SUCCESS" && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="mt-6 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center gap-3 text-emerald-500"
-                            >
-                                <CheckCircle2 className="w-5 h-5 shrink-0" />
-                                <span className="text-xs font-mono font-bold uppercase tracking-wider">Transmisión completada con éxito.</span>
-                            </motion.div>
-                        )}
+                        <AnimatePresence>
+                            {status === "SUCCESS" && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="mt-6 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center gap-3 text-emerald-500"
+                                >
+                                    <CheckCircle2 className="w-5 h-5 shrink-0" />
+                                    <span className="text-xs font-mono font-bold uppercase tracking-wider">Tu mensaje fue enviado con éxito.</span>
+                                </motion.div>
+                            )}
 
-                        {status === "ERROR" && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="mt-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-500"
-                            >
-                                <AlertCircle className="w-5 h-5 shrink-0" />
-                                <span className="text-xs font-mono font-bold uppercase tracking-wider">Error en la transmisión. Reintente.</span>
-                            </motion.div>
-                        )}
+                            {status === "ERROR" && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="mt-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-500"
+                                >
+                                    <AlertCircle className="w-5 h-5 shrink-0" />
+                                    <span className="text-xs font-mono font-bold uppercase tracking-wider">Error en la transmisión. Reintente.</span>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
 
                     {/* Footer Info Field inside Card */}

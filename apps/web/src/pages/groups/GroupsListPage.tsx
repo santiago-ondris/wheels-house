@@ -8,6 +8,7 @@ import { LikeButton } from "../../features/social/components/likes/LikeButton";
 import { useAuth } from "../../contexts/AuthContext";
 import PageHeader from "../../components/ui/PageHeader";
 import toast from "react-hot-toast";
+import { getOptimizedUrl } from "../../lib/cloudinary";
 
 export default function GroupsListPage() {
     const { username } = useParams<{ username: string }>();
@@ -94,9 +95,10 @@ export default function GroupsListPage() {
                                     {group.picture && (
                                         <div className="absolute inset-0 z-0">
                                             <img
-                                                src={group.picture}
+                                                src={getOptimizedUrl(group.picture, 'card-lg')}
                                                 alt={group.name}
                                                 className="w-full h-full object-cover opacity-40 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out"
+                                                loading="lazy"
                                             />
 
                                             <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent group-hover:via-black/30 transition-all duration-500" />

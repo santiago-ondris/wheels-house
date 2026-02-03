@@ -8,7 +8,11 @@ interface User {
   userId: number;
   username: string;
   picture?: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
   defaultSortPreference?: string;
+  isAdmin?: boolean;
 }
 
 interface AuthContextType {
@@ -27,15 +31,33 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-function decodeToken(token: string): { username: string, userId: number } {
-  const payload = token.split('.')[1];
-  const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-  return JSON.parse(atob(base64));
+function decodeToken(token: string): { username: string, userId: number } | null {
+  try {
+    const payload = token.split('.')[1];
+    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(atob(base64));
+  } catch {
+    return null;
+  }
+}
+
+function getInitialUser(): User | null {
+  const token = localStorage.getItem("auth_token");
+  if (!token) return null;
+  
+  const decoded = decodeToken(token);
+  if (!decoded) return null;
+
+  return {
+    username: decoded.username,
+    userId: decoded.userId,
+    // Other fields will be populated by the useEffect
+  };
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(getInitialUser());
+  const [isLoading, setIsLoading] = useState(!getInitialUser()); // Loading if no initial user
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [loginModalMessage, setLoginModalMessage] = useState("");
   const navigate = useNavigate();
@@ -89,20 +111,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (token) {
         try {
           const decoded = decodeToken(token);
-          try {
-            const profile = await getPublicProfile(decoded.username);
-            setUser({
-              username: decoded.username,
-              userId: decoded.userId,
-              picture: profile.picture,
-              defaultSortPreference: profile.defaultSortPreference
-            });
-          } catch {
-            setUser({
-              username: decoded.username,
-              userId: decoded.userId,
-              defaultSortPreference: 'id:desc'
-            });
+          if (decoded) {
+            try {
+              const profile = await getPublicProfile(decoded.username);
+              setUser({
+                username: decoded.username,
+                userId: decoded.userId,
+                picture: profile.picture,
+                email: profile.email,
+                firstName: profile.firstName,
+                lastName: profile.lastName,
+                defaultSortPreference: profile.defaultSortPreference,
+                isAdmin: profile.isAdmin
+              });
+            } catch {
+              setUser({
+                username: decoded.username,
+                userId: decoded.userId,
+                defaultSortPreference: 'id:desc'
+              });
+            }
+          } else {
+            localStorage.removeItem("auth_token");
+            localStorage.removeItem("refresh_token");
           }
         } catch {
           localStorage.removeItem("auth_token");
@@ -124,21 +155,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const decoded = decodeToken(response.accessToken);
 
-    // Fetch user picture from profile
-    try {
-      const profile = await getPublicProfile(decoded.username);
-      setUser({
-        username: decoded.username,
-        userId: decoded.userId,
-        picture: profile.picture,
-        defaultSortPreference: profile.defaultSortPreference
-      });
-    } catch {
-      setUser({
-        username: decoded.username,
-        userId: decoded.userId,
-        defaultSortPreference: 'id:desc'
-      });
+    if (decoded) {
+      // Fetch user picture from profile
+      try {
+        const profile = await getPublicProfile(decoded.username);
+        setUser({
+          username: decoded.username,
+          userId: decoded.userId,
+          picture: profile.picture,
+          email: profile.email,
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          defaultSortPreference: profile.defaultSortPreference,
+          isAdmin: profile.isAdmin
+        });
+      } catch {
+        setUser({
+          username: decoded.username,
+          userId: decoded.userId,
+          defaultSortPreference: 'id:desc'
+        });
+      }
     }
   };
 

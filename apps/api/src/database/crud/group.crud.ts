@@ -27,7 +27,7 @@ export async function createGroupedCars(newCars) {
 // Read
 
 export async function getGroupFromId(groupId: number) {
-    const groupObject = await db.select().from(group).where(eq(group.groupId, groupId));
+    const groupObject = await db.select().from(group).where(and(eq(group.groupId, groupId), eq(group.hidden, false)));
 
     return groupObject[0];
 }
@@ -41,7 +41,7 @@ export async function getGroupsFromUserId(userId: number) {
         featured: group.featured,
         order: group.order,
         likesCount: group.likesCount,
-    }).from(group).where(eq(group.userId, userId)).orderBy(desc(group.featured), desc(group.groupId));
+    }).from(group).where(and(eq(group.userId, userId), eq(group.hidden, false))).orderBy(desc(group.featured), desc(group.groupId));
 }
 
 
@@ -54,17 +54,17 @@ export async function getFeaturedGroupsFromUserId(userId: number) {
         featured: group.featured,
         order: group.order,
         likesCount: group.likesCount,
-    }).from(group).where(and(eq(group.userId, userId), eq(group.featured, true))).orderBy(desc(group.groupId));
+    }).from(group).where(and(eq(group.userId, userId), eq(group.featured, true), eq(group.hidden, false))).orderBy(desc(group.groupId));
 }
 
 
 export async function countFeaturedGroupsFromUserId(userId: number) {
-    const result = await db.select({ count: count() }).from(group).where(and(eq(group.userId, userId), eq(group.featured, true)));
+    const result = await db.select({ count: count() }).from(group).where(and(eq(group.userId, userId), eq(group.featured, true), eq(group.hidden, false)));
     return result[0]?.count ?? 0;
 }
 
 export async function getGroupFromNameAndUserId(name: string, userId: number) {
-    const groupObject = await db.select().from(group).where(and(eq(group.name, name), eq(group.userId, userId)));
+    const groupObject = await db.select().from(group).where(and(eq(group.name, name), eq(group.userId, userId), eq(group.hidden, false)));
 
     return groupObject[0];
 }
@@ -78,7 +78,7 @@ export async function getGroupsFromCarId(carId: number) {
         featured: group.featured,
         order: group.order,
         likesCount: group.likesCount,
-    }).from(groupedCar).where(eq(groupedCar.carId, carId)).innerJoin(group, eq(group.groupId, groupedCar.groupId));
+    }).from(groupedCar).innerJoin(group, eq(group.groupId, groupedCar.groupId)).where(and(eq(groupedCar.carId, carId), eq(group.hidden, false)));
 
     return groups;
 }
@@ -98,7 +98,7 @@ export async function getCarsFromGroupId(groupId: number) {
         country: car.country,
         condition: car.condition,
         likesCount: car.likesCount,
-    }).from(groupedCar).where(eq(groupedCar.groupId, groupId)).innerJoin(car, eq(groupedCar.carId, car.carId));
+    }).from(groupedCar).innerJoin(car, eq(groupedCar.carId, car.carId)).where(and(eq(groupedCar.groupId, groupId), eq(car.hidden, false)));
 
     return cars;
 }

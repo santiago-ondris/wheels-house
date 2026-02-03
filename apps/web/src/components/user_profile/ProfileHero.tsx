@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Calendar, BarChart2, Target } from "lucide-react";
 import { Link } from "react-router-dom";
 import FollowButton from "../../features/social/components/FollowButton";
+import { getOptimizedUrl } from "../../lib/cloudinary";
 
 interface ProfileHeroProps {
     userId: number;
@@ -53,7 +54,7 @@ export default function ProfileHero({
                         <div className="w-24 h-24 rounded-full bg-white/5 border border-white/10 overflow-hidden flex-shrink-0">
                             {picture ? (
                                 <img
-                                    src={picture}
+                                    src={getOptimizedUrl(picture, 'avatar-lg')}
                                     alt={`${firstName} ${lastName}`}
                                     className="w-full h-full object-cover transition-all duration-500"
                                 />
@@ -80,7 +81,7 @@ export default function ProfileHero({
                         </div>
                         <div className="flex items-center gap-4 text-white/40 font-mono text-sm tracking-widest uppercase">
                             <div><span className="text-accent">@</span>{username}</div>
-                            
+
                             {/* Profile Action Buttons - Desktop */}
                             <div className="flex items-center gap-4 ml-2">
                                 <Link
@@ -153,9 +154,9 @@ export default function ProfileHero({
                     <div className="w-20 h-20 rounded-full bg-white/5 border border-white/10 overflow-hidden flex-shrink-0">
                         {picture ? (
                             <img
-                                src={picture}
+                                src={getOptimizedUrl(picture, 'avatar-lg')}
                                 alt={`${firstName} ${lastName}`}
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-cover transition-all duration-500"
                             />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center bg-accent">

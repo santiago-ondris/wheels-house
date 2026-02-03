@@ -20,3 +20,6 @@ export { gameWord, dailyGame, userGameAttempt } from './wheelword.schema';
 // Social domain
 export { feedEvent, userFollow, carLike, groupLike, notification } from './social.schema';
 export type { FeedEventMetadata } from './social.schema';
+
+// Contact domain
+export { contactMessage, contactReasonEnum } from './contact_messages.schema';

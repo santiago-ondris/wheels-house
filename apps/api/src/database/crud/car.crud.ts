@@ -55,18 +55,18 @@ export async function getCarByIdWithOwner(carId: number) {
         })
         .from(car)
         .innerJoin(user, eq(car.userId, user.userId))
-        .where(eq(car.carId, carId));
+        .where(and(eq(car.carId, carId), eq(car.hidden, false)));
 
     return result[0];
 }
 
 
 export async function getCarsFromUserId(userId: number) {
-    return await db.select().from(car).where(and(eq(car.userId, userId), eq(car.wished, false)));
+    return await db.select().from(car).where(and(eq(car.userId, userId), eq(car.wished, false), eq(car.hidden, false)));
 }
 
 export async function getWishedCarsFromUserId(userId: number) {
-    return await db.select().from(car).where(and(eq(car.userId, userId), eq(car.wished, true)));
+    return await db.select().from(car).where(and(eq(car.userId, userId), eq(car.wished, true), eq(car.hidden, false)));
 }
 
 // TODO ver si realmente hace falta
@@ -77,7 +77,7 @@ export async function getCarsByNameAndUser(userId: number) {
 //functions for featured car
 
 export async function getTotalCarsCount() {
-    const result = await db.select({ value: count() }).from(car).where(eq(car.wished, false));
+    const result = await db.select({ value: count() }).from(car).where(and(eq(car.wished, false), eq(car.hidden, false)));
     return result[0].value;
 }
 
@@ -89,7 +89,7 @@ export async function getUniqueCarValues(userId: number) {
             designer: car.designer,
         })
         .from(car)
-        .where(and(eq(car.userId, userId), eq(car.wished, false)));
+        .where(and(eq(car.userId, userId), eq(car.wished, false), eq(car.hidden, false)));
 
     return result;
 }
@@ -118,7 +118,7 @@ export async function getCarByOffset(offset: number) {
         })
         .from(car)
         .innerJoin(user, eq(car.userId, user.userId))
-        .where(eq(car.wished, false))
+        .where(and(eq(car.wished, false), eq(car.hidden, false)))
         .limit(1)
         .offset(offset);
 
@@ -218,7 +218,7 @@ export async function getCarsFromUserIdPaginated(userId: number, query: Collecti
         search
     } = query;
 
-    const conditions_list: SQL[] = [eq(car.userId, userId), eq(car.wished, false)];
+    const conditions_list: SQL[] = [eq(car.userId, userId), eq(car.wished, false), eq(car.hidden, false)];
 
     // Filter by group if provided
     if (query.groupId) {
@@ -353,7 +353,7 @@ export async function getCarsFromUserIdPaginated(userId: number, query: Collecti
 export async function getCarIdsFromUserIdWithFilter(userId: number, query: CollectionQueryDTO) {
     const { brands, colors, manufacturers, scales, conditions, countries, rarities, qualities, varieties, finishes, hasPicture, search } = query;
 
-    const conditions_list: SQL[] = [eq(car.userId, userId), eq(car.wished, false)];
+    const conditions_list: SQL[] = [eq(car.userId, userId), eq(car.wished, false), eq(car.hidden, false)];
 
     if (brands && brands.length > 0) {
         conditions_list.push(or(...brands.map(b => eq(car.brand, b)))!);
@@ -436,7 +436,7 @@ export async function getFilterOptionsForUser(userId: number, groupId: number | 
             quality: car.quality,
             variety: car.variety,
             finish: car.finish,
-        }).from(car).where(and(eq(car.userId, userId), eq(car.wished, false)))
+        }).from(car).where(and(eq(car.userId, userId), eq(car.wished, false), eq(car.hidden, false)))
     ) : (
         // If groupId is defined
         await db.select({
@@ -451,7 +451,7 @@ export async function getFilterOptionsForUser(userId: number, groupId: number | 
             variety: car.variety,
             finish: car.finish,
         }).from(car).innerJoin(groupedCar, eq(groupedCar.carId, car.carId)).where(and(
-            eq(car.userId, userId), eq(car.wished, false), eq(groupedCar.groupId, groupId)))
+            eq(car.userId, userId), eq(car.wished, false), eq(groupedCar.groupId, groupId), eq(car.hidden, false)))
     );
 
     const countBy = <T extends string | null>(items: T[]): { name: string; count: number }[] => {
@@ -471,14 +471,14 @@ export async function getFilterOptionsForUser(userId: number, groupId: number | 
         // If groudId is undefined
         await db.select({
             carId: car.carId,
-        }).from(car).where(and(eq(car.userId, userId), eq(car.wished, false)))
+        }).from(car).where(and(eq(car.userId, userId), eq(car.wished, false), eq(car.hidden, false)))
             .innerJoin(carPicture, eq(carPicture.carId, car.carId)).groupBy(car.carId)
     ) : (
         // If groupId is defined
         await db.select({
             carId: car.carId,
         }).from(car).innerJoin(groupedCar, eq(groupedCar.carId, car.carId)).where(and(
-            eq(car.userId, userId), eq(car.wished, false), eq(groupedCar.groupId, groupId)))
+            eq(car.userId, userId), eq(car.wished, false), eq(groupedCar.groupId, groupId), eq(car.hidden, false)))
             .innerJoin(carPicture, eq(carPicture.carId, car.carId)).groupBy(car.carId)
     );
 

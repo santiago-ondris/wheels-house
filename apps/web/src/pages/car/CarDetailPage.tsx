@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowDown, ArrowUp, Edit, Trash2, ArrowLeft, Star, Loader2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Edit, Trash2, ArrowLeft, Star, Loader2, Shield } from "lucide-react";
 import { getCar, deleteCar, CarData } from "../../services/car.service";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigateBack } from "../../hooks/useNavigateBack";
@@ -11,6 +11,7 @@ import Modal from "../../components/ui/Modal";
 import toast from "react-hot-toast";
 import RelatedCarsCarousel from "../../components/cars/RelatedCarsCarousel";
 import { LikeButton } from "../../features/social/components/likes/LikeButton";
+import HideContentModal from "../../features/admin/components/HideContentModal";
 
 export const CarDetailPage = () => {
     const { carId } = useParams<{ carId: string }>();
@@ -20,6 +21,7 @@ export const CarDetailPage = () => {
     const [car, setCar] = useState<CarData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isHideModalOpen, setIsHideModalOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
     const isOwner = user?.username === car?.ownerUsername;
@@ -162,6 +164,27 @@ export const CarDetailPage = () => {
                                 initialLikesCount={car.likesCount || 0}
                                 type="car"
                             />
+                            {user?.isAdmin && (
+                                <button
+                                    onClick={() => setIsHideModalOpen(true)}
+                                    className="p-2 border border-red-500/30 rounded-lg hover:bg-red-500/10 transition-colors text-red-400 hover:text-red-300"
+                                    title="Admin: Ocultar contenido"
+                                >
+                                    <Shield size={18} />
+                                </button>
+                            )}
+                        </div>
+                    )}
+
+                    {isOwner && user?.isAdmin && (
+                        <div className="fixed top-24 right-4 z-50">
+                            <button
+                                onClick={() => setIsHideModalOpen(true)}
+                                className="p-2 bg-red-500/10 border border-red-500/30 rounded-lg hover:bg-red-500/20 transition-colors text-red-400 hover:text-red-300"
+                                title="Admin: Ocultar contenido"
+                            >
+                                <Shield size={18} />
+                            </button>
                         </div>
                     )}
 
@@ -275,6 +298,19 @@ export const CarDetailPage = () => {
                     </div>
                 </div>
             </Modal>
+
+            {car.carId && (
+                <HideContentModal
+                    isOpen={isHideModalOpen}
+                    onClose={() => setIsHideModalOpen(false)}
+                    entityId={car.carId}
+                    entityType="car"
+                    onSuccess={() => {
+                        toast.success("Contenido ocultado correctamente");
+                        navigate("/");
+                    }}
+                />
+            )}
 
         </div>
     );

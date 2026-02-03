@@ -5,34 +5,50 @@ let isRefreshing = false;
 let refreshPromise: Promise<string | null> | null = null;
 
 async function refreshAccessToken(): Promise<string | null> {
+  // If a refresh is already in progress, return the existing promise
+  if (isRefreshing && refreshPromise) {
+    return refreshPromise;
+  }
+
   const refreshToken = localStorage.getItem('refresh_token');
   if (!refreshToken) return null;
 
-  try {
-    const response = await fetch(`${API_URL}/refresh`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken }),
-    });
+  isRefreshing = true;
+  refreshPromise = (async () => {
+    try {
+      const response = await fetch(`${API_URL}/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+      });
 
-    if (!response.ok) {
-      // Refresh token is invalid/expired
+      if (!response.ok) {
+        return null;
+      }
+
+      const data = await response.json();
+      localStorage.setItem('auth_token', data.accessToken);
+      if (data.refreshToken) {
+        localStorage.setItem('refresh_token', data.refreshToken);
+      }
+      return data.accessToken;
+    } catch {
       return null;
+    } finally {
+      isRefreshing = false;
+      refreshPromise = null;
     }
+  })();
 
-    const data = await response.json();
-    localStorage.setItem('auth_token', data.accessToken);
-    return data.accessToken;
-  } catch {
-    return null;
-  }
+  return refreshPromise;
 }
 
 export async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const token = localStorage.getItem('auth_token');
+  let token = localStorage.getItem('auth_token');
+  if (token === 'null' || token === 'undefined') token = null;
 
   const response = await fetch(`${API_URL}${endpoint}`, {
     ...options,
@@ -46,15 +62,7 @@ export async function apiRequest<T>(
 
   // If 401, try to refresh the token
   if (response.status === 401 && endpoint !== '/refresh' && endpoint !== '/login') {
-    // Prevent multiple simultaneous refresh attempts
-    if (!isRefreshing) {
-      isRefreshing = true;
-      refreshPromise = refreshAccessToken();
-    }
-
-    const newToken = await refreshPromise;
-    isRefreshing = false;
-    refreshPromise = null;
+    const newToken = await refreshAccessToken();
 
     if (newToken) {
       // Retry the original request with new token

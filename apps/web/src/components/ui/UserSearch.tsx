@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { searchUsers, BasicUser, getSearchHistory, addToSearchHistory, removeFromSearchHistory, clearSearchHistory } from "../../services/profile.service";
 import { useAuth } from "../../contexts/AuthContext";
 import toast from "react-hot-toast";
+import { getOptimizedUrl } from "../../lib/cloudinary";
 
 interface UserSearchProps {
     className?: string;
@@ -147,7 +148,7 @@ export default function UserSearch({ className = "" }: UserSearchProps) {
                                             >
                                                 <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center overflow-hidden border border-white/10 shrink-0">
                                                     {user.picture ? (
-                                                        <img src={user.picture} alt={user.username} className="w-full h-full object-cover" />
+                                                        <img src={getOptimizedUrl(user.picture, 'thumbnail')} alt={user.username} className="w-full h-full object-cover" />
                                                     ) : (
                                                         <User className="w-4 h-4 text-accent" />
                                                     )}
@@ -179,7 +180,7 @@ export default function UserSearch({ className = "" }: UserSearchProps) {
                                         >
                                             <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center overflow-hidden border border-white/10 shrink-0">
                                                 {user.picture ? (
-                                                    <img src={user.picture} alt={user.username} className="w-full h-full object-cover" />
+                                                    <img src={getOptimizedUrl(user.picture, 'thumbnail')} alt={user.username} className="w-full h-full object-cover" />
                                                 ) : (
                                                     <User className="w-4 h-4 text-accent" />
                                                 )}

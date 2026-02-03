@@ -54,8 +54,6 @@ export default function AddCarPage() {
         finish: "",
     });
 
-    // ScrollRestoration handles scroll automatically
-
     const [errors, setErrors] = useState<Partial<Record<keyof CarFormData, string>>>({});
     const [isLoading, setIsLoading] = useState(false);
     const [userGroups, setUserGroups] = useState<GroupBasicInfo[]>([]);
@@ -246,7 +244,7 @@ export default function AddCarPage() {
 
                             <div>
                                 <label className="block text-accent uppercase tracking-widest text-[10px] font-bold mb-1.5 ml-1">
-                                    Estado del Auto <span className="text-danger">*</span>
+                                    Condición del Auto <span className="text-danger">*</span>
                                 </label>
                                 <div className="grid grid-cols-3 gap-3">
                                     {carConditions.map((condition) => (

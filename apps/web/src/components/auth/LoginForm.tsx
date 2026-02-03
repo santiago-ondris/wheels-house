@@ -49,7 +49,6 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
       toast.success("¡Bienvenido de vuelta!");
       onSuccess?.();
     } catch (err: any) {
-      console.log("Error completo:", err);
       const errorMsg = err?.error || "Error al iniciar sesión";
 
       if (errorMsg.includes("Invalid credentials")) {

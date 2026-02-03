@@ -3,6 +3,7 @@ import { Menu, Transition } from "@headlessui/react";
 import { User, LogOut, ChevronDown, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import { getOptimizedUrl } from "../../lib/cloudinary";
 
 export default function UserMenu() {
   const { user, logout } = useAuth();
@@ -15,7 +16,7 @@ export default function UserMenu() {
       <Menu.Button className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors">
         <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center overflow-hidden">
           {user.picture ? (
-            <img src={user.picture} alt={user.username} className="w-full h-full object-cover" />
+            <img src={getOptimizedUrl(user.picture, 'thumbnail')} alt={user.username} className="w-full h-full object-cover" />
           ) : (
             <span className="text-white font-bold text-sm">
               {user.username[0].toUpperCase()}

@@ -1,6 +1,6 @@
 
 import { Inject, Injectable } from '@nestjs/common';
-import { desc, eq, and, sql, lt } from 'drizzle-orm';
+import { desc, eq, and, sql, lt, or, isNull } from 'drizzle-orm';
 import { db } from '../../../database';
 import * as schema from '../../../database/schema';
 
@@ -87,7 +87,13 @@ export class NotificationsRepository {
             })
             .from(schema.notification)
             .leftJoin(schema.user, eq(schema.notification.actorId, schema.user.userId))
-            .where(eq(schema.notification.userId, userId))
+            .leftJoin(schema.car, eq(schema.notification.carId, schema.car.carId))
+            .leftJoin(schema.group, eq(schema.notification.groupId, schema.group.groupId))
+            .where(and(
+                eq(schema.notification.userId, userId),
+                or(eq(schema.car.hidden, false), isNull(schema.car.hidden)),
+                or(eq(schema.group.hidden, false), isNull(schema.group.hidden))
+            ))
             .orderBy(desc(schema.notification.createdAt))
             .limit(limit)
             .offset(offset);
@@ -97,10 +103,14 @@ export class NotificationsRepository {
         const [result] = await this.db
             .select({ count: sql<number>`count(*)` })
             .from(schema.notification)
+            .leftJoin(schema.car, eq(schema.notification.carId, schema.car.carId))
+            .leftJoin(schema.group, eq(schema.notification.groupId, schema.group.groupId))
             .where(
                 and(
                     eq(schema.notification.userId, userId),
-                    eq(schema.notification.read, false)
+                    eq(schema.notification.read, false),
+                    or(eq(schema.car.hidden, false), isNull(schema.car.hidden)),
+                    or(eq(schema.group.hidden, false), isNull(schema.group.hidden))
                 )
             );
         return Number(result.count);

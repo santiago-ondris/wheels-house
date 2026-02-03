@@ -44,6 +44,7 @@ export class PublicProfileDTO {
     firstName: string;
     lastName: string;
     picture?: string;
+    email?: string;
     createdDate?: Date;
     totalCars: number;
     totalGroups: number;
@@ -54,6 +55,7 @@ export class PublicProfileDTO {
     followingCount?: number;
     isFollowing?: boolean;
     isFollower?: boolean;
+    isAdmin?: boolean;
 
     constructor(
         userId: number,
@@ -70,13 +72,16 @@ export class PublicProfileDTO {
         biography?: string,
         defaultSortPreference?: string,
         isFollowing?: boolean,
-        isFollower?: boolean
+        isFollower?: boolean,
+        isAdmin?: boolean,
+        email?: string
     ) {
         this.userId = userId;
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.picture = picture;
+        this.email = email;
         this.createdDate = createdDate;
         this.totalCars = totalCars;
         this.totalGroups = totalGroups;
@@ -87,5 +92,6 @@ export class PublicProfileDTO {
         this.followingCount = followingCount;
         this.isFollowing = isFollowing;
         this.isFollower = isFollower;
+        this.isAdmin = isAdmin;
     }
 }

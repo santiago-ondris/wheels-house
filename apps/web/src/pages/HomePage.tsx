@@ -5,6 +5,7 @@ import { useState } from "react";
 import LoginModal from "../components/auth/LoginModal";
 import { useAuth } from "../contexts/AuthContext";
 import FeaturedCar from "../components/home/FeaturedCar";
+import BetaInfoSection from "../components/home/BetaInfoSection";
 import FeaturedCollections from "../components/home/FeaturedCollections";
 import CommunityPulse from "../components/home/CommunityPulse";
 import ScaleAndTrust from "../components/home/ScaleAndTrust";
@@ -136,6 +137,8 @@ export default function HomePage() {
       </div>
 
       <FeaturedCar />
+
+      <BetaInfoSection />
     </div>
   );
 }

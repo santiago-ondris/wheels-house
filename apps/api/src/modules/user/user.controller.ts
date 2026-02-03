@@ -20,6 +20,7 @@ export class UserController {
         return await this.userService.registerService(registerData);
     }
 
+    @UseGuards(ThrottlerGuard)
     @Post('/login')
     async login(@Body() loginData: LoginDTO) {
         await loginValidator(loginData);
