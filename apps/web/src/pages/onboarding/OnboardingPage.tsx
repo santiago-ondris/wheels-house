@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Rocket,
@@ -8,15 +8,16 @@ import {
     ChevronRight,
     ChevronLeft,
     X,
-    Heart
+    Heart,
+    PartyPopper,
+    Flag
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useOnboarding } from '../../hooks/useOnboarding';
 import OnboardingStep from '../../components/onboarding/OnboardingStep';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { getFounders } from '../../services/profile.service';
 
-const STEPS = [
+const STATIC_STEPS = [
     {
         title: 'Colección_Iniciada',
         description: 'Bienvenido a Wheels House. Tu nuevo espacio para gestionar, organizar y compartir tu colección de vehículos a escala.',
@@ -33,8 +34,8 @@ const STEPS = [
         icon: Layers,
     },
     {
-        title: 'En_Búsqueda',
-        description: 'Guardá los modelos que estas buscando. Cuando los consigas, pasalos directo a tu colección.',
+        title: 'Comunidad',
+        description: 'Mira lo que hacen otros coleccionistas mediante el feed de actividades y deja tu Like a los autos que más te gusten.',
         icon: Star,
     },
     {
@@ -55,18 +56,69 @@ const STEPS = [
 
 export default function OnboardingPage() {
     const [currentStep, setCurrentStep] = useState(0);
+    const [foundersCount, setFoundersCount] = useState<number | null>(0);
     const { completeOnboarding, skipOnboarding } = useOnboarding();
-    useNavigate();
-    useAuth();
 
-    // Redirect if already completed
-    // useEffect(() => {
-    //     if (hasCompletedOnboarding()) {
-    //         navigate(`/collection/${user?.username}`, { replace: true });
-    //     }
-    // }, [hasCompletedOnboarding, navigate, user]);
+    useEffect(() => {
+        const fetchFounders = async () => {
+            try {
+                const founders = await getFounders();
+                console.log(`[Onboarding] Founders count: ${founders.length}`);
+                setFoundersCount(founders.length);
+            } catch (error) {
+                console.error("[Onboarding] Error fetching founders count:", error);
+                setFoundersCount(100);
+            }
+        };
+        fetchFounders();
+    }, []);
 
-    const isLastStep = currentStep === STEPS.length - 1;
+    const steps = useMemo(() => {
+        const s = [...STATIC_STEPS];
+        if (foundersCount !== null && foundersCount < 100) {
+            s.push({
+                title: 'Miembro_Fundador',
+                description: 'Sos uno de nuestros primeros 100 usuarios.',
+                icon: PartyPopper,
+                subDescription: 'Como agradecimiento por confiar en nosotros desde el inicio, tenes acceso GRATUITO PARA SIEMPRE.',
+                customContent: (
+                    <div className="space-y-4 mt-2">
+                        <div className="p-3 bg-accent/5 border border-accent/20 rounded-xl space-y-2">
+                            <p className="text-white/70 text-sm md:text-base leading-relaxed font-mono">
+                                Wheels House va a ser de pago para nuevos usuarios una vez alcancemos los 100 miembros fundadores. Pero vos ya estás adentro.
+                            </p>
+                            <div className="pt-2 border-t border-white/5 mx-auto max-w-[280px]">
+                                <p className="text-[10px] font-bold text-accent uppercase tracking-wider leading-tight font-mono">
+                                    ⚠️ Añadí tu primer auto para oficializarte como miembro fundador y quedarte con tu acceso ilimitado
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row gap-2">
+                            <button
+                                onClick={completeOnboarding}
+                                className="flex-1 px-4 py-2 bg-accent text-dark font-black font-mono text-[10px] uppercase -skew-x-12 hover:scale-105 transition-all"
+                            >
+                                <span className="skew-x-12">Empezar a usar Wheels House</span>
+                            </button>
+                            <Link
+                                to="/early-access"
+                                className="flex-1 px-4 py-2 bg-white/5 border border-white/10 text-white font-black font-mono text-[10px] uppercase -skew-x-12 hover:bg-white/10 hover:scale-105 transition-all flex items-center justify-center gap-2"
+                            >
+                                <span className="skew-x-12 flex items-center gap-2">
+                                    <Flag className="w-3.5 h-3.5 text-accent" />
+                                    ¿Por qué esto?
+                                </span>
+                            </Link>
+                        </div>
+                    </div>
+                )
+            } as any);
+        }
+        return s;
+    }, [foundersCount]);
+
+    const isLastStep = currentStep === steps.length - 1;
     const isFirstStep = currentStep === 0;
 
     const nextStep = () => {
@@ -83,7 +135,7 @@ export default function OnboardingPage() {
         }
     };
 
-    const currentStepData = STEPS[currentStep];
+    const currentStepData = steps[currentStep] || steps[0];
 
     return (
         <div className="fixed inset-0 bg-[#0a0a0b] flex flex-col z-[100]">
@@ -112,12 +164,14 @@ export default function OnboardingPage() {
                     <OnboardingStep
                         key={currentStep}
                         stepNumber={currentStep + 1}
-                        totalSteps={STEPS.length}
+                        totalSteps={steps.length}
                         title={currentStepData.title}
                         description={currentStepData.description}
                         subDescription={(currentStepData as any).subDescription}
                         icon={currentStepData.icon}
-                    />
+                    >
+                        {(currentStepData as any).customContent}
+                    </OnboardingStep>
                 </AnimatePresence>
             </main>
 
@@ -126,7 +180,7 @@ export default function OnboardingPage() {
                 <div className="container mx-auto px-4 py-6">
                     {/* Progress Dots */}
                     <div className="flex justify-center gap-2 mb-6">
-                        {STEPS.map((_, idx) => (
+                        {steps.map((_: any, idx: number) => (
                             <motion.button
                                 key={idx}
                                 onClick={() => setCurrentStep(idx)}
