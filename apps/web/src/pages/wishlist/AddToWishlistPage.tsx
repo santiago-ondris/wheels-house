@@ -12,6 +12,7 @@ import {
     Save,
     Sparkles,
     Layers,
+    User,
     Gem,
     Award,
     PaintBucket,
@@ -152,7 +153,7 @@ export default function AddToWishlistPage() {
                         <Target className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
                         <div>
                             <p className="text-amber-500 font-bold text-sm uppercase tracking-tight">
-                                Estás iniciando una cacería
+                                Estás iniciando una búsqueda
                             </p>
                             <p className="text-amber-500/70 text-xs mt-1">
                                 Este auto se guardará como "en busca". Cuando lo consigas, podrás marcarlo y pasará a tu colección.
@@ -301,6 +302,35 @@ export default function AddToWishlistPage() {
                                     icon={<PaintBucket className="w-5 h-5" />}
                                     clearable
                                 />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                {/* Series */}
+                                <div>
+                                    <label className="block text-white/50 uppercase tracking-widest text-[10px] font-bold mb-1.5 ml-1">
+                                        Serie
+                                    </label>
+                                    <SuggestionInput
+                                        options={suggestions.series}
+                                        value={formData.series || ""}
+                                        onChange={(value) => updateField("series", value)}
+                                        placeholder="Ej: Japan Historics"
+                                        icon={<Layers className="w-5 h-5" />}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-white/50 uppercase tracking-widest text-[10px] font-bold mb-1.5 ml-1">
+                                        Diseñador
+                                    </label>
+                                    <SuggestionInput
+                                        options={suggestions.designers}
+                                        value={formData.designer || ""}
+                                        onChange={(value) => updateField("designer", value)}
+                                        placeholder="Ej: Ryu Asada"
+                                        icon={<User className="w-5 h-5" />}
+                                    />
+                                </div>
                             </div>
 
                             <div>

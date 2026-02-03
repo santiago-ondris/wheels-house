@@ -12,6 +12,7 @@ import {
     Save,
     Sparkles,
     Layers,
+    User,
     Gem,
     Award,
     PaintBucket,
@@ -341,6 +342,35 @@ export default function EditWishlistPage() {
                                     icon={<PaintBucket className="w-5 h-5" />}
                                     clearable
                                 />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                {/* Series */}
+                                <div>
+                                    <label className="block text-white/50 uppercase tracking-widest text-[10px] font-bold mb-1.5 ml-1">
+                                        Serie
+                                    </label>
+                                    <SuggestionInput
+                                        options={suggestions.series}
+                                        value={formData.series || ""}
+                                        onChange={(value) => updateField("series", value)}
+                                        placeholder="Ej: Japan Historics"
+                                        icon={<Layers className="w-5 h-5" />}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-white/50 uppercase tracking-widest text-[10px] font-bold mb-1.5 ml-1">
+                                        Diseñador
+                                    </label>
+                                    <SuggestionInput
+                                        options={suggestions.designers}
+                                        value={formData.designer || ""}
+                                        onChange={(value) => updateField("designer", value)}
+                                        placeholder="Ej: Ryu Asada"
+                                        icon={<User className="w-5 h-5" />}
+                                    />
+                                </div>
                             </div>
 
                             <div>
