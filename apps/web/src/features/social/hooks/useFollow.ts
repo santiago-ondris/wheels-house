@@ -15,18 +15,10 @@ export const useFollow = ({ userId, initialIsFollowing, onFollowChange }: UseFol
 
     const { mutate: performMutation, isPending: isLoading } = useMutation({
         mutationFn: async (shouldFollow: boolean) => {
-            console.log('[DEBUG] useFollow mutationFn. shouldFollow:', shouldFollow, 'UserId:', userId);
-            try {
-                if (shouldFollow) {
-                    console.log('[DEBUG] Calling followUser...');
-                    await followUser(userId);
-                } else {
-                    console.log('[DEBUG] Calling unfollowUser...');
-                    await unfollowUser(userId);
-                }
-            } catch (e) {
-                console.error('[DEBUG] useFollow mutation failed:', e);
-                throw e;
+            if (shouldFollow) {
+                await followUser(userId);
+            } else {
+                await unfollowUser(userId);
             }
         },
         onMutate: async (shouldFollow) => {

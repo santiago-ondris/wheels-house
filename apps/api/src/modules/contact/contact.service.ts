@@ -7,10 +7,8 @@ import { TokenData } from '../../dto/user.dto';
 @Injectable()
 export class ContactService {
     async createMessage(dto: CreateContactMessageDto, user?: TokenData) {
-        // Honeypot check
+        // Honeypot check - silently ignore
         if (dto.honeypot) {
-            // Silently ignore or log for monitoring
-            console.log('Honeypot triggered by:', dto.email);
             return { success: true, message: 'Message processed' };
         }
 

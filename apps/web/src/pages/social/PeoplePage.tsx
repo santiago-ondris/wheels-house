@@ -190,15 +190,15 @@ export default function PeoplePage() {
                                             ? "Sin coincidencias"
                                             : activeTab === 'following'
                                                 ? "Red solitaria"
-                                                : "Sin admiradores aún"}
+                                                : "Sin seguidores aún"}
                                     </h3>
 
                                     <p className="text-zinc-600 font-mono text-[10px] uppercase tracking-widest text-center max-w-xs leading-relaxed">
                                         {searchQuery
                                             ? `No encontramos a ningún "${searchQuery}" en tu lista.`
                                             : activeTab === 'following'
-                                                ? "Explora la comunidad y encuentra coleccionistas con tus mismos gustos para ver su actividad."
-                                                : "Participa en la comunidad, comparte tus autos y pronto verás gente interesada en tu garage."}
+                                                ? "Explora la comunidad y encontra coleccionistas de todo tipo para ver su actividad."
+                                                : "Participa en la comunidad, compartí tus autos y pronto vas a ver gente interesada en tu garage."}
                                     </p>
 
                                     {!searchQuery && (

@@ -94,9 +94,10 @@ export class OptionalJwtAuthGuard extends AuthGuard('jwt') {
   }
 
   handleRequest(err, user, info) {
-    // Si hay error (token inválido/expirado) y llegamos acá, lanzamos excepción
+    // Si hay error (token inválido/expirado) y llegamos acá, NO lanzamos excepción
+    // Simplemente retornamos null para tratarla como request anónima
     if (err || !user) {
-      throw err || new UnauthorizedException();
+      return null;
     }
     return user;
   }

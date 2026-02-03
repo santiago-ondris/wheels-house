@@ -74,7 +74,6 @@ export default function WheelWordPage() {
             // Si está autenticado, cargar estado previo
             if (isAuthenticated) {
                 const state = await getUserGameState();
-                console.log('🎮 Estado del juego cargado:', state);
                 if (state) {
                     setAttempts(state.attempts);
                     setFeedbacks(state.feedbacks);
@@ -82,7 +81,6 @@ export default function WheelWordPage() {
                     setWon(state.won);
                     setCorrectWord(state.correctWord);
                     updateLetterStates(state.attempts, state.feedbacks);
-                    console.log('🎮 gameOver:', state.gameOver, 'won:', state.won, 'attempts:', state.attempts.length);
 
                     // Si ya terminó, cargar stats y mostrar modal
                     if (state.gameOver) {

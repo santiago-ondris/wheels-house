@@ -9,7 +9,7 @@ export const PASSWORE_RESET_TIME_LIMIT = 1800000 // half an hour.
 export const INVALID_PASSWORD_EXCEPTION = new HttpException(
     {
         status: HttpStatus.BAD_REQUEST,
-        error: 'Password must contain at most 8 characters and at least one lowercase character and one uppercase character.'
+        error: 'Password must contain at least 8 characters and at least one lowercase character and one uppercase character.'
     },
     HttpStatus.BAD_REQUEST
 );

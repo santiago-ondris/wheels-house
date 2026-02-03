@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { HotWheelMock } from "../../data/mockHotWheels";
 import { LikeButton } from "../../features/social/components/likes/LikeButton";
+import { getOptimizedUrl } from "../../lib/cloudinary";
 
 interface ExtendedHotWheel extends HotWheelMock {
   likesCount?: number;
@@ -54,9 +55,10 @@ export default function HotWheelCardGrid({ car, onClick, selectable, isSelected,
       {/* Image */}
       <div className="aspect-4/3 relative overflow-hidden">
         <img
-          src={car.image}
+          src={getOptimizedUrl(car.image, 'card')}
           alt={car.name}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          loading="lazy"
         />
         {/* Overlay gradient */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0b] via-transparent to-transparent opacity-60" />

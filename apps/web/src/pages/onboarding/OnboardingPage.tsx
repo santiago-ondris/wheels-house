@@ -7,8 +7,10 @@ import {
     Star,
     ChevronRight,
     ChevronLeft,
-    X
+    X,
+    Heart
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useOnboarding } from '../../hooks/useOnboarding';
 import OnboardingStep from '../../components/onboarding/OnboardingStep';
 import { useNavigate } from 'react-router-dom';
@@ -31,9 +33,23 @@ const STEPS = [
         icon: Layers,
     },
     {
-        title: 'Tu_Wishlist',
-        description: 'Guardá los modelos que te faltan para no perderles el rastro. Cuando los consigas, pasalos directo a tu colección.',
+        title: 'En_Búsqueda',
+        description: 'Guardá los modelos que estas buscando. Cuando los consigas, pasalos directo a tu colección.',
         icon: Star,
+    },
+    {
+        title: '¡Atención!',
+        description: 'No hay necesidad de cargar toda tu colección de una, no hay apuro. Wheels House está pensado para conectar la comunidad de Diecast <3',
+        subDescription: (
+            <span>
+                Recordá que cualquier cosa que necesites decirnos podes hacerlo a través de la{' '}
+                <Link to="/contact" className="text-accent hover:underline">
+                    página de contacto
+                </Link>
+                .
+            </span>
+        ),
+        icon: Heart,
     },
 ];
 
@@ -70,7 +86,7 @@ export default function OnboardingPage() {
     const currentStepData = STEPS[currentStep];
 
     return (
-        <div className="h-[100dvh] bg-[#0a0a0b] flex flex-col overflow-hidden">
+        <div className="fixed inset-0 bg-[#0a0a0b] flex flex-col z-[100]">
             {/* Header with Skip Button */}
             <header className="shrink-0 z-50 bg-[#0a0a0b]/80 backdrop-blur-xl border-b border-white/5">
                 <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -91,7 +107,7 @@ export default function OnboardingPage() {
             </header>
 
             {/* Main Content */}
-            <main className="flex-1 flex flex-col pt-1 md:pt-12 overflow-y-auto w-full">
+            <main className="flex-1 flex flex-col items-center justify-center overflow-y-auto w-full relative">
                 <AnimatePresence mode="wait">
                     <OnboardingStep
                         key={currentStep}
@@ -99,6 +115,7 @@ export default function OnboardingPage() {
                         totalSteps={STEPS.length}
                         title={currentStepData.title}
                         description={currentStepData.description}
+                        subDescription={(currentStepData as any).subDescription}
                         icon={currentStepData.icon}
                     />
                 </AnimatePresence>

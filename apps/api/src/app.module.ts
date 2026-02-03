@@ -54,7 +54,6 @@ import { ContactModule } from './modules/contact/contact.module';
     SocialModule,
     CarModule,
     UserModule,
-    UserModule,
     GroupModule,
     AdminModule,
     ContactModule,

@@ -4,6 +4,7 @@ import { uploadImage, deleteRemoteImage } from "../../services/upload.service";
 import { resizeImage } from "../../lib/image-utils";
 import toast from "react-hot-toast";
 import ImageCropperModal from "./ImageCropperModal";
+import { getOptimizedUrl } from "../../lib/cloudinary";
 
 interface SingleImageUploadWidgetProps {
     value?: string | null;
@@ -186,7 +187,7 @@ export default function SingleImageUploadWidget({
                 <div className="relative w-full rounded-xl overflow-hidden border border-white/10 group bg-black/20">
                     <div style={{ aspectRatio: aspectRatio }} className="w-full relative">
                         <img
-                            src={value}
+                            src={getOptimizedUrl(value, 'detail')}
                             alt="Preview"
                             className="w-full h-full object-cover"
                         />

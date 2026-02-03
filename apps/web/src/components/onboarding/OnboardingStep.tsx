@@ -6,6 +6,7 @@ interface OnboardingStepProps {
     totalSteps: number;
     title: string;
     description: string;
+    subDescription?: string | React.ReactNode;
     icon: LucideIcon;
     children?: React.ReactNode;
 }
@@ -15,6 +16,7 @@ export default function OnboardingStep({
     totalSteps,
     title,
     description,
+    subDescription,
     icon: Icon,
     children,
 }: OnboardingStepProps) {
@@ -24,7 +26,7 @@ export default function OnboardingStep({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.4 }}
-            className="flex flex-col items-center px-6 py-4 text-center md:justify-center md:min-h-[50vh]"
+            className="flex flex-col items-center px-6 py-6 text-center md:justify-center min-h-full"
         >
             {/* Step Indicator */}
             <div className="mb-4">
@@ -58,10 +60,22 @@ export default function OnboardingStep({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4, duration: 0.4 }}
-                className="text-white font-mono text-lg md:text-xl max-w-md leading-relaxed"
+                className="text-white font-mono text-base md:text-xl max-w-md leading-relaxed"
             >
                 {description}
             </motion.p>
+
+            {/* Sub-description */}
+            {subDescription && (
+                <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5, duration: 0.4 }}
+                    className="text-white/60 font-mono text-xs md:text-sm max-w-sm leading-relaxed mt-4"
+                >
+                    {subDescription}
+                </motion.p>
+            )}
 
             {/* Optional children for extra content */}
             {children && (

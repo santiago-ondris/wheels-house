@@ -78,11 +78,13 @@ function LayoutContent() {
                     transition: 'padding-top 0.5s ease-in-out'
                 } as React.CSSProperties}
             >
-                <Navbar isScrolled={isScrolled} />
-                <main className="flex-1 pt-[var(--navbar-height)]">
+                {pathname !== '/onboarding' && <Navbar isScrolled={isScrolled} />}
+                <main
+                    className={`flex-1 ${pathname === '/onboarding' ? 'pt-0' : 'pt-[var(--navbar-height)]'}`}
+                >
                     <Outlet />
                 </main>
-                <Footer />
+                {pathname !== '/onboarding' && <Footer />}
             </div>
 
             {/* ScrollRestoration handles scroll position on navigation */}

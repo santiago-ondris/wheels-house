@@ -4,6 +4,7 @@ import { Folder, ChevronRight, Plus } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { listFeaturedGroups, GroupBasicInfo } from "../../services/group.service";
 import { LikeButton } from "../../features/social/components/likes/LikeButton";
+import { getOptimizedUrl } from "../../lib/cloudinary";
 
 
 interface GroupsSectionProps {
@@ -126,9 +127,10 @@ export default function GroupsSection({ username, totalGroups, isOwner }: Groups
                                     {group.picture && (
                                         <div className="absolute inset-0 z-0">
                                             <img
-                                                src={group.picture}
+                                                src={getOptimizedUrl(group.picture, 'card-lg')}
                                                 alt={group.name}
                                                 className="w-full h-full object-cover opacity-50 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out"
+                                                loading="lazy"
                                             />
                                             <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent group-hover:via-black/30 transition-all duration-500" />
                                         </div>

@@ -3,6 +3,7 @@ import { User, Car, Trophy, Target, Users, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { FeedItemDto } from "../../services/social.service";
 import { LikeButton } from "../../features/social/components/likes/LikeButton";
+import { getOptimizedUrl } from "../../lib/cloudinary";
 
 
 interface FeedItemProps {
@@ -91,9 +92,10 @@ export default function FeedItem({ item }: FeedItemProps) {
                     <div className="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 overflow-hidden shadow-lg">
                         {item.userPicture ? (
                             <img
-                                src={item.userPicture}
+                                src={getOptimizedUrl(item.userPicture, 'avatar')}
                                 alt={item.username}
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                loading="lazy"
                             />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center">
@@ -142,9 +144,10 @@ export default function FeedItem({ item }: FeedItemProps) {
                     <Link to={item.carId ? `/car/${item.carId}` : `/collection/${item.username}/group/${item.metadata?.groupName}`}>
                         <div className="relative mt-2 mb-2 rounded-xl border border-white/5 overflow-hidden bg-zinc-900 aspect-video max-w-full sm:max-w-md shadow-2xl group/img">
                             <img
-                                src={itemImage}
+                                src={getOptimizedUrl(itemImage, 'card-lg')}
                                 alt="Event visual"
                                 className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700"
+                                loading="lazy"
                             />
                             {/* Overlay tag */}
                             <div className="absolute top-3 right-3 p-1.5 bg-black/60 backdrop-blur-md rounded-lg border border-white/10 opacity-0 group-hover/img:opacity-100 transition-opacity">

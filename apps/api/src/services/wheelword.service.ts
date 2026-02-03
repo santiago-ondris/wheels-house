@@ -33,7 +33,6 @@ export class WheelwordService implements OnModuleInit {
 
             if (dbWords.length === 0) {
                 // Auto-seed si la tabla está vacía
-                console.log('🌱 WheelWord: Seeding palabras automáticamente...');
                 for (const wordData of GAME_WORDS) {
                     try {
                         await db.insert(gameWord).values({
@@ -45,11 +44,9 @@ export class WheelwordService implements OnModuleInit {
                         // Ignorar duplicados
                     }
                 }
-                console.log(`✅ WheelWord: ${GAME_WORDS.length} palabras insertadas`);
             }
 
             this.gameWordsLoaded = true;
-            console.log(`🎮 WheelWord: Listo (${dbWords.length || GAME_WORDS.length} palabras en DB)`);
         } catch (error) {
             console.error('Error initializing WheelWord:', error);
         }
@@ -180,7 +177,6 @@ export class WheelwordService implements OnModuleInit {
             })
             .where(eq(gameWord.gameWordId, selectedWord.gameWordId));
 
-        console.log(`🎮 WheelWord #${nextGameNumber} generado: ${selectedWord.word.length} letras`);
     }
 
     /**
@@ -278,12 +274,6 @@ export class WheelwordService implements OnModuleInit {
             try {
                 if (existingAttempt && existingAttempt.length > 0) {
                     // Actualizar intento existente
-                    console.log('🔄 Actualizando intento existente:', {
-                        attemptId: existingAttempt[0].userGameAttemptId,
-                        newAttempts,
-                        isCorrect,
-                        gameOver
-                    });
                     await db.update(userGameAttempt)
                         .set({
                             attempts: newAttempts,
@@ -292,16 +282,8 @@ export class WheelwordService implements OnModuleInit {
                             completedAt: gameOver ? new Date() : null,
                         })
                         .where(eq(userGameAttempt.userGameAttemptId, existingAttempt[0].userGameAttemptId));
-                    console.log('✅ Intento actualizado correctamente');
                 } else {
                     // Crear nuevo intento
-                    console.log('➕ Creando nuevo intento:', {
-                        userId,
-                        dailyGameId,
-                        newAttempts,
-                        isCorrect,
-                        gameOver
-                    });
                     await db.insert(userGameAttempt).values({
                         userId,
                         dailyGameId,
@@ -310,7 +292,6 @@ export class WheelwordService implements OnModuleInit {
                         won: isCorrect,
                         completedAt: gameOver ? new Date() : null,
                     });
-                    console.log('✅ Intento creado correctamente');
                 }
             } catch (dbError) {
                 console.error('❌ Error guardando intento en DB:', dbError);

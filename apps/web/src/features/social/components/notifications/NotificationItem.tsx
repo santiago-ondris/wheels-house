@@ -5,6 +5,7 @@ import { Heart, Users2, Trophy, Star, MessageCircle, ChevronRight } from 'lucide
 import { Notification } from './types';
 import { useAuth } from '../../../../contexts/AuthContext';
 import { motion } from 'framer-motion';
+import { getOptimizedUrl } from '../../../../lib/cloudinary';
 
 interface NotificationItemProps {
     notification: Notification;
@@ -105,7 +106,7 @@ export default function NotificationItem({ notification, onRead, onCloseDropdown
                     <div className="w-12 h-12 rounded-2xl overflow-hidden bg-white/5 border border-white/10">
                         {notification.actor.picture ? (
                             <img
-                                src={notification.actor.picture}
+                                src={getOptimizedUrl(notification.actor.picture, 'thumbnail')}
                                 alt={notification.actor.username}
                                 className="w-full h-full object-cover"
                             />

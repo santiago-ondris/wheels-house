@@ -85,8 +85,6 @@ export class CarService {
             const userCars = await getCarsFromUserId(userId);
             const count = userCars.length;
 
-            console.log(`[MilestoneCheck] User ${userId} now has ${count} cars.`);
-
             const milestones = [5, 25, 50, 100, 200];
             if (milestones.includes(count)) {
                 this.eventsService.emitMilestoneReached({

@@ -11,6 +11,7 @@ import GroupNotFoundPage from "./GroupNotFoundPage";
 import { LikeButton } from "../../features/social/components/likes/LikeButton";
 import HideContentModal from "../../features/admin/components/HideContentModal";
 import toast from "react-hot-toast";
+import { getOptimizedUrl } from "../../lib/cloudinary";
 
 
 export default function GroupDetailPage() {
@@ -69,7 +70,7 @@ export default function GroupDetailPage() {
                     {/* Background Image with Parallax-like feel */}
                     <div className="absolute inset-0">
                         <img
-                            src={group.picture!}
+                            src={getOptimizedUrl(group.picture!, 'fullscreen')}
                             alt={group.name}
                             className="w-full h-full object-cover"
                         />

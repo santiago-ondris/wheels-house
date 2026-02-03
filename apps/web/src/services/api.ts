@@ -47,7 +47,8 @@ export async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const token = localStorage.getItem('auth_token');
+  let token = localStorage.getItem('auth_token');
+  if (token === 'null' || token === 'undefined') token = null;
 
   const response = await fetch(`${API_URL}${endpoint}`, {
     ...options,
