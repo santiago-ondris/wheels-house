@@ -8,20 +8,39 @@ import {
     LayoutGrid,
     ArrowRight
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { getFoundersCount } from "../services/profile.service";
+
+// Detecta si el usuario está en Argentina por timezone
+function isArgentina(): boolean {
+    try {
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        return timezone === 'America/Buenos_Aires' || timezone === 'America/Argentina/Buenos_Aires';
+    } catch {
+        return false;
+    }
+}
 
 export default function EarlyAccessPage() {
     const { user } = useAuth();
+    const [foundingMembersCount, setFoundingMembersCount] = useState(0);
+    const isFromArgentina = isArgentina();
+    const totalFoundingMembers = 100;
+    const progressPercentage = (foundingMembersCount / totalFoundingMembers) * 100;
 
     useEffect(() => {
         window.scrollTo(0, 0);
+        
+        // Fetch real founders count from API
+        getFoundersCount()
+            .then(count => setFoundingMembersCount(count))
+            .catch(err => {
+                console.error("[EarlyAccess] Error fetching founders count:", err);
+                setFoundingMembersCount(0);
+            });
     }, []);
-
-    const foundingMembersCount = 6;
-    const totalFoundingMembers = 100;
-    const progressPercentage = (foundingMembersCount / totalFoundingMembers) * 100;
 
     return (
         <div className="min-h-screen bg-[#0a0a0b] text-white py-12 px-4 relative overflow-hidden">
@@ -143,7 +162,7 @@ export default function EarlyAccessPage() {
                                     </li>
                                     <li className="flex items-start gap-2">
                                         <div className="w-1.5 h-1.5 rounded-full bg-accent mt-2 shrink-0" />
-                                        <span>Plan premium: ARS 2,500/mes (para usuarios de ARG) o USD 3/mes (internacional)</span>
+                                        <span>Plan premium: {isFromArgentina ? 'ARS 2,500/mes' : 'USD 3/mes'}</span>
                                     </li>
                                 </ul>
                             </div>

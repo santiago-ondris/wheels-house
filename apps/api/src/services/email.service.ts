@@ -47,7 +47,7 @@ export class EmailService {
                     <li>✅ <strong>Influencia directa en el desarrollo</strong> (tu feedback importa)</li>
                     <li>✅ <strong>Badge exclusivo</strong> de "Founding Member"</li>
                 </ul>
-                <p>Una vez lleguemos a 100 miembros fundadores, Wheels House será de pago para nuevos usuarios (~$3 USD/mes - ARS 2000). Pero vos ya estás dentro.</p>
+                <p>Una vez lleguemos a 100 miembros fundadores, Wheels House será de pago para nuevos usuarios. Pero vos ya estás adentro. <a href="https://wheelshouse.app/early-access" style="color: #3b82f6; text-decoration: underline;">Ver más detalles</a></p>
                 <p><strong>Recordá cargar tu primer auto para oficializar tu lugar y confirmar así el acceso!</strong></p>
                 <p>¿Cómo podés ayudar?</p>
                 <ul>

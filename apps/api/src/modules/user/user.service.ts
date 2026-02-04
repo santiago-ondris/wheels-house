@@ -10,6 +10,7 @@ import {
     updatePasswordFromReset,
     deleteSearchHistoryFromUserId,
     getFounders,
+    getFoundersCount,
     countUsers,
     deleteFeedEventsFromUserId,
     deleteUserGameAttemptsFromUserId
@@ -237,6 +238,11 @@ export class UserService {
 
     async getFoundersService() {
         return await getFounders();
+    }
+
+    async getFoundersCountService(): Promise<{ count: number }> {
+        const count = await getFoundersCount();
+        return { count };
     }
 
     async updateUserService(userData: TokenData, userChanges: UpdateUserProfileDTO) {

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { TokenData } from '../../dto/user.dto';
-import { getUserFromUsername } from 'src/database/crud/user.crud';
+import { getUserFromUsername, assignFounderStatus } from 'src/database/crud/user.crud';
 import { CarInfo, CarInfoWithOwner, CarPictureToDB, CarToDB, CarUpdateDTO, CreateCarDTO } from 'src/dto/car.dto';
 import { ERROR_CREATING_CAR, ERROR_DELETING_CAR, ERROR_UPDATING_CAR } from 'src/utils/car.utils';
 import {
@@ -53,6 +53,14 @@ export class CarService {
 
             if (!createdPicture) {
                 throw ERROR_CREATING_CAR;
+            }
+        }
+
+        if (!carData.wished) {
+            const userCars = await getCarsFromUserId(user.userId);
+            const realCars = userCars.filter(c => !c.wished);
+            if (realCars.length === 1) {
+                await assignFounderStatus(user.userId);
             }
         }
 
@@ -331,6 +339,13 @@ export class CarService {
 
         for (const groupId of carChanges.groups!) {
             await createGroupedCars({ carId, groupId });
+        }
+
+        // Check if this is user's first real car after moving from wishlist - assign founder status
+        const userCars = await getCarsFromUserId(carBeforeUpdate.userId);
+        const realCars = userCars.filter(c => !c.wished);
+        if (realCars.length === 1) {
+            await assignFounderStatus(carBeforeUpdate.userId);
         }
 
         this.eventsService.emitWishlistItemAchieved({

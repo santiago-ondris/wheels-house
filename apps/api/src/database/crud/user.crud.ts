@@ -99,9 +99,51 @@ export async function getUserFromRequestTokenSelector(selector: string) {
     }
 }
 
+export async function getFoundersCount(): Promise<number> {
+    const result = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(user)
+        .where(sql`${user.founderNumber} IS NOT NULL`);
+    return Number(result[0].count);
+}
+
+export async function assignFounderStatus(userId: number): Promise<number | null> {
+    // Check if user already has a founder number
+    const existingUser = await db.select({ founderNumber: user.founderNumber })
+        .from(user)
+        .where(eq(user.userId, userId));
+    
+    if (existingUser[0]?.founderNumber) {
+        return existingUser[0].founderNumber; // Ya es fundador
+    }
+
+    // Cuenta cuantos fundadores hay
+    const currentCount = await getFoundersCount();
+    if (currentCount >= 100) {
+        return null; // No hay mas cupos
+    }
+
+    // Asigna el siguiente numero de fundador
+    const nextNumber = currentCount + 1;
+    
+    // Actualiza el usuario con el numero de fundador y el flag
+    const existingFlags = existingUser[0] ? 
+        await db.select({ hallOfFameFlags: user.hallOfFameFlags }).from(user).where(eq(user.userId, userId)) : 
+        [{ hallOfFameFlags: { isFounder: false, isContributor: false, isAmbassador: false, isLegend: false } }];
+    
+    const updatedFlags = { ...(existingFlags[0].hallOfFameFlags as any), isFounder: true };
+    
+    await db.update(user)
+        .set({ 
+            founderNumber: nextNumber,
+            hallOfFameFlags: updatedFlags
+        })
+        .where(eq(user.userId, userId));
+    
+    return nextNumber;
+}
+
 export async function getFounders(limit = 100) {
-    // Get first N users who have at least 1 car in their collection (not wishlist)
-    // Ordered by userId (first registered = first founder)
     const carCountSubquery = db
         .select({
             userId: car.userId,
@@ -114,18 +156,19 @@ export async function getFounders(limit = 100) {
 
     const founders = await db
         .select({
-            founderNumber: sql<number>`row_number() over (order by ${user.userId} asc)`.as('founderNumber'),
+            founderNumber: user.founderNumber,
             userId: user.userId,
             username: user.username,
             firstName: user.firstName,
             lastName: user.lastName,
             picture: user.picture,
             createdDate: user.createdDate,
-            carCount: carCountSubquery.carCount
+            carCount: sql<number>`COALESCE(${carCountSubquery.carCount}, 0)`.as('carCount')
         })
         .from(user)
-        .innerJoin(carCountSubquery, eq(user.userId, carCountSubquery.userId))
-        .orderBy(asc(user.userId))
+        .leftJoin(carCountSubquery, eq(user.userId, carCountSubquery.userId))
+        .where(sql`${user.founderNumber} IS NOT NULL`)
+        .orderBy(asc(user.founderNumber))
         .limit(limit);
 
     return founders;
