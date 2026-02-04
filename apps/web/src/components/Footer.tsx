@@ -59,6 +59,9 @@ export default function Footer() {
               <li><Link to="/contact" className="group flex items-center gap-2 text-white/40 hover:text-white font-mono text-[12px] uppercase transition-all tracking-widest">
                 <span className="opacity-0 group-hover:opacity-100 text-accent transition-opacity">//</span> Proponer_Mejoras
               </Link></li>
+              <li><Link to="/early-access" className="group flex items-center gap-2 text-white/40 hover:text-white font-mono text-[12px] uppercase transition-all tracking-widest">
+                <span className="opacity-0 group-hover:opacity-100 text-accent transition-opacity">//</span> Acceso_Anticipado
+              </Link></li>
             </ul>
           </div>
         </div>

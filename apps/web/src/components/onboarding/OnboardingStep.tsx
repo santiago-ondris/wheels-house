@@ -26,10 +26,10 @@ export default function OnboardingStep({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.4 }}
-            className="flex flex-col items-center px-6 py-6 text-center md:justify-center min-h-full"
+            className="flex flex-col items-center px-6 py-4 text-center md:justify-center min-h-full"
         >
             {/* Step Indicator */}
-            <div className="mb-4">
+            <div className="mb-2">
                 <span className="text-[14px] font-mono font-bold text-[#BF247A] uppercase tracking-[0.3em]">
                     PASO_{String(stepNumber).padStart(2, '0')} // {String(totalSteps).padStart(2, '0')}
                 </span>
@@ -40,9 +40,9 @@ export default function OnboardingStep({
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.2, duration: 0.4 }}
-                className="mb-6 p-5 bg-accent/10 border border-accent/20 rounded-full"
+                className="mb-3 p-3 bg-accent/10 border border-accent/20 rounded-full"
             >
-                <Icon className="w-12 h-12 md:w-16 md:h-16 text-accent" />
+                <Icon className="w-10 h-10 md:w-12 md:h-12 text-accent" />
             </motion.div>
 
             {/* Title */}
@@ -50,7 +50,7 @@ export default function OnboardingStep({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3, duration: 0.4 }}
-                className="text-3xl md:text-3xl font-mono font-bold text-white uppercase tracking-tight mb-4"
+                className="text-3xl md:text-2xl font-mono font-bold text-white uppercase tracking-tight mb-2"
             >
                 {title}
             </motion.h2>
@@ -60,7 +60,7 @@ export default function OnboardingStep({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4, duration: 0.4 }}
-                className="text-white font-mono text-base md:text-xl max-w-md leading-relaxed"
+                className="text-white font-mono text-base md:text-lg max-w-md leading-relaxed"
             >
                 {description}
             </motion.p>
@@ -71,7 +71,7 @@ export default function OnboardingStep({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5, duration: 0.4 }}
-                    className="text-white/60 font-mono text-xs md:text-sm max-w-sm leading-relaxed mt-4"
+                    className="text-white/60 font-mono text-xs md:text-sm max-w-sm leading-relaxed mt-2"
                 >
                     {subDescription}
                 </motion.p>
@@ -83,7 +83,7 @@ export default function OnboardingStep({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5, duration: 0.4 }}
-                    className="mt-8"
+                    className="mt-4"
                 >
                     {children}
                 </motion.div>

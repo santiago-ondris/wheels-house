@@ -32,6 +32,7 @@ export const user = pgTable("user", {
     hallOfFameFlags: jsonb("hallOfFameFlags").default({ isFounder: false, isContributor: false, isAmbassador: false, isLegend: false }),
     hallOfFameTitle: text("hallOfFameTitle"),
     hallOfFameOrder: integer("hallOfFameOrder"), // Posicion manual
+    founderNumber: integer("founderNumber"), // null = no es fundador, 1-100 = número permanente
 
     // for the future:
     // verificationCode: integer("verificationCode").notNull(),

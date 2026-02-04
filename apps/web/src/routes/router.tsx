@@ -38,6 +38,7 @@ import CommunityPage from "../pages/social/CommunityPage";
 import PeoplePage from "../pages/social/PeoplePage";
 import NotificationsPage from "../pages/NotificationsPage";
 import AdminContactPage from "../pages/admin/AdminContactPage";
+import EarlyAccessPage from "../pages/EarlyAccessPage";
 
 // Components
 import ProtectedRoute from "../components/auth/ProtectedRoute";
@@ -140,6 +141,7 @@ export const router = createBrowserRouter([
             { path: "about", element: <AboutUsPage /> },
             { path: "contact", element: <ContactPage /> },
             { path: "roadmap", element: <RoadmapPage /> },
+            { path: "early-access", element: <EarlyAccessPage /> },
             { path: "wheelword", element: <WheelWordPage /> },
 
             // Catch-all

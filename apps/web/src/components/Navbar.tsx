@@ -21,10 +21,11 @@ export default function Navbar({ isScrolled }: NavbarProps) {
   return (
     <>
       <nav
-        className={`fixed top-0 w-full px-6 z-50 transition-all duration-500 ease-in-out flex items-center ${isScrolled
+        className={`fixed w-full px-6 z-50 transition-all duration-500 ease-in-out flex items-center ${isScrolled
           ? "bg-background/80 backdrop-blur-2xl border-b border-white/5 shadow-[0_8px_32px_rgba(0,0,0,0.3)] h-[72px]"
           : "bg-transparent border-b border-transparent h-[88px]"
           }`}
+        style={{ top: 'var(--banner-height, 0px)' }}
       >
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center gap-8">

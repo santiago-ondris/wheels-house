@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Query, UseGuards, Request, ParseIntPipe } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards, Request, ParseIntPipe } from '@nestjs/common';
 import { JwtAuthGuard } from '../../validators/auth.validator';
 import { AdminGuard } from '../../shared/guards/admin.guard';
 import { AdminService } from './admin.service';
@@ -64,5 +64,10 @@ export class AdminController {
         @Body() body: { archived: boolean },
     ) {
         return this.adminService.archiveContactMessage(id, body.archived);
+    }
+
+    @Post('migrate-founders')
+    async migrateFounders() {
+        return this.adminService.migrateFounders();
     }
 }
