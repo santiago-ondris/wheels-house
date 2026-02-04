@@ -37,12 +37,12 @@ export default function Footer() {
               <li><Link to="/roadmap" className="group flex items-center gap-2 text-white/40 hover:text-white font-mono text-[12px] uppercase transition-all tracking-widest">
                 <span className="opacity-0 group-hover:opacity-100 text-accent transition-opacity">//</span> Roadmap
               </Link></li>
-              <li><button className="group flex items-center gap-2 text-white/40 hover:text-white font-mono text-[12px] uppercase transition-all tracking-widest">
+              <li><Link to="/privacy-policy" className="group flex items-center gap-2 text-white/40 hover:text-white font-mono text-[12px] uppercase transition-all tracking-widest">
                 <span className="opacity-0 group-hover:opacity-100 text-accent transition-opacity">//</span> Política_de_privacidad
-              </button></li>
-              <li><button className="group flex items-center gap-2 text-white/40 hover:text-white font-mono text-[12px] uppercase transition-all tracking-widest">
+              </Link></li>
+              <li><Link to="/terms-of-service" className="group flex items-center gap-2 text-white/40 hover:text-white font-mono text-[12px] uppercase transition-all tracking-widest">
                 <span className="opacity-0 group-hover:opacity-100 text-accent transition-opacity">//</span> Términos_y_condiciones
-              </button></li>
+              </Link></li>
             </ul>
           </div>
 

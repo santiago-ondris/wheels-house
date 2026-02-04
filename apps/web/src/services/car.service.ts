@@ -108,6 +108,16 @@ export async function getSuggestions(): Promise<CarSuggestions> {
     });
 }
 
+export async function getFeaturedCar(): Promise<CarData | null> {
+    const token = localStorage.getItem("auth_token");
+    return apiRequest<CarData | null>(`/car/featured`, {
+        method: 'GET',
+        headers: token ? {
+            'Authorization': `Bearer ${token}`
+        } : {}
+    });
+}
+
 // Paginated collection types
 export interface PaginationMeta {
     currentPage: number;

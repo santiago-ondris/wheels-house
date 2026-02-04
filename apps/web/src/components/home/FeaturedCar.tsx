@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Star } from "lucide-react";
+import { ArrowRight, Star, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import ImageAdapter from "../ui/ImageAdapter";
 import { getCuratedCarForCurrentMonth } from "../../data/curatedCars";
+import { getFeaturedCar, CarData } from "../../services/car.service";
 import { useAuth } from "../../contexts/AuthContext";
 import LoginModal from "../auth/LoginModal";
 
@@ -15,7 +16,8 @@ const fadeInUp = {
 export default function FeaturedCar() {
     const { user, isAuthenticated } = useAuth();
     const [isLoginOpen, setIsLoginOpen] = useState(false);
-    const featuredCar = getCuratedCarForCurrentMonth();
+    const [featuredCar, setFeaturedCar] = useState<CarData | null>(null);
+    const [loading, setLoading] = useState(true);
     const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
@@ -24,6 +26,33 @@ export default function FeaturedCar() {
         window.addEventListener("resize", checkMobile);
         return () => window.removeEventListener("resize", checkMobile);
     }, []);
+
+    useEffect(() => {
+        const loadFeaturedCar = async () => {
+            try {
+                const car = await getFeaturedCar();
+                setFeaturedCar(car);
+            } catch (error) {
+                console.error("Error loading featured car:", error);
+                // Fallback to curated data
+                setFeaturedCar(getCuratedCarForCurrentMonth());
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadFeaturedCar();
+    }, []);
+
+    // If still loading, show placeholder
+    if (loading || !featuredCar) {
+        return (
+            <section className="container mx-auto px-6 py-10 relative overflow-hidden">
+                <div className="flex items-center justify-center py-32">
+                    <Loader2 className="w-8 h-8 text-accent animate-spin" />
+                </div>
+            </section>
+        );
+    }
 
     // pictures[0] = PC, pictures[1] = Celu
     const carImage = isMobile && featuredCar.pictures && featuredCar.pictures.length > 1
@@ -105,7 +134,7 @@ export default function FeaturedCar() {
                     <div>
                         <div className="flex items-center gap-4 mb-8">
                             <span className="px-4 py-1.5 bg-accent/20 text-accent text-xs font-black uppercase tracking-widest rounded-full border border-accent/20 shadow-lg shadow-accent/5">
-                                {featuredCar.series || "Hot Wheels Premium"}
+                                {featuredCar.series || "Hot Vehicle"}
                             </span>
                             <div className="h-px flex-1 bg-white/10" />
                         </div>

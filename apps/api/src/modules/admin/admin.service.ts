@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { db } from '../../database';
-import { car } from '../../database/schema/car.schema';
+import { car, carPicture } from '../../database/schema/car.schema';
 import { group } from '../../database/schema/group.schema';
 import { user } from '../../database/schema/user.schema';
 import { contactMessage } from '../../database/schema/contact_messages.schema';
-import { eq, desc, and, sql, SQL, asc } from 'drizzle-orm';
+import { settings } from '../../database/schema/settings.schema';
+import { eq, desc, and, sql, SQL, asc, ilike } from 'drizzle-orm';
 import { TokenData } from '../../dto/user.dto';
 
 @Injectable()
@@ -137,14 +138,14 @@ export class AdminService {
                 .select({ hallOfFameFlags: user.hallOfFameFlags })
                 .from(user)
                 .where(eq(user.userId, u.userId));
-            
-            const updatedFlags = { 
-                ...(existingFlags[0]?.hallOfFameFlags as any || { isFounder: false, isContributor: false, isAmbassador: false, isLegend: false }), 
-                isFounder: true 
+
+            const updatedFlags = {
+                ...(existingFlags[0]?.hallOfFameFlags as any || { isFounder: false, isContributor: false, isAmbassador: false, isLegend: false }),
+                isFounder: true
             };
 
             await db.update(user)
-                .set({ 
+                .set({
                     founderNumber,
                     hallOfFameFlags: updatedFlags
                 })
@@ -160,5 +161,120 @@ export class AdminService {
             total: results.length + skipped,
             founders: results
         };
+    }
+
+    // Featured Car Settings
+    async getFeaturedCarSetting() {
+        const result = await db.select()
+            .from(settings)
+            .where(eq(settings.key, 'featuredCarId'))
+            .limit(1);
+
+        if (!result.length || !result[0].value) {
+            return null;
+        }
+
+        const carId = parseInt(result[0].value);
+
+        // Get the car details
+        const carResult = await db.select({
+            carId: car.carId,
+            name: car.name,
+            brand: car.brand,
+            manufacturer: car.manufacturer,
+            color: car.color,
+            scale: car.scale,
+            series: car.series,
+            description: car.description,
+            ownerUsername: user.username,
+        })
+            .from(car)
+            .innerJoin(user, eq(car.userId, user.userId))
+            .where(eq(car.carId, carId))
+            .limit(1);
+
+        if (!carResult.length) {
+            return null;
+        }
+
+        // Get pictures
+        const pictures = await db.select({ url: carPicture.url })
+            .from(carPicture)
+            .where(eq(carPicture.carId, carId));
+
+        return {
+            ...carResult[0],
+            pictures: pictures.map(p => p.url),
+            updatedAt: result[0].updatedAt,
+        };
+    }
+
+    async setFeaturedCarSetting(carId: number, adminUserId: number) {
+        // Verify car exists
+        const carExists = await db.select({ carId: car.carId })
+            .from(car)
+            .where(eq(car.carId, carId))
+            .limit(1);
+
+        if (!carExists.length) {
+            throw new Error('Car not found');
+        }
+
+        // Upsert the setting
+        await db.insert(settings)
+            .values({
+                key: 'featuredCarId',
+                value: carId.toString(),
+                updatedAt: new Date(),
+                updatedBy: adminUserId,
+            })
+            .onConflictDoUpdate({
+                target: settings.key,
+                set: {
+                    value: carId.toString(),
+                    updatedAt: new Date(),
+                    updatedBy: adminUserId,
+                }
+            });
+
+        return { success: true, carId };
+    }
+
+    async searchCarsAdmin(query: string, limit: number = 20) {
+        const results = await db.select({
+            carId: car.carId,
+            name: car.name,
+            brand: car.brand,
+            manufacturer: car.manufacturer,
+            color: car.color,
+            scale: car.scale,
+            series: car.series,
+            ownerUsername: user.username,
+        })
+            .from(car)
+            .innerJoin(user, eq(car.userId, user.userId))
+            .where(and(
+                ilike(car.name, `%${query}%`),
+                eq(car.wished, false),
+                eq(car.hidden, false)
+            ))
+            .orderBy(desc(car.carId))
+            .limit(limit);
+
+        // Get first picture for each car
+        const carsWithPictures = await Promise.all(
+            results.map(async (c) => {
+                const picture = await db.select({ url: carPicture.url })
+                    .from(carPicture)
+                    .where(eq(carPicture.carId, c.carId))
+                    .limit(1);
+                return {
+                    ...c,
+                    picture: picture[0]?.url || null,
+                };
+            })
+        );
+
+        return carsWithPictures;
     }
 }

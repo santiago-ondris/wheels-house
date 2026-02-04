@@ -10,6 +10,9 @@ import {
     getWishedCarsFromUserId,
     deleteFeedEventsFromCarId
 } from 'src/database/crud/car.crud';
+import { db } from 'src/database';
+import { settings } from 'src/database/schema/settings.schema';
+import { eq } from 'drizzle-orm';
 import { CollectionQueryDTO, PaginatedCarsResponse } from 'src/dto/collection-query.dto';
 import { createGroupedCars, deleteGroupedCarsFromCarId, getGroupsFromCarId, getGroupFromId, getGroupedCarsFromGroupId } from 'src/database/crud/group.crud';
 import { UploadService } from '../../services/upload.service';
@@ -218,14 +221,31 @@ export class CarService {
     }
 
     async getFeaturedCarService(viewerId?: number) {
-        const totalCars = await getTotalCarsCount();
-        if (totalCars === 0) return null;
-        const epoch = new Date('2025-01-01T00:00:00Z').getTime();
-        const now = new Date().getTime();
-        const daysSinceEpoch = Math.floor((now - epoch) / (1000 * 60 * 60 * 24));
-        const offset = daysSinceEpoch % totalCars;
-        const carFromDB = await getCarByOffset(offset);
-        if (!carFromDB) return null;
+        // First check if there's a manually configured featured car
+        const settingResult = await db.select()
+            .from(settings)
+            .where(eq(settings.key, 'featuredCarId'))
+            .limit(1);
+
+        let carFromDB: Awaited<ReturnType<typeof getCarByOffset>> | null = null;
+
+        if (settingResult.length > 0 && settingResult[0].value) {
+            // Use the manually configured car
+            const configuredCarId = parseInt(settingResult[0].value);
+            carFromDB = await getCarByIdWithOwner(configuredCarId);
+        }
+
+        // Fallback to rotation algorithm if no manual setting or car not found
+        if (!carFromDB) {
+            const totalCars = await getTotalCarsCount();
+            if (totalCars === 0) return null;
+            const epoch = new Date('2025-01-01T00:00:00Z').getTime();
+            const now = new Date().getTime();
+            const daysSinceEpoch = Math.floor((now - epoch) / (1000 * 60 * 60 * 24));
+            const offset = daysSinceEpoch % totalCars;
+            carFromDB = await getCarByOffset(offset);
+            if (!carFromDB) return null;
+        }
 
         const carPicturesFromDB = await getPicturesFromCar(carFromDB.carId);
         const carPicturesURLs = carPicturesFromDB.map(picture => picture.url);

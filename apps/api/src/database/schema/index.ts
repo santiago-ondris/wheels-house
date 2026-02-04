@@ -23,3 +23,6 @@ export type { FeedEventMetadata } from './social.schema';
 
 // Contact domain
 export { contactMessage, contactReasonEnum } from './contact_messages.schema';
+
+// Settings domain
+export { settings } from './settings.schema';

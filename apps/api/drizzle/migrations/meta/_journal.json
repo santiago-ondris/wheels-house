@@ -211,6 +211,13 @@
       "when": 1770169145301,
       "tag": "0029_add-founder-number",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1770229925301,
+      "tag": "0030_mature_nomad",
+      "breakpoints": true
     }
   ]
 }

@@ -17,7 +17,8 @@ import { getFoundersCount } from "../services/profile.service";
 function isArgentina(): boolean {
     try {
         const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        return timezone === 'America/Buenos_Aires' || timezone === 'America/Argentina/Buenos_Aires';
+        // Argentina tiene múltiples timezones según la provincia
+        return timezone === 'America/Buenos_Aires' || timezone.startsWith('America/Argentina/');
     } catch {
         return false;
     }
@@ -32,7 +33,7 @@ export default function EarlyAccessPage() {
 
     useEffect(() => {
         window.scrollTo(0, 0);
-        
+
         // Fetch real founders count from API
         getFoundersCount()
             .then(count => setFoundingMembersCount(count))
@@ -162,7 +163,7 @@ export default function EarlyAccessPage() {
                                     </li>
                                     <li className="flex items-start gap-2">
                                         <div className="w-1.5 h-1.5 rounded-full bg-accent mt-2 shrink-0" />
-                                        <span>Plan premium: {isFromArgentina ? 'ARS 2,500/mes' : 'USD 3/mes'}</span>
+                                        <span>Plan premium: {isFromArgentina ? 'ARS 2500/mes' : 'USD 3/mes'}</span>
                                     </li>
                                 </ul>
                             </div>

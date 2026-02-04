@@ -38,7 +38,10 @@ import CommunityPage from "../pages/social/CommunityPage";
 import PeoplePage from "../pages/social/PeoplePage";
 import NotificationsPage from "../pages/NotificationsPage";
 import AdminContactPage from "../pages/admin/AdminContactPage";
+import AdminFeaturedCarPage from "../pages/admin/AdminFeaturedCarPage";
 import EarlyAccessPage from "../pages/EarlyAccessPage";
+import PrivacyPolicyPage from "../pages/PrivacyPolicyPage";
+import TermsOfServicePage from "../pages/TermsOfServicePage";
 
 // Components
 import ProtectedRoute from "../components/auth/ProtectedRoute";
@@ -108,6 +111,10 @@ export const router = createBrowserRouter([
                 path: "admin/contact",
                 element: <AdminRoute><AdminContactPage /></AdminRoute>
             },
+            {
+                path: "admin/featured-car",
+                element: <AdminRoute><AdminFeaturedCarPage /></AdminRoute>
+            },
 
             // User collection routes (public viewing)
             { path: "collection/:username", element: <ProfilePage /> },
@@ -142,6 +149,8 @@ export const router = createBrowserRouter([
             { path: "contact", element: <ContactPage /> },
             { path: "roadmap", element: <RoadmapPage /> },
             { path: "early-access", element: <EarlyAccessPage /> },
+            { path: "privacy-policy", element: <PrivacyPolicyPage /> },
+            { path: "terms-of-service", element: <TermsOfServicePage /> },
             { path: "wheelword", element: <WheelWordPage /> },
 
             // Catch-all

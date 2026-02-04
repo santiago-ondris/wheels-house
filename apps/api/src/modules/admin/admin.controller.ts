@@ -70,4 +70,26 @@ export class AdminController {
     async migrateFounders() {
         return this.adminService.migrateFounders();
     }
+
+    @Get('featured-car')
+    async getFeaturedCar() {
+        return this.adminService.getFeaturedCarSetting();
+    }
+
+    @Patch('featured-car')
+    async setFeaturedCar(
+        @Body() body: { carId: number },
+        @Request() req,
+    ) {
+        const user = req.user as TokenData;
+        return this.adminService.setFeaturedCarSetting(body.carId, user.userId);
+    }
+
+    @Get('cars/search')
+    async searchCars(@Query('q') query: string) {
+        if (!query || query.length < 2) {
+            return [];
+        }
+        return this.adminService.searchCarsAdmin(query);
+    }
 }
