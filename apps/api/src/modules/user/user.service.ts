@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Logger } from 'nestjs-pino';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDTO, UserToDB, LoginDTO, TokenData, UpdateUserProfileDTO, UpdatePasswordDTO, ResetPasswordDTO, ForgotPasswordDTO } from '../../dto/user.dto';
 import { PublicProfileDTO, PublicCarDTO } from '../../dto/public-profile.dto';
@@ -31,6 +32,7 @@ import { EmailService } from '../../services/email.service';
 @Injectable()
 export class UserService {
     constructor(
+        private readonly logger: Logger,
         private readonly jwtService: JwtService,
         private readonly uploadService: UploadService,
         private readonly configService: ConfigService,
@@ -62,7 +64,7 @@ export class UserService {
                 await this.emailService.sendWelcomeEmail(registerData.email, registerData.username, userCount);
             }
         } catch (e) {
-            console.error("[Register] Error sending welcome email:", e);
+            this.logger.error({ err: e, username: registerData.username }, "Error sending welcome email");
         }
 
         return true;
@@ -337,7 +339,7 @@ export class UserService {
             try {
                 await this.uploadService.deleteImage(getPublicIdFromURL(deletedUser.picture));
             } catch (e) {
-                console.error("Cloudinary: Error deleting user picture", e);
+                this.logger.error({ err: e, username: userData.username }, "Cloudinary: Error deleting user picture");
             }
         }
 
@@ -345,7 +347,7 @@ export class UserService {
             try {
                 await this.uploadService.deleteImage(getPublicIdFromURL(url));
             } catch (e) {
-                console.error("Cloudinary: Error deleting car picture", e);
+                this.logger.error({ err: e, url }, "Cloudinary: Error deleting car picture");
             }
         }
 
@@ -354,7 +356,7 @@ export class UserService {
                 try {
                     await this.uploadService.deleteImage(getPublicIdFromURL(group.picture));
                 } catch (e) {
-                    console.error("Cloudinary: Error deleting group picture", e);
+                    this.logger.error({ err: e, groupId: group.groupId }, "Cloudinary: Error deleting group picture");
                 }
             }
         }

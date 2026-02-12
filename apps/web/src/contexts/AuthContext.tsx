@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { login as loginService } from "../services/auth.service";
+import * as Sentry from "@sentry/react";
 
 import { getPublicProfile } from "../services/profile.service";
 
@@ -44,7 +45,7 @@ function decodeToken(token: string): { username: string, userId: number } | null
 function getInitialUser(): User | null {
   const token = localStorage.getItem("auth_token");
   if (!token) return null;
-  
+
   const decoded = decodeToken(token);
   if (!decoded) return null;
 
@@ -66,6 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     navigate("/", { replace: true });
     setTimeout(() => {
       setUser(null);
+      Sentry.setUser(null);
       localStorage.removeItem("auth_token");
       localStorage.removeItem("refresh_token");
     }, 50);
@@ -145,6 +147,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     initAuth();
   }, []);
+
+  // Sync Sentry user whenever auth user changes
+  useEffect(() => {
+    if (user) {
+      Sentry.setUser({
+        id: user.userId.toString(),
+        username: user.username,
+        email: user.email,
+      });
+    } else {
+      Sentry.setUser(null);
+    }
+  }, [user]);
 
   const login = async (usernameOrEmail: string, password: string) => {
     const response = await loginService({ usernameOrEmail, password });

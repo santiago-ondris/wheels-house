@@ -1,11 +1,12 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { Logger } from 'nestjs-pino';
 import * as FeedRepository from './feed.repository';
 import type { FeedQueryOptions, CreateFeedEventInput, FeedEventWithUser } from './feed.repository';
 import * as FollowsRepository from '../follows/follows.repository';
 
 @Injectable()
 export class FeedService {
-    private readonly logger = new Logger(FeedService.name);
+    constructor(private readonly logger: Logger) { }
 
     // Cache simple en memoria para IDs de seguidos
     private followsCache = new Map<number, { ids: number[], timestamp: number }>();

@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
+import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
+import { LoggerModule } from './shared/logger/logger.module';
 
 
 import { UploadController } from './controllers/upload.controller';
@@ -36,6 +38,7 @@ import { ContactModule } from './modules/contact/contact.module';
 
 @Module({
   imports: [
+    LoggerModule,
     SentryModule.forRoot(),
     ThrottlerModule.forRoot([{
       ttl: 60000, // Time to live in milliseconds (1 minute)
@@ -63,6 +66,10 @@ import { ContactModule } from './modules/contact/contact.module';
     {
       provide: APP_FILTER,
       useClass: SentryGlobalFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
     },
     JwtStrategy, JwtRefreshStrategy, UploadService, StatsService, SearchHistoryService, ImportService, EmailService, WheelwordService],
 })
