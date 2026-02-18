@@ -105,6 +105,12 @@ export function useCollectionParams(options?: UseCollectionParamsOptions) {
 
             const merged = { ...params, ...updates };
 
+            const effectiveDefaults: CollectionParams = {
+                ...DEFAULTS,
+                sortBy: defaultSortBy,
+                sortOrder: defaultSortOrder,
+            };
+
             // Set or delete each param
             Object.entries(merged).forEach(([key, value]) => {
                 if (Array.isArray(value)) {
@@ -114,7 +120,7 @@ export function useCollectionParams(options?: UseCollectionParamsOptions) {
                     } else {
                         newParams.delete(key);
                     }
-                } else if (value !== undefined && value !== '' && value !== DEFAULTS[key as keyof CollectionParams]) {
+                } else if (value !== undefined && value !== '' && value !== effectiveDefaults[key as keyof CollectionParams]) {
                     newParams.set(key, String(value));
                 } else {
                     newParams.delete(key);
@@ -123,7 +129,7 @@ export function useCollectionParams(options?: UseCollectionParamsOptions) {
 
             return newParams;
         }, { replace: shouldReplace });
-    }, [params, setSearchParams]);
+    }, [params, setSearchParams, defaultSortBy, defaultSortOrder]);
 
     const setPage = useCallback((page: number) => setParams({ page }), [setParams]);
     const setLimit = useCallback((limit: number) => setParams({ limit, page: 1 }), [setParams]);
