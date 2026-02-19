@@ -71,6 +71,15 @@ export const groupLike = pgTable("groupLike", {
     index("groupLike_groupId_idx").on(t.groupId),
 ]);
 
+export const carSearchHistory = pgTable("carSearchHistory", {
+    userId: integer("userId").references(() => user.userId).notNull(),
+    carId: integer("carId").references(() => car.carId, { onDelete: "cascade" }).notNull(),
+    searchedAt: timestamp("searchedAt", { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [
+    { pk: [t.userId, t.carId] },
+    index("carSearchHistory_userId_idx").on(t.userId),
+]);
+
 export const notification = pgTable("notification", {
     notificationId: serial("notificationId").primaryKey(),
     userId: integer("userId").references(() => user.userId).notNull(), // A quién va dirigida

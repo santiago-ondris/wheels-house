@@ -11,6 +11,7 @@ import AddCarPage from "../pages/car/AddCarPage";
 import EditCarPage from "../pages/car/EditCarPage";
 import QuickAddPage from "../pages/car/QuickAddPage";
 import CarDetailPage from "../pages/car/CarDetailPage";
+import SearchResultsPage from "../pages/search/SearchResultsPage";
 import RegisterPage from "../pages/login/RegisterPage";
 import AuthRequiredPage from "../pages/login/AuthRequiredPage";
 import ResetPasswordPage from "../pages/login/ResetPasswordPage";
@@ -52,15 +53,16 @@ export const router = createBrowserRouter([
         path: "/",
         element: <RootLayout />,
         children: [
-            // Public routes
+            // Public
             { index: true, element: <HomePage /> },
             { path: "register", element: <RegisterPage /> },
             { path: "reset-password", element: <ResetPasswordPage /> },
             { path: "auth-required", element: <AuthRequiredPage /> },
             { path: "car/:carId", element: <CarDetailPage /> },
+            { path: "search", element: <SearchResultsPage /> },
             { path: "community", element: <CommunityPage /> },
 
-            // Protected routes
+            // Protected
             {
                 path: "onboarding",
                 element: <ProtectedRoute><OnboardingPage /></ProtectedRoute>
@@ -106,7 +108,7 @@ export const router = createBrowserRouter([
                 element: <ProtectedRoute><NotificationsPage /></ProtectedRoute>
             },
 
-            // Admin routes
+            // Admin
             {
                 path: "admin/contact",
                 element: <AdminRoute><AdminContactPage /></AdminRoute>
@@ -116,13 +118,13 @@ export const router = createBrowserRouter([
                 element: <AdminRoute><AdminFeaturedCarPage /></AdminRoute>
             },
 
-            // User collection routes (public viewing)
+            // User collection routes (public)
             { path: "collection/:username", element: <ProfilePage /> },
             { path: "collection/:username/stats", element: <StatsPage /> },
             { path: "collection/:username/groups", element: <GroupsListPage /> },
             { path: "collection/:username/group/:groupName", element: <GroupDetailPage /> },
 
-            // Wishlist routes
+            // Wishlist
             {
                 path: "wishlist/add",
                 element: <ProtectedRoute><AddToWishlistPage /></ProtectedRoute>
@@ -137,14 +139,14 @@ export const router = createBrowserRouter([
             },
             { path: "wishlist/:username", element: <WishlistPage /> },
 
-            // Hall of Fame routes
+            // Hall of Fame
             { path: "hall-of-fame", element: <HallOfFamePage /> },
             { path: "hall-of-fame/founders", element: <FoundersPage /> },
             { path: "hall-of-fame/contributors", element: <ContributorsPage /> },
             { path: "hall-of-fame/ambassadors", element: <AmbassadorsPage /> },
             { path: "hall-of-fame/legends", element: <LegendsPage /> },
 
-            // Other routes
+            // Other
             { path: "about", element: <AboutUsPage /> },
             { path: "contact", element: <ContactPage /> },
             { path: "roadmap", element: <RoadmapPage /> },

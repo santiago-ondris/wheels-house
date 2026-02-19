@@ -8,7 +8,8 @@ import {
     deleteAllCarPictures, deleteCarPicture, updateCarPicture, getTotalCarsCount, getCarByOffset, getUniqueCarValues,
     getCarsFromUserIdPaginated, getFilterOptionsForUser, getCarIdsFromUserIdWithFilter,
     getWishedCarsFromUserId,
-    deleteFeedEventsFromCarId
+    deleteFeedEventsFromCarId,
+    globalSearchCars, getCarSearchHistoryForUser, upsertCarToSearchHistory, removeCarFromSearchHistory, clearCarSearchHistory,
 } from 'src/database/crud/car.crud';
 import { db } from 'src/database';
 import { settings } from 'src/database/schema/settings.schema';
@@ -376,6 +377,29 @@ export class CarService {
         });
 
         this.checkAndEmitMilestone(carBeforeUpdate.userId);
+    }
+
+    async globalSearchCarsService(query: string, page: number, limit: number, sortBy: 'likes' | 'newest' = 'likes') {
+        if (!query || query.trim().length < 2) {
+            return { items: [], pagination: { currentPage: 1, totalPages: 0, totalItems: 0, limit } };
+        }
+        return globalSearchCars(query, page, limit, sortBy);
+    }
+
+    async getCarSearchHistoryService(userId: number) {
+        return getCarSearchHistoryForUser(userId);
+    }
+
+    async addCarToSearchHistoryService(userId: number, carId: number) {
+        await upsertCarToSearchHistory(userId, carId);
+    }
+
+    async removeCarFromSearchHistoryService(userId: number, carId: number) {
+        await removeCarFromSearchHistory(userId, carId);
+    }
+
+    async clearCarSearchHistoryService(userId: number) {
+        await clearCarSearchHistory(userId);
     }
 
     async getWishlistService(username: string, viewerId?: number) {

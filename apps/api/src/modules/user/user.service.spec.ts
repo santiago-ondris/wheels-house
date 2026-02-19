@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { Logger } from 'nestjs-pino';
 import { UserService } from './user.service';
 import { JwtService } from '@nestjs/jwt';
 import { UploadService } from '../../services/upload.service';
@@ -36,11 +37,13 @@ describe('UserService', () => {
   const mockEmailService = {};
   const mockJwtService = {};
   const mockConfigService = {};
+  const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UserService,
+        { provide: Logger, useValue: mockLogger },
         { provide: UploadService, useValue: mockUploadService },
         { provide: NotificationsRepository, useValue: mockNotificationsRepository },
         { provide: EmailService, useValue: mockEmailService },

@@ -1,7 +1,7 @@
 import { CarPictureToDB, CarToDB, CarUpdateDTO } from "src/dto/car.dto";
 import { CollectionQueryDTO } from "src/dto/collection-query.dto";
 import { db } from "../index";
-import { car, carPicture, user, groupedCar, feedEvent } from "../schema";
+import { car, carPicture, user, groupedCar, feedEvent, carSearchHistory } from "../schema";
 import { count, eq, or, and, ilike, asc, desc, sql, SQL, inArray, notInArray } from 'drizzle-orm';
 
 // Create
@@ -420,6 +420,110 @@ export async function getCarIdsFromUserIdWithFilter(userId: number, query: Colle
         .where(and(...conditions_list));
 
     return result.map(r => r.carId);
+}
+
+// Búsqueda global de autos en toda la app
+export async function globalSearchCars(query: string, page: number, limit: number, sortBy: 'likes' | 'newest' = 'likes') {
+    const pattern = `%${query.trim()}%`;
+
+    const whereClause = and(
+        eq(car.hidden, false),
+        eq(car.wished, false),
+        or(
+            ilike(car.name, pattern),
+            ilike(car.brand, pattern),
+            ilike(car.series, pattern),
+        )
+    );
+
+    const [{ total }] = await db.select({ total: count() }).from(car).where(whereClause);
+
+    // Subquery para obtener la primera imagen (index 0) de cada auto
+    const firstPicture = db
+        .select({ carId: carPicture.carId, url: carPicture.url })
+        .from(carPicture)
+        .where(eq(carPicture.index, 0))
+        .as('firstPicture');
+
+    const orderClause = sortBy === 'newest'
+        ? [desc(car.carId)]
+        : [desc(car.likesCount), desc(car.carId)];
+
+    const items = await db
+        .select({
+            carId: car.carId,
+            name: car.name,
+            brand: car.brand,
+            likesCount: car.likesCount,
+            ownerUsername: user.username,
+            ownerAvatar: user.picture,
+            picture: firstPicture.url,
+        })
+        .from(car)
+        .innerJoin(user, eq(car.userId, user.userId))
+        .leftJoin(firstPicture, eq(firstPicture.carId, car.carId))
+        .where(whereClause)
+        .orderBy(...orderClause)
+        .limit(limit)
+        .offset((page - 1) * limit);
+
+    return {
+        items,
+        pagination: {
+            currentPage: page,
+            totalPages: Math.ceil(Number(total) / limit),
+            totalItems: Number(total),
+            limit,
+        },
+    };
+}
+
+// CRUD historial de búsqueda de vehículos
+export async function getCarSearchHistoryForUser(userId: number) {
+    const firstPicture = db
+        .select({ carId: carPicture.carId, url: carPicture.url })
+        .from(carPicture)
+        .where(eq(carPicture.index, 0))
+        .as('firstPicture');
+
+    return db
+        .select({
+            carId: car.carId,
+            name: car.name,
+            brand: car.brand,
+            likesCount: car.likesCount,
+            ownerUsername: user.username,
+            ownerAvatar: user.picture,
+            picture: firstPicture.url,
+            searchedAt: carSearchHistory.searchedAt,
+        })
+        .from(carSearchHistory)
+        .innerJoin(car, eq(carSearchHistory.carId, car.carId))
+        .innerJoin(user, eq(car.userId, user.userId))
+        .leftJoin(firstPicture, eq(firstPicture.carId, car.carId))
+        .where(and(eq(carSearchHistory.userId, userId), eq(car.hidden, false)))
+        .orderBy(desc(carSearchHistory.searchedAt))
+        .limit(10);
+}
+
+export async function upsertCarToSearchHistory(userId: number, carId: number) {
+    await db
+        .insert(carSearchHistory)
+        .values({ userId, carId, searchedAt: new Date() })
+        .onConflictDoUpdate({
+            target: [carSearchHistory.userId, carSearchHistory.carId],
+            set: { searchedAt: new Date() },
+        });
+}
+
+export async function removeCarFromSearchHistory(userId: number, carId: number) {
+    await db
+        .delete(carSearchHistory)
+        .where(and(eq(carSearchHistory.userId, userId), eq(carSearchHistory.carId, carId)));
+}
+
+export async function clearCarSearchHistory(userId: number) {
+    await db.delete(carSearchHistory).where(eq(carSearchHistory.userId, userId));
 }
 
 export async function getFilterOptionsForUser(userId: number, groupId: number | undefined) {

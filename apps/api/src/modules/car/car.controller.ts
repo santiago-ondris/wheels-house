@@ -126,6 +126,42 @@ export class CarController {
     }
 
 
+    @UseGuards(OptionalJwtAuthGuard)
+    @Get('global-search')
+    async globalSearch(
+        @Query('q') q: string,
+        @Query('page') page?: string,
+        @Query('limit') limit?: string,
+        @Query('sortBy') sortBy?: string,
+    ) {
+        const sort = (sortBy === 'newest' ? 'newest' : 'likes') as 'likes' | 'newest';
+        return this.carService.globalSearchCarsService(q, page ? +page : 1, limit ? +limit : 6, sort);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('search-history')
+    async getCarSearchHistory(@Request() req) {
+        return this.carService.getCarSearchHistoryService(req.user.userId);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('search-history')
+    async addCarToSearchHistory(@Request() req, @Body() body: { carId: number }) {
+        await this.carService.addCarToSearchHistoryService(req.user.userId, body.carId);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Delete('search-history/:carId')
+    async removeCarFromSearchHistory(@Request() req, @Param('carId') carId: string) {
+        await this.carService.removeCarFromSearchHistoryService(req.user.userId, +carId);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Delete('search-history')
+    async clearCarSearchHistory(@Request() req) {
+        await this.carService.clearCarSearchHistoryService(req.user.userId);
+    }
+
     @UseGuards(JwtAuthGuard)
     @Post('bulk/add-to-group')
     async bulkAddToGroup(@Request() req, @Body() body: BulkAddToGroupDTO) {

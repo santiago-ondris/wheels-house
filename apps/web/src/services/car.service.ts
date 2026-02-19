@@ -260,6 +260,61 @@ export async function wishedCarToCollection(carId: number, data: WishedCarToColl
     });
 }
 
+export interface CarSearchResult {
+    carId: number;
+    name: string;
+    brand: string;
+    picture?: string;
+    ownerUsername: string;
+    ownerAvatar?: string;
+    likesCount: number;
+}
+
+export interface GlobalCarSearchResponse {
+    items: CarSearchResult[];
+    pagination: PaginationMeta;
+}
+
+export async function globalSearchCars(q: string, page = 1, limit = 6, sortBy: 'likes' | 'newest' = 'likes'): Promise<GlobalCarSearchResponse> {
+    return apiRequest<GlobalCarSearchResponse>(
+        `/car/global-search?q=${encodeURIComponent(q)}&page=${page}&limit=${limit}&sortBy=${sortBy}`,
+        { method: 'GET' }
+    );
+}
+
+export async function getCarSearchHistory(): Promise<CarSearchResult[]> {
+    const token = localStorage.getItem("auth_token");
+    return apiRequest<CarSearchResult[]>(`/car/search-history?t=${Date.now()}`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+}
+
+export async function addCarToSearchHistory(carId: number): Promise<void> {
+    const token = localStorage.getItem("auth_token");
+    return apiRequest<void>('/car/search-history', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ carId }),
+    });
+}
+
+export async function removeCarFromSearchHistory(carId: number): Promise<void> {
+    const token = localStorage.getItem("auth_token");
+    return apiRequest<void>(`/car/search-history/${carId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+}
+
+export async function clearCarSearchHistory(): Promise<void> {
+    const token = localStorage.getItem("auth_token");
+    return apiRequest<void>('/car/search-history', {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+}
+
 export async function createWishedCar(data: CarData & { wished: true }): Promise<number> {
     const token = localStorage.getItem("auth_token");
     return apiRequest<number>('/car/create', {
