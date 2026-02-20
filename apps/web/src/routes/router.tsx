@@ -40,7 +40,6 @@ import PeoplePage from "../pages/social/PeoplePage";
 import NotificationsPage from "../pages/NotificationsPage";
 import AdminContactPage from "../pages/admin/AdminContactPage";
 import AdminFeaturedCarPage from "../pages/admin/AdminFeaturedCarPage";
-import EarlyAccessPage from "../pages/EarlyAccessPage";
 import PrivacyPolicyPage from "../pages/PrivacyPolicyPage";
 import TermsOfServicePage from "../pages/TermsOfServicePage";
 
@@ -150,7 +149,6 @@ export const router = createBrowserRouter([
             { path: "about", element: <AboutUsPage /> },
             { path: "contact", element: <ContactPage /> },
             { path: "roadmap", element: <RoadmapPage /> },
-            { path: "early-access", element: <EarlyAccessPage /> },
             { path: "privacy-policy", element: <PrivacyPolicyPage /> },
             { path: "terms-of-service", element: <TermsOfServicePage /> },
             { path: "wheelword", element: <WheelWordPage /> },

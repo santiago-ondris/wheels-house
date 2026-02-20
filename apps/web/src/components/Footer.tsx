@@ -19,7 +19,7 @@ export default function Footer() {
             </div>
 
             <p className="text-white/30 font-mono text-[12px] leading-relaxed max-w-sm uppercase tracking-wider">
-              Almacén digital premium para documentación de vehículos a escala de alta precisión.
+              Almacén digital para documentación de vehículos a escala.
               Diseñado para coleccionistas de cualquier tipo.
             </p>
           </div>
@@ -58,9 +58,6 @@ export default function Footer() {
               </Link></li>
               <li><Link to="/contact" className="group flex items-center gap-2 text-white/40 hover:text-white font-mono text-[12px] uppercase transition-all tracking-widest">
                 <span className="opacity-0 group-hover:opacity-100 text-accent transition-opacity">//</span> Proponer_Mejoras
-              </Link></li>
-              <li><Link to="/early-access" className="group flex items-center gap-2 text-white/40 hover:text-white font-mono text-[12px] uppercase transition-all tracking-widest">
-                <span className="opacity-0 group-hover:opacity-100 text-accent transition-opacity">//</span> Acceso_Anticipado
               </Link></li>
             </ul>
           </div>

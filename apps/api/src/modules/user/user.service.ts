@@ -11,8 +11,6 @@ import {
     updatePasswordFromReset,
     deleteSearchHistoryFromUserId,
     getFounders,
-    getFoundersCount,
-    countUsers,
     deleteFeedEventsFromUserId,
     deleteUserGameAttemptsFromUserId
 } from 'src/database/crud/user.crud';
@@ -57,12 +55,8 @@ export class UserService {
             throw ERROR_CREATING_USER;
         }
 
-        // Check if user is among founders (first 100)
         try {
-            const userCount = await countUsers();
-            if (userCount <= 100) {
-                await this.emailService.sendWelcomeEmail(registerData.email, registerData.username, userCount);
-            }
+            await this.emailService.sendWelcomeEmail(registerData.email, registerData.username);
         } catch (e) {
             this.logger.error({ err: e, username: registerData.username }, "Error sending welcome email");
         }
@@ -252,11 +246,6 @@ export class UserService {
 
     async getFoundersService() {
         return await getFounders();
-    }
-
-    async getFoundersCountService(): Promise<{ count: number }> {
-        const count = await getFoundersCount();
-        return { count };
     }
 
     async updateUserService(userData: TokenData, userChanges: UpdateUserProfileDTO) {

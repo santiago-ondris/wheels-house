@@ -98,11 +98,6 @@ export async function getFounders(): Promise<Founder[]> {
     return apiRequest<Founder[]>('/founders');
 }
 
-export async function getFoundersCount(): Promise<number> {
-    const response = await apiRequest<{ count: number }>('/founders/count');
-    return response.count;
-}
-
 export async function getGlobalStats(): Promise<GlobalStats> {
     return apiRequest<GlobalStats>('/stats/global');
 }

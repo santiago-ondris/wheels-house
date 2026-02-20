@@ -5,7 +5,7 @@ import { group } from '../../database/schema/group.schema';
 import { user } from '../../database/schema/user.schema';
 import { contactMessage } from '../../database/schema/contact_messages.schema';
 import { settings } from '../../database/schema/settings.schema';
-import { eq, desc, and, sql, SQL, asc, ilike } from 'drizzle-orm';
+import { eq, desc, and, sql, SQL, ilike } from 'drizzle-orm';
 import { TokenData } from '../../dto/user.dto';
 
 @Injectable()
@@ -93,74 +93,6 @@ export class AdminService {
             .where(eq(contactMessage.contactMessageId, id));
 
         return { success: true };
-    }
-
-    // Script para asignar founderNumber a usuarios existentes cuando estemos en prod, una unica vez
-    async migrateFounders() {
-        // Subquery para contar autos reales (no wishlist) por usuario
-        const carCountSubquery = db
-            .select({
-                userId: car.userId,
-                carCount: sql<number>`count(*)`.as('carCount')
-            })
-            .from(car)
-            .where(eq(car.wished, false))
-            .groupBy(car.userId)
-            .as('carCounts');
-
-        // Obtener los primeros 100 usuarios con al menos 1 auto
-        const eligibleUsers = await db
-            .select({
-                userId: user.userId,
-                username: user.username,
-                founderNumber: user.founderNumber,
-                carCount: carCountSubquery.carCount
-            })
-            .from(user)
-            .innerJoin(carCountSubquery, eq(user.userId, carCountSubquery.userId))
-            .orderBy(asc(user.userId))
-            .limit(100);
-
-        const results: { username: string; founderNumber: number }[] = [];
-        let skipped = 0;
-
-        for (let i = 0; i < eligibleUsers.length; i++) {
-            const u = eligibleUsers[i];
-            const founderNumber = i + 1;
-
-            if (u.founderNumber !== null) {
-                skipped++;
-                continue;
-            }
-
-            // Obtener flags existentes
-            const existingFlags = await db
-                .select({ hallOfFameFlags: user.hallOfFameFlags })
-                .from(user)
-                .where(eq(user.userId, u.userId));
-
-            const updatedFlags = {
-                ...(existingFlags[0]?.hallOfFameFlags as any || { isFounder: false, isContributor: false, isAmbassador: false, isLegend: false }),
-                isFounder: true
-            };
-
-            await db.update(user)
-                .set({
-                    founderNumber,
-                    hallOfFameFlags: updatedFlags
-                })
-                .where(eq(user.userId, u.userId));
-
-            results.push({ username: u.username, founderNumber });
-        }
-
-        return {
-            success: true,
-            assigned: results.length,
-            skipped,
-            total: results.length + skipped,
-            founders: results
-        };
     }
 
     // Featured Car Settings

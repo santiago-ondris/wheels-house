@@ -4,8 +4,6 @@ import { Users, Car, ArrowRight, ChevronLeft, ChevronRight, Sparkles } from "luc
 import { Link } from "react-router-dom";
 import { getFounders, Founder } from "../../services/profile.service";
 
-const TOTAL_FOUNDERS_LIMIT = 100;
-
 export default function FeaturedCollections() {
     const [featuredUsers, setFeaturedUsers] = useState<Founder[]>([]);
     const [totalFounders, setTotalFounders] = useState(0);
@@ -86,7 +84,7 @@ export default function FeaturedCollections() {
                     </h2>
                 </div>
                 <span className="text-white/30 text-xs hidden md:block">
-                    ¡Y sé parte del inicio!
+                    Coleccionistas de todo el mundo
                 </span>
             </div>
 
@@ -236,12 +234,8 @@ function UserCard({ user }: { user: Founder }) {
     );
 }
 
-// Founders Call-to-Action Card - Urgency Design
+// Founders Call-to-Action Card
 function FoundersCtaCard({ progress }: { progress: number }) {
-    const remaining = TOTAL_FOUNDERS_LIMIT - progress;
-    const progressPercent = Math.min((progress / TOTAL_FOUNDERS_LIMIT) * 100, 100);
-    const isUrgent = remaining <= 20;
-
     return (
         <Link
             to="/hall-of-fame/founders"
@@ -269,30 +263,13 @@ function FoundersCtaCard({ progress }: { progress: number }) {
                     Salón de Fundadores
                 </h3>
                 <p className="text-sky-400 text-sm font-medium mt-1">
-                    ¡Aún podés ser parte!
+                    Los primeros miembros de la comunidad
                 </p>
 
-                {/* Progress Section */}
+                {/* Members count */}
                 <div className="mt-5 pt-4 border-t border-sky-400/10">
-                    <div className="flex justify-between text-xs mb-2">
-                        <span className="text-white/40">Ocupación</span>
-                        <span className="text-sky-400 font-mono font-bold">
-                            {progress}/{TOTAL_FOUNDERS_LIMIT}
-                        </span>
-                    </div>
-                    <div className="h-2.5 bg-white/5 rounded-full overflow-hidden border border-white/5">
-                        <div
-                            className="h-full bg-gradient-to-r from-sky-500 to-sky-400 rounded-full"
-                            style={{ width: `${progressPercent}%` }}
-                        />
-                    </div>
-
-                    {/* Urgency message */}
-                    <p className={`text-sm mt-3 font-medium ${isUrgent ? 'text-amber-400' : 'text-white/50'}`}>
-                        {remaining > 0
-                            ? `${remaining} lugares restantes`
-                            : "¡Salón completo!"}
-                    </p>
+                    <span className="text-sky-400 font-mono font-bold text-2xl">{progress}</span>
+                    <span className="text-white/40 text-xs ml-2">miembros fundadores</span>
                 </div>
 
                 {/* CTA */}

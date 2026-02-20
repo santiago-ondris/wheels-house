@@ -6,7 +6,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import LoginModal from "../components/auth/LoginModal";
-import GuestEarlyAccessBanner from "../components/GuestEarlyAccessBanner";
 import { useAuth } from "../contexts/AuthContext";
 
 const queryClient = new QueryClient({
@@ -81,13 +80,10 @@ function LayoutContent() {
                 } as React.CSSProperties}
             >
                 {pathname !== '/onboarding' && (
-                    <>
-                        <GuestEarlyAccessBanner />
-                        <Navbar isScrolled={isScrolled} />
-                    </>
+                    <Navbar isScrolled={isScrolled} />
                 )}
                 <main
-                    className={`flex-1 ${pathname === '/onboarding' ? 'pt-0' : 'pt-[calc(var(--navbar-height)+var(--banner-height,0px))]'}`}
+                    className={`flex-1 ${pathname === '/onboarding' ? 'pt-0' : 'pt-[var(--navbar-height)]'}`}
                 >
                     <Outlet />
                 </main>

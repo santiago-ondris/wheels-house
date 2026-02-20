@@ -31,31 +31,25 @@ export class EmailService {
     }
   }
 
-  async sendWelcomeEmail(to: string, username: string, founderNumber: number) {
+  async sendWelcomeEmail(to: string, username: string) {
     try {
       await this.resend.emails.send({
         from: 'Wheels House <noreply@wheelshouse.app>',
         to: to,
-        subject: `🎉 ¡Bienvenido, Miembro Fundador #${founderNumber}!`,
+        subject: `¡Bienvenido a Wheels House, ${username}!`,
         html: `
             <div style="font-family: sans-serif; line-height: 1.6; color: #333;">
                 <p>Hola, <strong>${username}</strong>.</p>
-                <p>Acabas de convertirte en el <strong>Miembro Fundador #${founderNumber}</strong> de Wheels House.</p>
-                <p>¿Qué significa esto?</p>
+                <p>¡Ya sos parte de Wheels House, el hogar digital de los coleccionistas de vehículos a escala!</p>
+                <p>Esto es lo que podés hacer desde hoy:</p>
                 <ul>
-                    <li>✅ <strong>Acceso GRATUITO para siempre</strong> (sí, para siempre)</li>
-                    <li>✅ <strong>Influencia directa en el desarrollo</strong> (tu feedback importa)</li>
-                    <li>✅ <strong>Badge exclusivo</strong> de "Founding Member"</li>
+                    <li>Agregá tus autos con fotos, marca, modelo, escala y todos los detalles que quieras documentar</li>
+                    <li>Organizá tu colección en grupos por serie, color, o cualquier criterio que imagines</li>
+                    <li>Descubrí las colecciones de otros coleccionistas y dejá tu like en los autos que te gusten</li>
+                    <li>Jugá WheelWord, el juego diario de Wheels House</li>
                 </ul>
-                <p>Una vez lleguemos a 100 miembros fundadores, Wheels House será de pago para nuevos usuarios. Pero vos ya estás adentro. <a href="https://wheelshouse.app/early-access" style="color: #3b82f6; text-decoration: underline;">Ver más detalles</a></p>
-                <p><strong>Recordá cargar tu primer auto para oficializar tu lugar y confirmar así el acceso!</strong></p>
-                <p>¿Cómo podés ayudar?</p>
-                <ul>
-                    <li>Compartí con amigos coleccionistas</li>
-                    <li>Reportá bugs o sugerí features, ¡nos encantamos!</li>
-                    <li>Úsalo y disfrútalo 🚗</li>
-                </ul>
-                <p>¡Gracias por confiar en nosotros desde el inicio!</p>
+                <p>Si tenés alguna duda, sugerencia o simplemente querés saludar, escribinos desde <a href="https://wheelshouse.app/contact" style="color: #D9731A;">wheelshouse.app/contact</a>. Nos encanta leer los mensajes.</p>
+                <p>¡Que disfrutes coleccionar!</p>
                 <p>El equipo de Wheels House.</p>
             </div>
         `,

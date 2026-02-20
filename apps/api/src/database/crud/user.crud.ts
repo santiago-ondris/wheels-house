@@ -108,38 +108,31 @@ export async function getFoundersCount(): Promise<number> {
 }
 
 export async function assignFounderStatus(userId: number): Promise<number | null> {
-    // Check if user already has a founder number
     const existingUser = await db.select({ founderNumber: user.founderNumber })
         .from(user)
         .where(eq(user.userId, userId));
-    
+
     if (existingUser[0]?.founderNumber) {
-        return existingUser[0].founderNumber; // Ya es fundador
+        return existingUser[0].founderNumber;
     }
 
-    // Cuenta cuantos fundadores hay
     const currentCount = await getFoundersCount();
     if (currentCount >= 100) {
-        return null; // No hay mas cupos
+        return null;
     }
 
-    // Asigna el siguiente numero de fundador
     const nextNumber = currentCount + 1;
-    
-    // Actualiza el usuario con el numero de fundador y el flag
-    const existingFlags = existingUser[0] ? 
-        await db.select({ hallOfFameFlags: user.hallOfFameFlags }).from(user).where(eq(user.userId, userId)) : 
-        [{ hallOfFameFlags: { isFounder: false, isContributor: false, isAmbassador: false, isLegend: false } }];
-    
-    const updatedFlags = { ...(existingFlags[0].hallOfFameFlags as any), isFounder: true };
-    
-    await db.update(user)
-        .set({ 
-            founderNumber: nextNumber,
-            hallOfFameFlags: updatedFlags
-        })
+
+    const existingFlags = await db.select({ hallOfFameFlags: user.hallOfFameFlags })
+        .from(user)
         .where(eq(user.userId, userId));
-    
+
+    const updatedFlags = { ...(existingFlags[0]?.hallOfFameFlags as any ?? { isFounder: false, isContributor: false, isAmbassador: false, isLegend: false }), isFounder: true };
+
+    await db.update(user)
+        .set({ founderNumber: nextNumber, hallOfFameFlags: updatedFlags })
+        .where(eq(user.userId, userId));
+
     return nextNumber;
 }
 

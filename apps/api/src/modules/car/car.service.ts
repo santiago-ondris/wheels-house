@@ -362,7 +362,6 @@ export class CarService {
             await createGroupedCars({ carId, groupId });
         }
 
-        // Check if this is user's first real car after moving from wishlist - assign founder status
         const userCars = await getCarsFromUserId(carBeforeUpdate.userId);
         const realCars = userCars.filter(c => !c.wished);
         if (realCars.length === 1) {
