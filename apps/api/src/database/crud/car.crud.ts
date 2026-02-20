@@ -130,6 +130,11 @@ export async function getPicturesFromCar(carId: number) {
     return await db.select().from(carPicture).where(eq(carPicture.carId, carId)).orderBy(carPicture.index);
 }
 
+export async function getPicturesFromCarIds(carIds: number[]) {
+    if (!carIds || carIds.length === 0) return [];
+    return await db.select().from(carPicture).where(inArray(carPicture.carId, carIds)).orderBy(carPicture.index);
+}
+
 // Update
 
 export async function updateCar(carChanges: CarUpdateDTO, carId: number) {

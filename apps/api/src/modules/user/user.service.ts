@@ -16,7 +16,7 @@ import {
     deleteFeedEventsFromUserId,
     deleteUserGameAttemptsFromUserId
 } from 'src/database/crud/user.crud';
-import { deleteAllCarPictures, deleteCarsFromUserId, deleteFeedEventsFromCarId, getCarsFromUserId, getPicturesFromCar } from 'src/database/crud/car.crud';
+import { deleteAllCarPictures, deleteCarsFromUserId, deleteFeedEventsFromCarId, getCarsFromUserId, getPicturesFromCar, getPicturesFromCarIds } from 'src/database/crud/car.crud';
 import { deleteFeedEventsFromGroupId, deleteGroupedCarsFromCarId, deleteGroupedCarsFromGroupId, deleteGroupsFromUserId, getGroupsFromUserId } from 'src/database/crud/group.crud';
 import * as FollowsRepository from '../social/follows/follows.repository';
 import * as likesRepository from '../social/likes/likes.repository';
@@ -168,9 +168,21 @@ export class UserService {
             isFollower = await FollowsRepository.isFollowing(userData.userId, currentUserId);
         }
 
+        const carIds = carsFromDB.map(c => c.carId);
+        const allCarPictures = await getPicturesFromCarIds(carIds);
+
+        // Group pictures by carId
+        const picturesByCarId = allCarPictures.reduce((acc, pic) => {
+            if (!acc[pic.carId]) {
+                acc[pic.carId] = [];
+            }
+            acc[pic.carId].push(pic);
+            return acc;
+        }, {} as Record<number, typeof allCarPictures[0][]>);
+
         const cars: PublicCarDTO[] = [];
         for (const car of carsFromDB) {
-            const carPicturesFromDB = await getPicturesFromCar(car.carId);
+            const carPicturesFromDB = picturesByCarId[car.carId] || [];
             const pictureUrls = carPicturesFromDB.map(p => p.url);
 
             cars.push(new PublicCarDTO(
